@@ -1,0 +1,18 @@
+[
+    { "id": "ALV", "name": "Aluva", "code": "ALV", "line": "Line 1", "order": 1 },
+    { "id": "PUL", "name": "Pulinchodu", "code": "PUL", "line": "Line 1", "order": 2 },
+    { "id": "COM", "name": "Companypady", "code": "COM", "line": "Line 1", "order": 3 },
+    { "id": "SNJ", "name": "SN Junction", "code": "SNJ", "line": "Line 1", "order": 4 },
+    { "id": "AMB", "name": "Ambattukavu", "code": "AMB", "line": "Line 1", "order": 5 },
+    { "id": "KAK", "name": "Kakkanad", "code": "KAK", "line": "Line 1", "order": 6 },
+    { "id": "PAL", "name": "Palarivattom", "code": "PAL", "line": "Line 1", "order": 7 },
+    { "id": "EDA", "name": "Edapally", "code": "EDA", "line": "Line 1", "order": 8 },
+    { "id": "MUT", "name": "Muttom", "code": "MUT", "line": "Line 1", "order": 9 },
+    { "id": "KAL", "name": "Kaloor", "code": "KAL", "line": "Line 1", "order": 10 },
+    { "id": "LIS", "name": "Lissie", "code": "LIS", "line": "Line 1", "order": 11 },
+    { "id": "MGR", "name": "M.G. Road", "code": "MGR", "line": "Line 1", "order": 12 },
+    { "id": "ERS", "name": "Ernakulam South", "code": "ERS", "line": "Line 1", "order": 13 },
+    { "id": "VYT", "name": "Vyttila", "code": "VYT", "line": "Vyttila Extension", "order": 14 },
+    { "id": "THY", "name": "Thykoodam", "code": "THY", "line": "Vyttila Extension", "order": 15 },
+    { "id": "SEA", "name": "Seaport", "code": "SEA", "line": "Vyttila Extension", "order": 16 }
+]
