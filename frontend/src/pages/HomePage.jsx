@@ -25,6 +25,38 @@ function HomePage({ onNavigate }) {
     const fromDropdownRef = useRef(null);
     const toDropdownRef = useRef(null);
     const [imageAvailable, setImageAvailable] = useState(true);
+    const [currentSlide, setCurrentSlide] = useState(0);
+
+    const sliderImages = [
+        '/images/homepagesliderimages/image1.png',
+        '/images/homepagesliderimages/image2.png',
+        '/images/homepagesliderimages/image3.png',
+        '/images/homepagesliderimages/image4.png',
+        '/images/homepagesliderimages/image5.png',
+        '/images/homepagesliderimages/image6.png'
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide(prev => (prev + 1) % sliderImages.length);
+        }, 3500);
+        return () => clearInterval(timer);
+    }, []);
+
+    const [currentNoticeIndex, setCurrentNoticeIndex] = useState(0);
+    const notices = [
+        "Attention Kochi commuters: Due to a high-profile visit, traffic restrictions will be in place across parts of the city. Use the Metro to avoid delays. Parents and Ward SSC students - please take the metro to reach exam centers on time.",
+        "New feeder bus service launched from Aluva Station! Connect seamlessly to Kochi Airport. Service starts 6:00 AM daily. Check the 'Feeder' section for routes.",
+        "Maintenance Alert: Elevator access at Edappally Station will be restricted for scheduled maintenance this Sunday, 10 AM to 2 PM. Please use alternate exits.",
+        "Go Green with Kochi Metro! Save over 50% on monthly passes. Visit your nearest ticket counter or recharge online today for exclusive discounts."
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentNoticeIndex(prev => (prev + 1) % notices.length);
+        }, 6000);
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         fetchStations();
@@ -209,59 +241,104 @@ function HomePage({ onNavigate }) {
         <div className="home-page page-content-above-video">
             {/* Main Welcome Section with Image */}
             <div className="welcome-section">
-                <div className="welcome-content">
-                    <div className="metro-image">
-                        {/* Use VideoBackground component with oip(1) as background (poster/src). Adjust overlayOpacity to ensure text contrast */}
-                        {/* If you have an mp4, set src to '/images/oip1.mp4' and poster to '/images/oip1.jpg' */}
-                        {/* Using poster-only ensures a static background if video not available */}
-                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                            {/* VideoBackground is fixed to viewport; ensure page content has class 'page-content-above-video' to sit above it */}
-                            {/* Provide a darker overlay for better readability */}
-                            {/* Use poster image oip(1) */}
-                            {/* render VideoBackground at top-level via portal-like fixed positioning; include once per page */}
+                <div className="parent">
+                    <div className="div1">
+                        <div style={{ width: '100%', height: '100%', overflow: 'hidden', borderRadius: '12px', position: 'relative' }}>
+                            <img
+                                src="https://media1.tenor.com/m/rASIofnw47IAAAAd/mumbai-metro-mumbai.gif?w=1080&h=1920"
+                                alt="Metro Animation"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'right', display: 'block' }}
+                                onError={(e) => { e.currentTarget.src = '/vite.svg'; }}
+                            />
                         </div>
+                    </div>
+                    <div className="div2">
+                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            {sliderImages.map((src, index) => (
+                                <img
+                                    key={index}
+                                    src={src}
+                                    alt={`Metro Slide ${index + 1}`}
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover',
+                                        opacity: index === currentSlide ? 1 : 0,
+                                        transition: 'opacity 0.8s ease-in-out'
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="div3">
+                        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#0066b3' }}>Live Trains</h4>
+                                <LocalClock />
+                            </div>
+                            {liveTrains && liveTrains.length > 0 ? (
+                                <LiveTicker trains={liveTrains} />
+                            ) : (
+                                <div style={{ fontSize: '0.8rem', color: '#666' }}>No active trains</div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="div4">
                         <img
-                            src="/videos/5be6990fa9fe0c3863fb16b883d50506.gif"
-                            alt="Metro hero"
-                            className="home-hero-image"
-                            style={{ borderRadius: 8, maxWidth: '100%', maxHeight: 360 }}
-                            onError={(e) => { e.currentTarget.src = '/vite.svg'; }}
+                            src="/images/div4.png"
+                            alt="Metro Feature"
+                            style={{ width: '100%', height: '100%', objectFit: 'fill', display: 'block' }}
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
                     </div>
-                    <div style={{ marginLeft: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                            <h4 style={{ margin: 0 }}>Live Trains</h4>
-                            <div style={{ fontSize: 12, color: '#666' }}>• Local time: <LocalClock /></div>
-                        </div>
-                        {liveTrains && liveTrains.length > 0 ? (
-                            <div>
-                                {/* rotate highlighted train every few seconds for dynamic feeling */}
-                                <LiveTicker trains={liveTrains} />
+                    <div className="div5">
+                        <div className="notices-card">
+                            <div className="notices-header">
+                                <span className="notices-title">NOTICES & ALERTS</span>
+                                <svg className="external-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="7" y1="17" x2="17" y2="7" />
+                                    <polyline points="7 7 17 7 17 17" />
+                                </svg>
                             </div>
-                        ) : (
-                            <div>No live data</div>
-                        )}
-                    </div>
-
-                    <div className="welcome-text">
-                        <h2>Welcome to KMRL</h2>
-                        <p className="subtitle">Kochi Metro Rail Limited</p>
-                        <p className="description">
-                            Your smart metro travel companion for finding the best routes and calculating accurate fares.
-                            Sign in or create an account to get started.
-                        </p>
-                        <div className="features">
-                            <div className="feature-item">
-                                <span className="feature-icon">🚇</span>
-                                <p>Find Metro Routes</p>
+                            <div className="notices-content-area">
+                                <p className="notices-text" key={currentNoticeIndex} style={{ animation: 'fadeIn 0.5s ease' }}>
+                                    {notices[currentNoticeIndex]}
+                                </p>
                             </div>
-                            <div className="feature-item">
-                                <span className="feature-icon">💰</span>
-                                <p>Calculate Fares</p>
-                            </div>
-                            <div className="feature-item">
-                                <span className="feature-icon">⏱️</span>
-                                <p>Real-time Info</p>
+                            <div className="notices-controls">
+                                <div className="pagination-dots">
+                                    {notices.map((_, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`dot ${idx === currentNoticeIndex ? 'active' : ''}`}
+                                            onClick={() => setCurrentNoticeIndex(idx)}
+                                            style={{ cursor: 'pointer' }}
+                                        ></div>
+                                    ))}
+                                </div>
+                                <div className="nav-arrows">
+                                    <button
+                                        className="nav-btn"
+                                        onClick={() => setCurrentNoticeIndex(prev => (prev - 1 + notices.length) % notices.length)}
+                                        aria-label="Previous Notice"
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        className="nav-btn"
+                                        onClick={() => setCurrentNoticeIndex(prev => (prev + 1) % notices.length)}
+                                        aria-label="Next Notice"
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M5 12h14M12 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
