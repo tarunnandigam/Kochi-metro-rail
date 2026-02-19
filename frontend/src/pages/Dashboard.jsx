@@ -11,8 +11,8 @@ function Dashboard({ user, onLogout, onNavigate }) {
         savedAmount: 0,
         currentBalance: 450
     });
-    
-    
+
+
     const [walletBalance, setWalletBalance] = useState(450);
     const [transactions, setTransactions] = useState([
         { id: 1, description: 'Metro Journey - Aluva to MG Road', amount: 25, type: 'debit', date: new Date(Date.now() - 86400000) },
@@ -178,7 +178,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
         for (let line of metroLinesData) {
             const fromStn = (line.stations || []).find(s => s.name === from);
             const toStn = (line.stations || []).find(s => s.name === to);
-            
+
             if (fromStn && toStn) {
                 fromStation = fromStn;
                 toStation = toStn;
@@ -305,7 +305,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
 
     const handlePostNews = async (e) => {
         e.preventDefault();
-        
+
         // Only station masters and officers can post news
         if (user?.userType !== 'station_master' && user?.userType !== 'officer') {
             alert('Only station masters and officers can post news');
@@ -318,7 +318,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
             title: newsTitle,
             description: newsContent.substring(0, 100),
             content: newsContent,
-            date: new Date().toISOString().slice(0,10),
+            date: new Date().toISOString().slice(0, 10),
             postedByName: user?.fullName || 'Local User',
             priority: newsPriority
         };
@@ -397,10 +397,10 @@ function Dashboard({ user, onLogout, onNavigate }) {
             setActiveTab('wallet');
             return;
         }
-        
+
         const newBalance = walletBalance - ticketData.fare;
         setWalletBalance(newBalance);
-        
+
         const newBooking = {
             id: bookingHistory.length + 1,
             from: ticketData.fromStation,
@@ -412,7 +412,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
             status: 'Completed'
         };
         setBookingHistory([newBooking, ...bookingHistory]);
-        
+
         const debitTransaction = {
             id: transactions.length + 1,
             description: `Journey: ${ticketData.fromStation} → ${ticketData.toStation}`,
@@ -421,7 +421,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
             date: new Date()
         };
         setTransactions([debitTransaction, ...transactions]);
-        
+
         alert(`✓ Ticket booked successfully!\n\nFrom: ${ticketData.fromStation}\nTo: ${ticketData.toStation}\nFare: ₹${ticketData.fare}\nLine: ${ticketData.lineName}\nTime: ${ticketData.estimatedTime || '30 mins'}\n\nRemaining Balance: ₹${newBalance}`);
         closeBookingModal();
     };
@@ -429,31 +429,6 @@ function Dashboard({ user, onLogout, onNavigate }) {
     return (
         <div className="dashboard-container page-content-above-video">
             <VideoBackground src="/images/dashboard.jpg" poster="/images/dashboard.jpg" overlayOpacity={0.36} />
-            {/* video removed per request */}
-            {/* Header */}
-            <div className="dashboard-header">
-                <div className="header-content">
-                    <div className="logo-section">
-                        <h1>🚇 KMRL Metro</h1>
-                        <p>Dashboard</p>
-                    </div>
-                    <div className="user-section">
-                        <div className="user-info">
-                            <span className="user-name">{user?.fullName || user?.username}</span>
-                            <span className="user-email">{user?.email}</span>
-                            {user?.userType && user?.userType !== 'customer' && (
-                                <span className="user-role" style={{color: 'orange', marginTop: '5px'}}>
-                                    {user?.userType === 'station_master' ? '🚇 Station Master' : '👮 KMRL Officer'}
-                                </span>
-                            )}
-                        </div>
-                        <button className="btn-logout" onClick={handleLogout}>
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             {/* Navigation Tabs */}
             <div className="dashboard-nav">
                 <button
@@ -556,7 +531,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                 </div>
                             </div>
                             {(user?.userType === 'station_master' || user?.userType === 'officer') && (
-                                <div className="stat-card staff-card" style={{cursor: 'pointer'}} onClick={() => setActiveTab('post-news')}>
+                                <div className="stat-card staff-card" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('post-news')}>
                                     <div className="stat-icon">📝</div>
                                     <div className="stat-content">
                                         <h3>Post Station Update</h3>
@@ -681,8 +656,8 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                     </div>
                                 </div>
 
-                                <button 
-                                    className="btn-calculate-fare" 
+                                <button
+                                    className="btn-calculate-fare"
                                     onClick={handleCalculateFare}
                                 >
                                     Calculate Fare 🚀
@@ -723,25 +698,25 @@ function Dashboard({ user, onLogout, onNavigate }) {
                     <div className="tab-content">
                         <h2>⏱️ Real-time Metro Information</h2>
                         <div className="realtime-info-grid">
-                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('fare-calculator')} style={{cursor: 'pointer'}}>
+                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('fare-calculator')} style={{ cursor: 'pointer' }}>
                                 <div className="info-icon">🕐</div>
                                 <h3>Operating Hours</h3>
                                 <div className="info-details">
                                     <p><strong>Monday to Sunday:</strong></p>
                                     <p>6:00 AM - 10:00 PM</p>
-                                    <p style={{marginTop: '10px', fontSize: '0.9em', color: '#666'}}>
+                                    <p style={{ marginTop: '10px', fontSize: '0.9em', color: '#666' }}>
                                         Extended hours on weekends
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('realtime-info')} style={{cursor: 'pointer'}}>
+                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('realtime-info')} style={{ cursor: 'pointer' }}>
                                 <div className="info-icon">🚝</div>
                                 <h3>Service Status</h3>
                                 <div className="info-details">
                                     <p><strong>All Lines:</strong></p>
-                                    <p style={{color: 'green', fontWeight: 'bold'}}>✓ Running Normally</p>
-                                    <p style={{marginTop: '10px', fontSize: '0.9em'}}>
+                                    <p style={{ color: 'green', fontWeight: 'bold' }}>✓ Running Normally</p>
+                                    <p style={{ marginTop: '10px', fontSize: '0.9em' }}>
                                         Average waiting time: 2-3 minutes
                                     </p>
                                 </div>
@@ -752,9 +727,9 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                 <h3>Live Trains</h3>
                                 <div className="info-details">
                                     {liveTrains && liveTrains.length > 0 ? (
-                                        <ul style={{marginLeft: '16px'}}>
-                                            {liveTrains.slice(0,5).map((t, idx) => (
-                                                <li key={t.trainId || idx} style={{marginBottom: '6px'}}>
+                                        <ul style={{ marginLeft: '16px' }}>
+                                            {liveTrains.slice(0, 5).map((t, idx) => (
+                                                <li key={t.trainId || idx} style={{ marginBottom: '6px' }}>
                                                     <strong>{t.name}</strong> — {t.currentStation || 'N/A'} {t.delayedByMinutes ? `(Delay ${t.delayedByMinutes}m)` : ''}
                                                 </li>
                                             ))}
@@ -765,11 +740,11 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                 </div>
                             </div>
 
-                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('fare-calculator')} style={{cursor: 'pointer'}}>
+                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('fare-calculator')} style={{ cursor: 'pointer' }}>
                                 <div className="info-icon">🎫</div>
                                 <h3>Ticket Types</h3>
                                 <div className="info-details">
-                                    <ul style={{marginLeft: '20px'}}>
+                                    <ul style={{ marginLeft: '20px' }}>
                                         <li>Single Journey</li>
                                         <li>Day Pass</li>
                                         <li>Smart Card</li>
@@ -778,11 +753,11 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                 </div>
                             </div>
 
-                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('findmetro')} style={{cursor: 'pointer'}}>
+                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('findmetro')} style={{ cursor: 'pointer' }}>
                                 <div className="info-icon">🛂</div>
                                 <h3>Station Services</h3>
                                 <div className="info-details">
-                                    <ul style={{marginLeft: '20px'}}>
+                                    <ul style={{ marginLeft: '20px' }}>
                                         <li>ATM/Payment</li>
                                         <li>Food Court</li>
                                         <li>Lost & Found</li>
@@ -791,13 +766,13 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                 </div>
                             </div>
 
-                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('realtime-info')} style={{cursor: 'pointer'}}>
+                            <div className="info-card-dashboard" onClick={() => onNavigate && onNavigate('realtime-info')} style={{ cursor: 'pointer' }}>
                                 <div className="info-icon">👥</div>
                                 <h3>Crowd Status</h3>
                                 <div className="info-details">
                                     <p><strong>Peak Hours:</strong></p>
                                     <p>7-9 AM, 5-7 PM</p>
-                                    <p style={{marginTop: '10px', fontSize: '0.9em', color: '#ff6b6b'}}>
+                                    <p style={{ marginTop: '10px', fontSize: '0.9em', color: '#ff6b6b' }}>
                                         ⚠️ Avoid peak hours for comfortable travel
                                     </p>
                                 </div>
@@ -832,7 +807,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                         <li>✓ Flexible Routes</li>
                                         <li>✓ Pay Per Journey</li>
                                     </ul>
-                                    <button 
+                                    <button
                                         className="btn-book-ticket"
                                         onClick={() => {
                                             setTicketType('single');
@@ -858,7 +833,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                         <li>✓ Best for Frequent Travelers</li>
                                         <li>✓ Activates on First Use</li>
                                     </ul>
-                                    <button 
+                                    <button
                                         className="btn-book-ticket"
                                         onClick={() => {
                                             setTicketType('day-pass');
@@ -883,7 +858,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                         <li>✓ Great Value</li>
                                         <li>✓ Save up to 30%</li>
                                     </ul>
-                                    <button 
+                                    <button
                                         className="btn-book-ticket"
                                         onClick={() => {
                                             setTicketType('weekly-pass');
@@ -908,7 +883,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                         <li>✓ Maximum Savings</li>
                                         <li>✓ Best for Commuters</li>
                                     </ul>
-                                    <button 
+                                    <button
                                         className="btn-book-ticket"
                                         onClick={() => {
                                             setTicketType('monthly-pass');
@@ -933,7 +908,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                         <li>✓ No Expiry on Card</li>
                                         <li>✓ 10% Cashback</li>
                                     </ul>
-                                    <button 
+                                    <button
                                         className="btn-book-ticket"
                                         onClick={() => {
                                             setTicketType('smart-card');
@@ -958,7 +933,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                         <li>✓ Valid Student ID Required</li>
                                         <li>✓ Unlimited Journeys</li>
                                     </ul>
-                                    <button 
+                                    <button
                                         className="btn-book-ticket"
                                         onClick={() => alert('Please visit customer care with valid student ID')}
                                     >
@@ -969,7 +944,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                         </div>
 
                         {/* Ticket Comparison Table */}
-                        <div className="ticket-comparison" style={{marginTop: '40px'}}>
+                        <div className="ticket-comparison" style={{ marginTop: '40px' }}>
                             <h3>Ticket Types Comparison</h3>
                             <table className="comparison-table">
                                 <thead>
@@ -1027,7 +1002,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                 {activeTab === 'live-service' && (
                     <div className="tab-content">
                         <h2>📍 Live Metro Service Status</h2>
-                        
+
                         {/* Overall Status */}
                         <div className="live-service-overview" style={{ marginBottom: 24 }}>
                             <div className="status-card" style={{ backgroundColor: '#d4edda', borderLeft: '4px solid #28a745', padding: 16, borderRadius: 8 }}>
@@ -1377,28 +1352,28 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                     <>
                                         <div className="profile-field">
                                             <label>Full Name</label>
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 value={editData.fullName}
-                                                onChange={(e) => setEditData({...editData, fullName: e.target.value})}
+                                                onChange={(e) => setEditData({ ...editData, fullName: e.target.value })}
                                                 placeholder="Enter full name"
                                             />
                                         </div>
                                         <div className="profile-field">
                                             <label>Email</label>
-                                            <input 
-                                                type="email" 
+                                            <input
+                                                type="email"
                                                 value={editData.email}
-                                                onChange={(e) => setEditData({...editData, email: e.target.value})}
+                                                onChange={(e) => setEditData({ ...editData, email: e.target.value })}
                                                 placeholder="Enter email"
                                             />
                                         </div>
                                         <div className="profile-field">
                                             <label>Username</label>
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 value={editData.username}
-                                                onChange={(e) => setEditData({...editData, username: e.target.value})}
+                                                onChange={(e) => setEditData({ ...editData, username: e.target.value })}
                                                 placeholder="Enter username"
                                             />
                                         </div>

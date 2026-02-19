@@ -82,7 +82,7 @@ function HomePage({ onNavigate }) {
         } else {
             const filtered = allStations.filter(station =>
                 station.name.toLowerCase().includes(value.toLowerCase()) ||
-                (station.code||'').toLowerCase().includes(value.toLowerCase())
+                (station.code || '').toLowerCase().includes(value.toLowerCase())
             );
             setFromSuggestions(filtered);
         }
@@ -97,7 +97,7 @@ function HomePage({ onNavigate }) {
         } else {
             const filtered = allStations.filter(station =>
                 station.name.toLowerCase().includes(value.toLowerCase()) ||
-                (station.code||'').toLowerCase().includes(value.toLowerCase())
+                (station.code || '').toLowerCase().includes(value.toLowerCase())
             );
             setToSuggestions(filtered);
         }
@@ -207,23 +207,6 @@ function HomePage({ onNavigate }) {
 
     return (
         <div className="home-page page-content-above-video">
-            {/* video removed per request to avoid UI hiding issues */}
-            {/* Header with Sign In and Sign Up */}
-            <div className="home-header">
-                <div className="logo-section">
-                    <h1>KMRL</h1>
-                    <p>Kochi Metro Rail Limited</p>
-                </div>
-                <div className="auth-buttons">
-                    <button className="btn-signin" onClick={() => onNavigate('signin')}>
-                        Sign In
-                    </button>
-                    <button className="btn-signup" onClick={() => onNavigate('signup')}>
-                        Sign Up
-                    </button>
-                </div>
-            </div>
-
             {/* Main Welcome Section with Image */}
             <div className="welcome-section">
                 <div className="welcome-content">
@@ -245,10 +228,10 @@ function HomePage({ onNavigate }) {
                             onError={(e) => { e.currentTarget.src = '/vite.svg'; }}
                         />
                     </div>
-                    <div style={{marginLeft: '20px'}}>
-                        <div style={{display:'flex', alignItems:'baseline', gap:12}}>
-                            <h4 style={{margin:0}}>Live Trains</h4>
-                            <div style={{fontSize:12, color:'#666'}}>• Local time: <LocalClock /></div>
+                    <div style={{ marginLeft: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                            <h4 style={{ margin: 0 }}>Live Trains</h4>
+                            <div style={{ fontSize: 12, color: '#666' }}>• Local time: <LocalClock /></div>
                         </div>
                         {liveTrains && liveTrains.length > 0 ? (
                             <div>
@@ -259,7 +242,7 @@ function HomePage({ onNavigate }) {
                             <div>No live data</div>
                         )}
                     </div>
-                    
+
                     <div className="welcome-text">
                         <h2>Welcome to KMRL</h2>
                         <p className="subtitle">Kochi Metro Rail Limited</p>
@@ -290,7 +273,7 @@ function HomePage({ onNavigate }) {
                 <div className="section-container">
                     <h2>🚇 Find Your Metro Route</h2>
                     <p className="section-subtitle">Search and explore metro routes in Kochi</p>
-                    
+
                     {/* Scrollable Station List */}
                     {allStations.length > 0 && (
                         <div className="stations-list-section">
@@ -309,7 +292,7 @@ function HomePage({ onNavigate }) {
                             </div>
                         </div>
                     )}
-                    
+
                     <form onSubmit={handleSearchRoute} className="home-search-form">
                         <div className="search-inputs">
                             <div className="input-group" ref={fromDropdownRef}>
@@ -397,8 +380,8 @@ function HomePage({ onNavigate }) {
                                     </div>
                                     <p><strong>⏱️ Duration:</strong> {route.estimatedTime || 30} min</p>
                                     <p><strong>💰 Fare:</strong> ₹{route.fare || 20}</p>
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         className="btn-book-route"
                                         onClick={() => handleBookTicket(route)}
                                     >
@@ -416,7 +399,7 @@ function HomePage({ onNavigate }) {
                 <div className="section-container">
                     <h2>💰 Fare Calculator</h2>
                     <p className="section-subtitle">Calculate metro fares instantly</p>
-                    
+
                     <div className="fare-card">
                         <div className="fare-input-group">
                             <label>Distance (km)</label>
@@ -451,7 +434,7 @@ function HomePage({ onNavigate }) {
                 <div className="section-container">
                     <h2>⏱️ Real-time Metro Information</h2>
                     <p className="section-subtitle">Stay updated with metro operations</p>
-                    
+
                     <div className="info-grid">
                         <div className="info-card">
                             <div className="info-icon">🚇</div>
@@ -604,45 +587,45 @@ function LocalClock() {
     return <span style={{ fontSize: 12 }}>{fmt.format(now)}</span>;
 }
 
-        function LiveTicker({ trains }) {
-            const [index, setIndex] = useState(0);
-            const [now, setNow] = useState(Date.now());
+function LiveTicker({ trains }) {
+    const [index, setIndex] = useState(0);
+    const [now, setNow] = useState(Date.now());
 
-            useEffect(() => {
-                const iv = setInterval(() => {
-                    setIndex(i => (i + 1) % (trains.length || 1));
-                }, 8000);
-                return () => clearInterval(iv);
-            }, [trains.length]);
+    useEffect(() => {
+        const iv = setInterval(() => {
+            setIndex(i => (i + 1) % (trains.length || 1));
+        }, 8000);
+        return () => clearInterval(iv);
+    }, [trains.length]);
 
-            useEffect(() => {
-                const iv2 = setInterval(() => setNow(Date.now()), 1000); // refresh every 1s for accurate local time
-                return () => clearInterval(iv2);
-            }, []);
+    useEffect(() => {
+        const iv2 = setInterval(() => setNow(Date.now()), 1000); // refresh every 1s for accurate local time
+        return () => clearInterval(iv2);
+    }, []);
 
-            if (!trains || trains.length === 0) return null;
+    if (!trains || trains.length === 0) return null;
 
-            const t = trains[index];
-            const ts = t && t.timestamp ? new Date(t.timestamp) : null;
-            let updatedText = 'Updated: N/A';
-            const locale = (typeof navigator !== 'undefined' && navigator.language) ? navigator.language : 'en-US';
-            const fmt = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZoneName: 'short' });
-            if (ts) {
-                const diff = Math.floor((now - ts.getTime()) / 1000);
-                if (diff < 60) updatedText = 'Updated: just now';
-                else if (diff < 3600) updatedText = `Updated: ${Math.floor(diff / 60)}m ago`;
-                else updatedText = `Updated: ${fmt.format(ts)}`;
-            } else {
-                updatedText = `Updated: ${fmt.format(new Date(now))}`;
-            }
+    const t = trains[index];
+    const ts = t && t.timestamp ? new Date(t.timestamp) : null;
+    let updatedText = 'Updated: N/A';
+    const locale = (typeof navigator !== 'undefined' && navigator.language) ? navigator.language : 'en-US';
+    const fmt = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZoneName: 'short' });
+    if (ts) {
+        const diff = Math.floor((now - ts.getTime()) / 1000);
+        if (diff < 60) updatedText = 'Updated: just now';
+        else if (diff < 3600) updatedText = `Updated: ${Math.floor(diff / 60)}m ago`;
+        else updatedText = `Updated: ${fmt.format(ts)}`;
+    } else {
+        updatedText = `Updated: ${fmt.format(new Date(now))}`;
+    }
 
-            return (
-                <div style={{padding: '0.6rem 0.2rem'}}>
-                    <div style={{fontWeight: 700}}>{t.name || t.trainId}</div>
-                    <div style={{color:'#444'}}>{t.currentStation || 'N/A'} {t.delayedByMinutes ? `(Delay ${t.delayedByMinutes}m)` : ''}</div>
-                    <div style={{marginTop:6, fontSize:12, color:'#888'}}>{updatedText}</div>
-                </div>
-            );
-        }
+    return (
+        <div style={{ padding: '0.6rem 0.2rem' }}>
+            <div style={{ fontWeight: 700 }}>{t.name || t.trainId}</div>
+            <div style={{ color: '#444' }}>{t.currentStation || 'N/A'} {t.delayedByMinutes ? `(Delay ${t.delayedByMinutes}m)` : ''}</div>
+            <div style={{ marginTop: 6, fontSize: 12, color: '#888' }}>{updatedText}</div>
+        </div>
+    );
+}
 
-        export default HomePage;
+export default HomePage;

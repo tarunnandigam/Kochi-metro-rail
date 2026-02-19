@@ -33,7 +33,8 @@
     gap: 1rem;
 }
 
-.btn-signin, .btn-signup {
+.btn-signin,
+.btn-signup {
     padding: 0.7rem 1.5rem;
     border: none;
     border-radius: 5px;
@@ -103,7 +104,8 @@
 }
 
 /* Video hero styles */
-.home-hero-video, .home-hero-image {
+.home-hero-video,
+.home-hero-image {
     max-width: 460px;
     max-height: 360px;
     width: 100%;
@@ -114,29 +116,71 @@
 }
 
 /* gentle entrance animation for hero */
-.metro-image { animation: floatUp 520ms ease both; }
+.metro-image {
+    animation: floatUp 520ms ease both;
+}
 
 /* Additional subtle animations */
-.welcome-text { animation: slideIn 640ms cubic-bezier(.2,.9,.3,1) both; }
-.search-results-home .route-card-home { opacity: 0; transform: translateY(8px); animation: fadeInUp 420ms ease both; }
-.search-results-home .route-card-home:nth-child(1) { animation-delay: 60ms; }
-.search-results-home .route-card-home:nth-child(2) { animation-delay: 120ms; }
-.search-results-home .route-card-home:nth-child(3) { animation-delay: 180ms; }
-.feature-item { will-change: transform; }
+.welcome-text {
+    animation: slideIn 640ms cubic-bezier(.2, .9, .3, 1) both;
+}
+
+.search-results-home .route-card-home {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: fadeInUp 420ms ease both;
+}
+
+.search-results-home .route-card-home:nth-child(1) {
+    animation-delay: 60ms;
+}
+
+.search-results-home .route-card-home:nth-child(2) {
+    animation-delay: 120ms;
+}
+
+.search-results-home .route-card-home:nth-child(3) {
+    animation-delay: 180ms;
+}
+
+.feature-item {
+    will-change: transform;
+}
 
 @keyframes floatUp {
-    from { opacity: 0; transform: translateY(14px) scale(.995); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(.995);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-12px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .welcome-text h2 {
@@ -440,34 +484,48 @@
 
 /* Subtle animations to enhance UX */
 @keyframes floatUp {
-    0% { transform: translateY(6px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+        transform: translateY(6px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
-.live-item, .route-card-home, .station-card {
+.live-item,
+.route-card-home,
+.station-card {
     animation: floatUp 420ms ease both;
 }
 
-.btn-search-home, .btn-signup {
+.btn-search-home,
+.btn-signup {
     transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-.btn-search-home:active, .btn-signup:active {
+.btn-search-home:active,
+.btn-signup:active {
     transform: translateY(2px) scale(0.995);
 }
 
-.live-item { 
-    background: linear-gradient(180deg, rgba(255,255,255,0.9), white);
+.live-item {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), white);
     border-radius: 8px;
     padding: 0.8rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
     margin-bottom: 0.6rem;
 }
 
-.live-time { color: #0066b3; font-weight: 700; }
+.live-time {
+    color: #0066b3;
+    font-weight: 700;
+}
 
 .fare-input-group label {
     font-weight: 600;
@@ -607,7 +665,8 @@
     overflow-y: hidden;
     padding: 1rem 0;
     scroll-behavior: smooth;
-    height: 160px; /* increase height so station cards are larger for readability */
+    height: 160px;
+    /* increase height so station cards are larger for readability */
 }
 
 .scrollable-stations::-webkit-scrollbar {
@@ -635,7 +694,8 @@
     padding: 1.25rem;
     cursor: pointer;
     transition: all 0.3s;
-    min-height: 140px; /* larger card */
+    min-height: 140px;
+    /* larger card */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -658,7 +718,8 @@
 
 .station-card strong {
     font-weight: 700;
-    font-size: 1.05rem; /* slightly larger for readability */
+    font-size: 1.05rem;
+    /* slightly larger for readability */
 }
 
 .station-code {
@@ -719,6 +780,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -740,6 +802,7 @@
         transform: translateY(50px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;

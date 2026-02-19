@@ -80,13 +80,13 @@ function FindMetro({ onNavigate, user, onLogout }) {
         metroLinesData.forEach(line => {
             (line.stations || []).forEach(station => {
                 if (!stations.find(s => s.name === station.name)) {
-                    stations.push({ 
+                    stations.push({
                         name: station.name,
                         code: station.code || station.name.slice(0, 3).toUpperCase(),
                         lat: station.lat,
                         lng: station.lng,
-                        lineName: line.name, 
-                        lineColor: line.color 
+                        lineName: line.name,
+                        lineColor: line.color
                     });
                 }
             });
@@ -104,13 +104,13 @@ function FindMetro({ onNavigate, user, onLogout }) {
                     data.forEach(line => {
                         (line.stations || []).forEach(station => {
                             if (!backendStations.find(s => s.name === station.name)) {
-                                backendStations.push({ 
+                                backendStations.push({
                                     name: station.name,
                                     code: station.code || station.name.slice(0, 3).toUpperCase(),
                                     lat: station.lat,
                                     lng: station.lng,
-                                    lineName: line.name, 
-                                    lineColor: line.color 
+                                    lineName: line.name,
+                                    lineColor: line.color
                                 });
                             }
                         });
@@ -421,21 +421,6 @@ function FindMetro({ onNavigate, user, onLogout }) {
     };
     return (
         <div className="findmetro-container">
-            {/* Header */}
-            <div className="findmetro-header">
-                <div className="header-content">
-                    <div className="logo-section">
-                        <button className="btn-back" onClick={() => onNavigate('dashboard')}>← Back</button>
-                        <h1>🚇 Find Metro</h1>
-                        <p>Search Your Route</p>
-                    </div>
-                    <div className="user-section">
-                        <span>{user?.fullName || 'User'}</span>
-                        <button className="btn-logout" onClick={handleLogout}>Logout</button>
-                    </div>
-                </div>
-            </div>
-
             <div className="findmetro-content" style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 24 }}>
                 {/* Left column: lines, search, results */}
                 <div>
@@ -467,10 +452,10 @@ function FindMetro({ onNavigate, user, onLogout }) {
                         <h3 style={{ marginBottom: 8 }}>Live Trains</h3>
                         {liveTrains && liveTrains.length > 0 ? (
                             <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
-                                {liveTrains.slice(0,6).map((t, i) => (
+                                {liveTrains.slice(0, 6).map((t, i) => (
                                     <div key={i} style={{ minWidth: 150, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 10px rgba(0,0,0,0.06)' }}>
                                         <div style={{ fontWeight: 700 }}>{t.name}</div>
-                                        <div style={{ fontSize: 12 }}>{t.currentStation || '-' } → {t.nextStop || '-'}</div>
+                                        <div style={{ fontSize: 12 }}>{t.currentStation || '-'} → {t.nextStop || '-'}</div>
                                         <div style={{ fontSize: 12, color: t.delayedByMinutes ? '#c0392b' : '#2ecc71' }}>{t.delayedByMinutes ? `Delay ${t.delayedByMinutes}m` : t.status || 'Running'}</div>
                                     </div>
                                 ))}
@@ -661,7 +646,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                             )}
 
                                             <div style={{ marginTop: 12 }}>
-                                                <button 
+                                                <button
                                                     type="button"
                                                     className="btn-book"
                                                     onClick={() => handleBookTicket(route)}

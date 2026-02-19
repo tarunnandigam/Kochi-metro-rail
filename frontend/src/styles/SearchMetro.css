@@ -395,6 +395,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -407,18 +408,21 @@
     padding: 1rem 1.25rem;
     background: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     border-left: 5px solid #0066b3;
 }
+
 .live-trains-panel h3 {
     margin: 0 0 0.75rem 0;
     color: #0066b3;
 }
+
 .live-list {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
 }
+
 .live-item {
     display: flex;
     justify-content: space-between;
@@ -426,25 +430,30 @@
     padding: 0.6rem 0.8rem;
     border-radius: 8px;
     background: #f7fbff;
-    border: 1px solid rgba(0,102,179,0.06);
+    border: 1px solid rgba(0, 102, 179, 0.06);
 }
+
 .live-left {
     display: flex;
     flex-direction: column;
 }
+
 .live-sub {
     color: #444;
     font-size: 0.9rem;
 }
+
 .live-right {
     text-align: right;
     color: #333;
     font-size: 0.9rem;
 }
+
 .live-time {
     font-size: 0.8rem;
     color: #666;
 }
+
 .live-empty {
     color: #666;
     font-style: italic;
@@ -466,6 +475,7 @@
         transform: translateY(50px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;

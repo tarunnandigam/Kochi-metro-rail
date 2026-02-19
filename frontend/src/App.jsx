@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import Header from './components/Layout/Header';
 import HomePage from './pages/HomePage';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
@@ -26,8 +27,12 @@ function App() {
         setCurrentPage('home');
     };
 
+    // Pages that handle their own full-screen layout (auth pages)
+    const authPages = ['signin', 'signup'];
+    const isAuthPage = authPages.includes(currentPage);
+
     const renderPage = () => {
-        switch(currentPage) {
+        switch (currentPage) {
             case 'home':
                 return <HomePage onNavigate={setCurrentPage} />;
             case 'signup':
@@ -49,7 +54,19 @@ function App() {
 
     return (
         <div className="App">
-            {renderPage()}
+            {/* Global Header — shown on all pages except auth pages */}
+            {!isAuthPage && (
+                <Header
+                    isAuthenticated={isLoggedIn}
+                    user={user}
+                    onLogout={handleLogout}
+                    onNavigate={setCurrentPage}
+                    currentPage={currentPage}
+                />
+            )}
+            <main className={!isAuthPage ? 'app-main' : ''}>
+                {renderPage()}
+            </main>
             <Chatbot />
         </div>
     );

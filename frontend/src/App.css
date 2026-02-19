@@ -1,19 +1,27 @@
 .App {
     width: 100%;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
+
+.app-main {
+    flex: 1;
+    width: 100%;
+}
+
 
 .option-card {
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     background-color: #fff;
 }
 
 .option-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .option-card h3 {
@@ -33,15 +41,15 @@
     .welcome-header h1 {
         font-size: 2rem;
     }
-    
+
     .metro-options {
         grid-template-columns: 1fr;
     }
-    
+
     .SearchForm {
         grid-template-columns: 1fr;
     }
-    
+
     .switch-button {
         grid-column: 1;
         justify-self: center;

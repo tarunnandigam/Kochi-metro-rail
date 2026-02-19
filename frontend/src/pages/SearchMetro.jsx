@@ -7,22 +7,22 @@ import liveTrainsData from '../data/liveTrains.json';
 function SearchMetro({ onLogout, user, onNavigate }) {
     const [stations, setStations] = useState([
         { id: 1, name: 'Aluva', code: 'ALV', lineName: 'Aluva – M.G. Road' },
-            { id: 2, name: 'Pulinchodu', code: 'PUL', lineName: 'Aluva – M.G. Road' },
-            { id: 3, name: 'Companypady', code: 'COM', lineName: 'Aluva – M.G. Road' },
-            { id: 4, name: 'SN Junction', code: 'SNJ', lineName: 'Aluva – M.G. Road' },
-            { id: 5, name: 'Ambattukavu', code: 'AMB', lineName: 'Aluva – M.G. Road' },
-            { id: 6, name: 'Kakkanad', code: 'KAK', lineName: 'Aluva – M.G. Road' },
-            { id: 7, name: 'Palarivattom', code: 'PAL', lineName: 'Aluva – M.G. Road' },
-            { id: 8, name: 'Edapally', code: 'EDA', lineName: 'Aluva – M.G. Road' },
-            { id: 9, name: 'Muttom', code: 'MUT', lineName: 'Aluva – M.G. Road' },
-            { id: 10, name: 'Kaloor', code: 'KAL', lineName: 'Aluva – M.G. Road' },
-            { id: 11, name: 'Lissie', code: 'LIS', lineName: 'Aluva – M.G. Road' },
-            { id: 12, name: 'M.G. Road', code: 'MGR', lineName: 'Aluva – M.G. Road' },
-            { id: 13, name: 'Ernakulam South', code: 'ERS', lineName: 'Aluva – M.G. Road' },
-            { id: 14, name: 'Vyttila', code: 'VYT', lineName: 'Vyttila Extension' },
-            { id: 15, name: 'Thykoodam', code: 'THY', lineName: 'Vyttila Extension' },
-            { id: 16, name: 'Seaport', code: 'SEA', lineName: 'Vyttila Extension' }
-        ]);
+        { id: 2, name: 'Pulinchodu', code: 'PUL', lineName: 'Aluva – M.G. Road' },
+        { id: 3, name: 'Companypady', code: 'COM', lineName: 'Aluva – M.G. Road' },
+        { id: 4, name: 'SN Junction', code: 'SNJ', lineName: 'Aluva – M.G. Road' },
+        { id: 5, name: 'Ambattukavu', code: 'AMB', lineName: 'Aluva – M.G. Road' },
+        { id: 6, name: 'Kakkanad', code: 'KAK', lineName: 'Aluva – M.G. Road' },
+        { id: 7, name: 'Palarivattom', code: 'PAL', lineName: 'Aluva – M.G. Road' },
+        { id: 8, name: 'Edapally', code: 'EDA', lineName: 'Aluva – M.G. Road' },
+        { id: 9, name: 'Muttom', code: 'MUT', lineName: 'Aluva – M.G. Road' },
+        { id: 10, name: 'Kaloor', code: 'KAL', lineName: 'Aluva – M.G. Road' },
+        { id: 11, name: 'Lissie', code: 'LIS', lineName: 'Aluva – M.G. Road' },
+        { id: 12, name: 'M.G. Road', code: 'MGR', lineName: 'Aluva – M.G. Road' },
+        { id: 13, name: 'Ernakulam South', code: 'ERS', lineName: 'Aluva – M.G. Road' },
+        { id: 14, name: 'Vyttila', code: 'VYT', lineName: 'Vyttila Extension' },
+        { id: 15, name: 'Thykoodam', code: 'THY', lineName: 'Vyttila Extension' },
+        { id: 16, name: 'Seaport', code: 'SEA', lineName: 'Vyttila Extension' }
+    ]);
 
     const [searchData, setSearchData] = useState({
         fromStation: '',
@@ -75,13 +75,13 @@ function SearchMetro({ onLogout, user, onNavigate }) {
                 }
             } catch (error) {
                 console.error('Error fetching stations:', error);
-                const fallback = (fareStationsData || stations).map((s, idx) => ({ id: s.id || idx+1, code: (s.code||'').toString().toUpperCase(), name: s.name || s.stationName || '' }));
+                const fallback = (fareStationsData || stations).map((s, idx) => ({ id: s.id || idx + 1, code: (s.code || '').toString().toUpperCase(), name: s.name || s.stationName || '' }));
                 setStations(fallback);
             }
         } catch (error) {
             console.error('Error fetching stations:', error);
             // Keep default stations if API fails; fallback to local data
-            const fallback = (fareStationsData || stations).map((s, idx) => ({ id: s.id || idx+1, code: (s.code||'').toString().toUpperCase(), name: s.name || s.stationName || '' }));
+            const fallback = (fareStationsData || stations).map((s, idx) => ({ id: s.id || idx + 1, code: (s.code || '').toString().toUpperCase(), name: s.name || s.stationName || '' }));
             setStations(fallback);
         }
     };
@@ -111,7 +111,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
 
     const saveExternalFeed = (val) => {
         setExternalFeed(val);
-        try { localStorage.setItem('liveFeedUrl', val || ''); } catch (e) {}
+        try { localStorage.setItem('liveFeedUrl', val || ''); } catch (e) { }
     };
 
     const getStationName = (code) => {
@@ -144,29 +144,29 @@ function SearchMetro({ onLogout, user, onNavigate }) {
     };
 
     const calculateDistance = (fromCode, toCode) => {
-            const stationIndices = {
-                'ALV': 0, 'PUL': 1, 'COM': 2, 'SNJ': 3, 'AMB': 4, 'KAK': 5, 'PAL': 6,
-                'EDA': 7, 'MUT': 8, 'KAL': 9, 'LIS': 10, 'MGR': 11, 'ERS': 12,
-                'VYT': 13, 'THY': 14, 'SEA': 15
-            };
+        const stationIndices = {
+            'ALV': 0, 'PUL': 1, 'COM': 2, 'SNJ': 3, 'AMB': 4, 'KAK': 5, 'PAL': 6,
+            'EDA': 7, 'MUT': 8, 'KAL': 9, 'LIS': 10, 'MGR': 11, 'ERS': 12,
+            'VYT': 13, 'THY': 14, 'SEA': 15
+        };
 
-            const fromIdx = stationIndices[fromCode];
-            const toIdx = stationIndices[toCode];
+        const fromIdx = stationIndices[fromCode];
+        const toIdx = stationIndices[toCode];
 
-            if (fromIdx === undefined || toIdx === undefined) return 0;
+        if (fromIdx === undefined || toIdx === undefined) return 0;
 
-            return Math.abs(toIdx - fromIdx) * 2; // 2 km per station
+        return Math.abs(toIdx - fromIdx) * 2; // 2 km per station
     };
 
     const calculateFare = (distance, passengers) => {
-            let baseFare = 20; // Base fare in rupees
+        let baseFare = 20; // Base fare in rupees
 
-            if (distance <= 2) baseFare = 20;
-            else if (distance <= 6) baseFare = 25;
-            else if (distance <= 10) baseFare = 30;
-            else if (distance <= 14) baseFare = 35;
-            else if (distance <= 18) baseFare = 40;
-            else baseFare = 50;
+        if (distance <= 2) baseFare = 20;
+        else if (distance <= 6) baseFare = 25;
+        else if (distance <= 10) baseFare = 30;
+        else if (distance <= 14) baseFare = 35;
+        else if (distance <= 18) baseFare = 40;
+        else baseFare = 50;
 
         return baseFare * parseInt(passengers);
     };
@@ -252,7 +252,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
         (async () => {
             try {
                 const headers = {};
-                try { const token = localStorage.getItem('kmrl_token'); if (token) headers['Authorization'] = `Bearer ${token}`; } catch (e) {}
+                try { const token = localStorage.getItem('kmrl_token'); if (token) headers['Authorization'] = `Bearer ${token}`; } catch (e) { }
                 const resp = await fetch(ticketUrl, { headers });
                 if (!resp.ok) { window.open(ticketUrl, '_blank'); return; }
                 const blob = await resp.blob();
@@ -328,7 +328,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
             const fromIdx = route.indexOf(getStationName(from));
             const toIdx = route.indexOf(getStationName(to));
             if (fromIdx >= 0 && toIdx >= 0 && fromIdx < toIdx) {
-                const intermediate = route.slice(Math.max(0, fromIdx - 1), Math.min(route.length, toIdx + 2)).map(name => ({ code: (name || '').slice(0,3).toUpperCase(), name }));
+                const intermediate = route.slice(Math.max(0, fromIdx - 1), Math.min(route.length, toIdx + 2)).map(name => ({ code: (name || '').slice(0, 3).toUpperCase(), name }));
                 return {
                     lineId: t.trainNumber,
                     lineColor: '#0066b3',
@@ -369,28 +369,13 @@ function SearchMetro({ onLogout, user, onNavigate }) {
 
     return (
         <div className="search-metro-container">
-            {/* Header */}
-            <div className="search-header">
-                <div className="header-content">
-                    <div className="logo-section">
-                        <button className="btn-back" onClick={() => onNavigate && onNavigate('dashboard')}>← Back</button>
-                        <h1>KMRL</h1>
-                        <p>Kochi Metro Rail Limited</p>
-                    </div>
-                    <div className="user-section">
-                        <span>Welcome, {user?.fullName || 'User'}</span>
-                        <button className="btn-logout" onClick={onLogout}>Logout</button>
-                    </div>
-                </div>
-            </div>
-
             {/* Live Trains Panel */}
             <div className="live-trains-panel">
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3>Live Train Status</h3>
-                    <div style={{fontSize: 12}}>
-                        <label style={{marginRight:8}}>External feed:</label>
-                        <input type="text" placeholder="https://api.example.com" value={externalFeed} onChange={(e)=>saveExternalFeed(e.target.value)} style={{padding:'4px 6px', width:260}} />
+                    <div style={{ fontSize: 12 }}>
+                        <label style={{ marginRight: 8 }}>External feed:</label>
+                        <input type="text" placeholder="https://api.example.com" value={externalFeed} onChange={(e) => saveExternalFeed(e.target.value)} style={{ padding: '4px 6px', width: 260 }} />
                     </div>
                 </div>
                 {liveTrains && liveTrains.length > 0 ? (
@@ -423,7 +408,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
             {/* Main Search Section */}
             <div className="search-section">
                 <h2>Find Metro Routes</h2>
-                
+
                 <form onSubmit={handleSearchMetros} className="search-form">
                     <div className="form-row">
                         <div className="form-group">
@@ -640,7 +625,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
                                     </div>
                                 </div>
 
-                                <button 
+                                <button
                                     type="button"
                                     className="btn-book"
                                     onClick={() => handleBookTicket(result)}
@@ -699,17 +684,17 @@ function SearchMetro({ onLogout, user, onNavigate }) {
 
                                 <div className="form-group">
                                     <label>Passenger Name</label>
-                                    <input type="text" value={passengerName} onChange={(e)=>setPassengerName(e.target.value)} placeholder="Full name" />
+                                    <input type="text" value={passengerName} onChange={(e) => setPassengerName(e.target.value)} placeholder="Full name" />
                                 </div>
 
                                 <div className="form-group">
                                     <label>Phone (optional)</label>
-                                    <input type="text" value={passengerPhone} onChange={(e)=>setPassengerPhone(e.target.value)} placeholder="Phone number" />
+                                    <input type="text" value={passengerPhone} onChange={(e) => setPassengerPhone(e.target.value)} placeholder="Phone number" />
                                 </div>
 
                                 <div className="form-group">
                                     <label>Email (optional — for ticket delivery)</label>
-                                    <input type="email" value={passengerEmail} onChange={(e)=>setPassengerEmail(e.target.value)} placeholder="you@example.com" />
+                                    <input type="email" value={passengerEmail} onChange={(e) => setPassengerEmail(e.target.value)} placeholder="you@example.com" />
                                 </div>
 
                                 <div className="price-breakdown">
@@ -751,7 +736,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
                                         <p style={{ color: 'green' }}>Booking successful! ID: {bookingResponse.data.bookingId}</p>
                                         <button onClick={() => downloadTicket(bookingResponse.data.ticketUrl)}>Download Ticket</button>
                                         <div style={{ marginTop: '0.5rem' }}>
-                                            <input placeholder="Email address" value={passengerEmail} onChange={(e)=>setPassengerEmail(e.target.value)} />
+                                            <input placeholder="Email address" value={passengerEmail} onChange={(e) => setPassengerEmail(e.target.value)} />
                                             <button onClick={() => emailTicket(bookingResponse.data.bookingId, passengerEmail)}>Email Ticket</button>
                                         </div>
                                     </div>

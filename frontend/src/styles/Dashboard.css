@@ -124,6 +124,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -177,9 +178,20 @@
 
 /* Subtle dashboard animations to improve perceived polish */
 @keyframes pulseSoft {
-    0% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-    50% { transform: scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
-    100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
 }
 
 .stat-card.pulse {
@@ -188,9 +200,17 @@
 
 /* animated gradient for welcome section */
 @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .welcome-section {
@@ -203,7 +223,11 @@
 .live-updates {
     transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
-.live-updates:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+
+.live-updates:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
 
 .stat-icon {
     font-size: 2.5rem;
@@ -848,6 +872,7 @@
         transform: translateX(400px);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -1047,6 +1072,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -1068,6 +1094,7 @@
         transform: translateY(50px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -1401,11 +1428,11 @@
     .ticket-types-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .comparison-table {
         font-size: 0.9rem;
     }
-    
+
     .comparison-table th,
     .comparison-table td {
         padding: 10px;
