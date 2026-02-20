@@ -479,8 +479,8 @@ function HomePage({ onNavigate }) {
             <section className="comprehensive-services-section">
                 <div className="section-container">
                     <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                        <div style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375' }}>Kochi Metro Rail</div>
-                        <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#39ae62', lineHeight: '1.2', marginTop: '0.5rem' }}>Comprehensive Services</div>
+                        <div style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', fontFamily: 'Urbanist, sans-serif' }}>Kochi Metro Rail</div>
+                        <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#39ae62', lineHeight: '1.2', marginTop: '0.5rem', fontFamily: 'Urbanist, sans-serif' }}>Comprehensive Services</div>
                     </h2>
                     <div className="services-grid-parent">
                         <div
@@ -688,7 +688,8 @@ function HomePage({ onNavigate }) {
                 </div>
             </section>
 
-            {/* Fare Calculator Section */}
+            {/* Fare Calculator Section (Commented Out) */}
+            {/* 
             <section className="fare-calculator-section">
                 <div className="section-container">
                     <h2>💰 Fare Calculator</h2>
@@ -722,9 +723,192 @@ function HomePage({ onNavigate }) {
                     </div>
                 </div>
             </section>
+            */}
 
-            {/* Real-time Info Section */}
-            <section className="realtime-info-section">
+            {/* Experience Section */}
+            <section className="experience-section" style={{ padding: '3rem 1rem', background: '#fff' }}>
+                <div className="section-container">
+                    <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#0f172a', fontSize: '1.2rem', fontWeight: '500' }}>
+                        Experience the perfect blend of
+                    </h2>
+                    <h3 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '2.8rem', fontWeight: '800', fontFamily: 'Urbanist, sans-serif' }}>
+                        <span style={{ color: '#ae8639' }}>Speed</span><span style={{ color: '#a5ae39' }}>{', '}</span>
+                        <span style={{ color: '#a5ae39' }}>Convenience</span><span style={{ color: '#a5ae39' }}>{', & '}</span>
+                        <span style={{ color: '#39ae62' }}>Sustainability.</span>
+                    </h3>
+
+                    <div className="experience-parent">
+                        <div className="experience-div1">
+                            {/* Text overlay - top left */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '1.5rem',
+                                left: '1.5rem',
+                                zIndex: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px'
+                            }}>
+                                <h1 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '600',
+                                    fontSize: '32px',
+                                    lineHeight: '1.25',
+                                    fontStyle: 'bold',
+                                    textAlign: 'left',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    Smooth Rides, Stress-Free Commutes
+                                </h1>
+                                <h2 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '500',
+                                    fontSize: '14px',
+                                    lineHeight: '1.25',
+                                    textAlign: 'left',
+                                    maxWidth: '294px',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    Experience Seamless Journeys, Every Day.
+                                </h2>
+                            </div>
+                            {/* Background image */}
+                            <img
+                                src="/images/pic1.png"
+                                alt="Speed"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain',
+                                    objectPosition: 'bottom right',
+                                    display: 'block'
+                                }}
+                            />
+                        </div>
+                        <div className="experience-div2">
+                            {/* Text overlay - top left */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '1.5rem',
+                                left: '1.5rem',
+                                zIndex: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '4px'
+                            }}>
+                                <h3 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '600',
+                                    fontSize: '22px',
+                                    lineHeight: '1.25',
+                                    textAlign: 'left',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    Seamless ticket
+                                </h3>
+                                <h1 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '600',
+                                    fontSize: '32px',
+                                    lineHeight: '1.25',
+                                    textAlign: 'left',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    booking experience
+                                </h1>
+                                <h2 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '500',
+                                    fontSize: '14px',
+                                    lineHeight: '1.25',
+                                    textAlign: 'left',
+                                    maxWidth: '325px',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    Utilize our interactive maps to effortlessly plan your route
+                                </h2>
+                            </div>
+                            {/* Background image */}
+                            <img
+                                src="/images/pic2.png"
+                                alt="Convenience"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain',
+                                    objectPosition: 'bottom right',
+                                    display: 'block'
+                                }}
+                            />
+                        </div>
+                        <div className="experience-div3">
+                            {/* Text overlay - top left */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '1.5rem',
+                                left: '1.5rem',
+                                zIndex: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px'
+                            }}>
+                                <h1 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '600',
+                                    fontSize: '32px',
+                                    lineHeight: '1.25',
+                                    textAlign: 'left',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    Accessibility for all
+                                </h1>
+                                <h2 style={{
+                                    margin: 0,
+                                    color: '#ffffff',
+                                    fontWeight: '500',
+                                    fontSize: '14px',
+                                    lineHeight: '1.25',
+                                    textAlign: 'left',
+                                    maxWidth: '360px',
+                                    fontFamily: 'Urbanist, sans-serif'
+                                }}>
+                                    Our stations and trains are designed to be accessible for everyone, including passengers with disabilities.
+                                </h2>
+                            </div>
+                            {/* Background image */}
+                            <img
+                                src="/images/pic3.png"
+                                alt="Sustainability"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain',
+                                    objectPosition: 'bottom right',
+                                    display: 'block'
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Real-time Info Section - commented out for now */}
+            {/* <section className="realtime-info-section">
                 <div className="section-container">
                     <h2>⏱️ Real-time Metro Information</h2>
                     <p className="section-subtitle">Stay updated with metro operations</p>
@@ -756,6 +940,143 @@ function HomePage({ onNavigate }) {
                             <h3>Live Updates</h3>
                             <p><strong>Stay Connected:</strong></p>
                             <p>Sign in for real-time alerts</p>
+                        </div>
+                    </div>
+                </div>
+            </section> */}
+
+            {/* New Banner Grid Section */}
+            <section style={{ padding: '4rem 5rem', background: '#fff' }}>
+                <div className="new-banner-parent">
+                    <div className="new-banner-div2" style={{ position: 'relative', overflow: 'hidden' }}>
+                        {/* footer1.png - left side */}
+                        <img
+                            src="/images/footer1.png"
+                            alt="Footer Banner Left"
+                            style={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                height: '50%',
+                                width: 'auto',
+                                objectFit: 'contain',
+                                objectPosition: 'left bottom',
+                                display: 'block'
+                            }}
+                        />
+                        {/* footer.png - right side */}
+                        <img
+                            src="/images/footer.png"
+                            alt="Footer Banner Right"
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                height: '100%',
+                                width: 'auto',
+                                objectFit: 'contain',
+                                objectPosition: 'right center',
+                                display: 'block'
+                            }}
+                        />
+                        {/* Left-center text */}
+                        <div style={{
+                            position: 'relative',
+                            zIndex: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-start',
+                            justifyContent: 'center',
+                            textAlign: 'left',
+                            gap: '8px',
+                            padding: '0 2rem'
+                        }}>
+                            <p style={{
+                                margin: 0,
+                                fontSize: '1rem',
+                                fontWeight: '500',
+                                color: '#334e68',
+                                lineHeight: '1.5',
+                                fontFamily: 'Urbanist, sans-serif'
+                            }}>
+                                Your Journey, Your Way
+                            </p>
+                            <h1 style={{
+                                margin: 0,
+                                fontSize: '2.5rem',
+                                fontWeight: '800',
+                                color: '#0f172a',
+                                lineHeight: '1.2',
+                                fontFamily: 'Urbanist, sans-serif'
+                            }}>
+                                Download the Kochi Metro <br />Mobile App Today!
+                            </h1>
+
+                            {/* App Store Buttons */}
+                            <div style={{
+                                marginTop: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                flexWrap: 'wrap'
+                            }}>
+                                {/* Play Store */}
+                                <a
+                                    href="https://play.google.com/store/apps/details?id=com.metroconnect3.app"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '14px',
+                                        backgroundColor: '#000',
+                                        borderRadius: '10px',
+                                        height: '54px',
+                                        padding: '0 20px',
+                                        textDecoration: 'none',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                        transition: 'box-shadow 0.2s'
+                                    }}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="29" height="31" viewBox="0 0 29 31" fill="none">
+                                        <path d="M15.3445 13.8594L19.5445 9.35938L3.24453 0.559375C3.14453 0.459375 2.94453 0.459375 2.64453 0.359375L15.3445 13.8594Z" fill="#00F076" />
+                                        <path d="M21.3445 20.3594L27.2445 17.1594C27.9445 16.7594 28.3445 16.1594 28.3445 15.3594C28.3445 14.5594 27.9445 13.8594 27.2445 13.5594L21.3445 10.3594L16.6445 15.3594L21.3445 20.3594Z" fill="#FFC900" />
+                                        <path d="M0.74375 1.25928C0.44375 1.55928 0.34375 1.95928 0.34375 2.35928V28.3593C0.34375 28.7593 0.44375 29.1593 0.74375 29.5593L13.9438 15.3593L0.74375 1.25928Z" fill="#00D6FF" />
+                                        <path d="M15.3445 16.8594L2.64453 30.3594C2.84453 30.3594 3.04453 30.2594 3.24453 30.1594L19.5445 21.3594L15.3445 16.8594Z" fill="#FF3A44" />
+                                    </svg>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ color: '#fff', fontWeight: '400', fontSize: '0.8rem', lineHeight: '1.3', fontFamily: 'Urbanist, sans-serif' }}>Get it on</span>
+                                        <span style={{ color: '#fff', fontWeight: '800', fontSize: '1rem', textTransform: 'uppercase', lineHeight: '1.3', fontFamily: 'Urbanist, sans-serif' }}>Play Store</span>
+                                    </div>
+                                </a>
+
+                                {/* App Store */}
+                                <a
+                                    href="https://apps.apple.com/us/app/metroconnect3/id6723876321"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '14px',
+                                        backgroundColor: '#000',
+                                        borderRadius: '10px',
+                                        height: '54px',
+                                        padding: '0 20px',
+                                        textDecoration: 'none',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                        transition: 'box-shadow 0.2s'
+                                    }}
+                                >
+                                    <svg style={{ fill: '#fff' }} xmlns="http://www.w3.org/2000/svg" width="27" height="33" viewBox="0 0 27 33" fill="none">
+                                        <path d="M22.0586 17.3604C22.1033 22.2031 26.2822 23.8146 26.3286 23.8351C25.8177 25.4514 25.0761 26.9845 24.1269 28.3863C22.8008 30.3357 21.4246 32.2779 19.2567 32.3182C17.1265 32.3576 16.4415 31.0476 14.006 31.0476C11.5705 31.0476 10.8102 32.278 8.79365 32.3577C6.70094 32.4375 5.10744 30.2499 3.7707 28.3076C1.03862 24.3347 -1.04928 17.0811 1.75419 12.1843C3.14655 9.75338 5.63548 8.21355 8.3369 8.17408C10.3918 8.1346 12.3313 9.56464 13.5877 9.56464C14.844 9.56464 17.2001 7.84494 19.678 8.09755C20.7153 8.14093 23.6272 8.51898 25.4969 11.2718C25.3462 11.3657 22.0226 13.3119 22.0586 17.3606V17.3604ZM18.0552 5.4696C19.1662 4.1169 19.9141 2.23389 19.7101 0.359863C18.1082 0.424656 16.1721 1.43325 15.0235 2.78515C13.9937 3.98202 13.0925 5.89852 13.3357 7.73503C15.1206 7.87394 16.9442 6.82264 18.0552 5.46914" />
+                                    </svg>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ color: '#fff', fontWeight: '400', fontSize: '0.8rem', lineHeight: '1.3', fontFamily: 'Urbanist, sans-serif' }}>Download From</span>
+                                        <span style={{ color: '#fff', fontWeight: '800', fontSize: '1rem', textTransform: 'uppercase', lineHeight: '1.3', fontFamily: 'Urbanist, sans-serif' }}>App Store</span>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
