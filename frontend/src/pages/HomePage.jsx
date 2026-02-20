@@ -3,6 +3,7 @@ import '../styles/HomePage.css';
 import VideoBackground from '../components/VideoBackground';
 import fareStationsData from '../data/fareStations.json';
 import liveTrainsData from '../data/liveTrains.json';
+import MapMetro from '../components/Metro/MapMetro';
 
 function HomePage({ onNavigate }) {
     const [metroLines, setMetroLines] = useState([]);
@@ -346,128 +347,344 @@ function HomePage({ onNavigate }) {
             </div>
 
             {/* Find Metro Section */}
-            <section className="find-metro-section">
-                <div className="section-container">
-                    <h2>🚇 Find Your Metro Route</h2>
-                    <p className="section-subtitle">Search and explore metro routes in Kochi</p>
+            {/* Find Metro Section (Hidden) */}
+            {false && (
+                <section className="find-metro-section">
+                    <div className="section-container">
+                        <h2>🚇 Find Your Metro Route</h2>
+                        <p className="section-subtitle">Search and explore metro routes in Kochi</p>
 
-                    {/* Scrollable Station List */}
-                    {allStations.length > 0 && (
-                        <div className="stations-list-section">
-                            <h3>Available Stations</h3>
-                            <div className="scrollable-stations">
-                                {allStations.map((station, idx) => (
-                                    <div key={idx} className="station-card" onClick={() => setFromStation(station.name)}>
-                                        <div className="station-card-header">
-                                            <strong>{station.name}</strong>
-                                            <span className="station-code">{station.code}</span>
+                        {/* Scrollable Station List */}
+                        {allStations.length > 0 && (
+                            <div className="stations-list-section">
+                                <h3>Available Stations</h3>
+                                <div className="scrollable-stations">
+                                    {allStations.map((station, idx) => (
+                                        <div key={idx} className="station-card" onClick={() => setFromStation(station.name)}>
+                                            <div className="station-card-header">
+                                                <strong>{station.name}</strong>
+                                                <span className="station-code">{station.code}</span>
+                                            </div>
+                                            <small className="station-location">{station.location || 'Kochi'}</small>
+                                            <small className="station-area">{station.area || 'Kerala'}</small>
                                         </div>
-                                        <small className="station-location">{station.location || 'Kochi'}</small>
-                                        <small className="station-area">{station.area || 'Kerala'}</small>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSearchRoute} className="home-search-form">
+                            <div className="search-inputs">
+                                <div className="input-group" ref={fromDropdownRef}>
+                                    <label>From Station</label>
+                                    <div className="input-wrapper">
+                                        <input
+                                            type="text"
+                                            value={fromStation}
+                                            onChange={handleFromStationChange}
+                                            onFocus={() => {
+                                                setShowFromDropdown(true);
+                                                if (!fromStation.trim()) setFromSuggestions(allStations);
+                                            }}
+                                            placeholder="Search or select station..."
+                                            autoComplete="off"
+                                        />
+                                        {showFromDropdown && fromSuggestions.length > 0 && (
+                                            <div className="dropdown-list">
+                                                {fromSuggestions.map((station, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="dropdown-item"
+                                                        onClick={(e) => { e.stopPropagation(); selectFromStation(station); }}
+                                                    >
+                                                        <div className="station-info">
+                                                            <strong>{station.name}</strong>
+                                                            <span className="station-code">{station.code}</span>
+                                                        </div>
+                                                        <small>{station.location || 'Kochi'} - {station.area || 'Kerala'}</small>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="input-group" ref={toDropdownRef}>
+                                    <label>To Station</label>
+                                    <div className="input-wrapper">
+                                        <input
+                                            type="text"
+                                            value={toStation}
+                                            onChange={handleToStationChange}
+                                            onFocus={() => {
+                                                setShowToDropdown(true);
+                                                if (!toStation.trim()) setToSuggestions(allStations);
+                                            }}
+                                            placeholder="Search or select station..."
+                                            autoComplete="off"
+                                        />
+                                        {showToDropdown && toSuggestions.length > 0 && (
+                                            <div className="dropdown-list">
+                                                {toSuggestions.map((station, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="dropdown-item"
+                                                        onClick={(e) => { e.stopPropagation(); selectToStation(station); }}
+                                                    >
+                                                        <div className="station-info">
+                                                            <strong>{station.name}</strong>
+                                                            <span className="station-code">{station.code}</span>
+                                                        </div>
+                                                        <small>{station.location || 'Kochi'} - {station.area || 'Kerala'}</small>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="btn-search-home" disabled={loading}>
+                                {loading ? 'Searching...' : '🔍 Search Routes'}
+                            </button>
+                        </form>
+
+                        {searchResults.length > 0 && (
+                            <div className="search-results-home">
+                                <h3 style={{ gridColumn: '1 / -1' }}>Available Routes</h3>
+                                {searchResults.map((route, idx) => (
+                                    <div key={idx} className="route-card-home">
+                                        <div className="route-header-home">
+                                            <h4>{route.lineName}</h4>
+                                            <span className="stops-badge">{route.numberOfStops || 5} stops</span>
+                                        </div>
+                                        <p><strong>⏱️ Duration:</strong> {route.estimatedTime || 30} min</p>
+                                        <p><strong>💰 Fare:</strong> ₹{route.fare || 20}</p>
+                                        <button
+                                            type="button"
+                                            className="btn-book-route"
+                                            onClick={() => handleBookTicket(route)}
+                                        >
+                                            📱 Book Ticket
+                                        </button>
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
+                </section>
+            )}
 
-                    <form onSubmit={handleSearchRoute} className="home-search-form">
-                        <div className="search-inputs">
-                            <div className="input-group" ref={fromDropdownRef}>
-                                <label>From Station</label>
-                                <div className="input-wrapper">
-                                    <input
-                                        type="text"
-                                        value={fromStation}
-                                        onChange={handleFromStationChange}
-                                        onFocus={() => {
-                                            setShowFromDropdown(true);
-                                            if (!fromStation.trim()) setFromSuggestions(allStations);
-                                        }}
-                                        placeholder="Search or select station..."
-                                        autoComplete="off"
-                                    />
-                                    {showFromDropdown && fromSuggestions.length > 0 && (
-                                        <div className="dropdown-list">
-                                            {fromSuggestions.map((station, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="dropdown-item"
-                                                    onClick={(e) => { e.stopPropagation(); selectFromStation(station); }}
-                                                >
-                                                    <div className="station-info">
-                                                        <strong>{station.name}</strong>
-                                                        <span className="station-code">{station.code}</span>
-                                                    </div>
-                                                    <small>{station.location || 'Kochi'} - {station.area || 'Kerala'}</small>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+            {/* Kochi Metro's Line Comprehensive Services */}
+            <section className="comprehensive-services-section">
+                <div className="section-container">
+                    <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                        <div style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375' }}>Kochi Metro Rail</div>
+                        <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#39ae62', lineHeight: '1.2', marginTop: '0.5rem' }}>Comprehensive Services</div>
+                    </h2>
+                    <div className="services-grid-parent">
+                        <div
+                            className="services-div1"
+                            style={{ position: 'relative', background: '#f6f7fa' }}
+                        >
+                            {/* Radial Gradient Background */}
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: '20px',
+                                    opacity: 0.8,
+                                    background: 'radial-gradient(200px at 86.2px 3.9375px, rgba(23, 99, 212, 0.15), transparent 100%)',
+                                    pointerEvents: 'none'
+                                }}
+                            ></div>
 
-                            <div className="input-group" ref={toDropdownRef}>
-                                <label>To Station</label>
-                                <div className="input-wrapper">
-                                    <input
-                                        type="text"
-                                        value={toStation}
-                                        onChange={handleToStationChange}
-                                        onFocus={() => {
-                                            setShowToDropdown(true);
-                                            if (!toStation.trim()) setToSuggestions(allStations);
-                                        }}
-                                        placeholder="Search or select station..."
-                                        autoComplete="off"
+                            {/* Card Content */}
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                zIndex: 1,
+                                width: '100%',
+                                padding: '0 24px'
+                            }}>
+                                {/* Calculator Icon Circle with Image */}
+                                <div className="service-icon-container" style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <img
+                                        src="/images/farecal.svg"
+                                        alt="Fare Calculator"
+                                        style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentNode.innerHTML = '🧮'; }}
                                     />
-                                    {showToDropdown && toSuggestions.length > 0 && (
-                                        <div className="dropdown-list">
-                                            {toSuggestions.map((station, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="dropdown-item"
-                                                    onClick={(e) => { e.stopPropagation(); selectToStation(station); }}
-                                                >
-                                                    <div className="station-info">
-                                                        <strong>{station.name}</strong>
-                                                        <span className="station-code">{station.code}</span>
-                                                    </div>
-                                                    <small>{station.location || 'Kochi'} - {station.area || 'Kerala'}</small>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
+
+                                {/* Text */}
+                                <span style={{
+                                    fontSize: '1.375rem',
+                                    fontWeight: '600',
+                                    color: '#0f172a', /* primaryText */
+                                    lineHeight: '1.375', /* leading-snug */
+                                    textAlign: 'left'
+                                }}>
+                                    Fare Calculator
+                                </span>
                             </div>
                         </div>
-
-                        <button type="submit" className="btn-search-home" disabled={loading}>
-                            {loading ? 'Searching...' : '🔍 Search Routes'}
-                        </button>
-                    </form>
-
-                    {searchResults.length > 0 && (
-                        <div className="search-results-home">
-                            <h3 style={{ gridColumn: '1 / -1' }}>Available Routes</h3>
-                            {searchResults.map((route, idx) => (
-                                <div key={idx} className="route-card-home">
-                                    <div className="route-header-home">
-                                        <h4>{route.lineName}</h4>
-                                        <span className="stops-badge">{route.numberOfStops || 5} stops</span>
-                                    </div>
-                                    <p><strong>⏱️ Duration:</strong> {route.estimatedTime || 30} min</p>
-                                    <p><strong>💰 Fare:</strong> ₹{route.fare || 20}</p>
-                                    <button
-                                        type="button"
-                                        className="btn-book-route"
-                                        onClick={() => handleBookTicket(route)}
-                                    >
-                                        📱 Book Ticket
-                                    </button>
+                        <div className="services-div2" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f6f7fa', padding: '1.5rem', color: '#166534' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+                                <div className="service-icon-container" style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <img
+                                        src="/images/accessible-facility-svgrepo-com.svg"
+                                        alt="Facilities"
+                                        style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+                                    />
                                 </div>
-                            ))}
+                                <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', textAlign: 'left' }}>Facilities</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', fontSize: '1.5rem', marginBottom: '0.5rem', color: '#15803d' }}>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/1/1848.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/18561/18561555.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/3522/3522581.png" alt="Wheelchair" style={{ width: '22px', height: '22px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/13707/13707123.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/562/562678.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/9001/9001771.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                            </div>
+                            <h3 style={{
+                                color: 'black',
+                                fontWeight: '500',
+                                marginTop: '8px',
+                                textAlign: 'left',
+                                fontSize: '0.875rem',
+                                lineHeight: '1.375'
+                            }}>
+                                Facility for Women, Differently Abled & Parking
+                            </h3>
                         </div>
-                    )}
+                        <div className="services-div5" style={{ padding: 0, overflow: 'hidden', display: 'block', position: 'relative' }}>
+                            <div style={{ width: '100%', height: '100%' }}>
+                                <MapMetro height="100%" />
+                            </div>
+                            <button
+                                onClick={() => onNavigate('findmetro')}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '15px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    backgroundColor: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    padding: '8px 20px',
+                                    color: 'black',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    zIndex: 1000,
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.15)',
+                                    fontSize: '0.9rem',
+                                    transition: 'transform 0.2s ease'
+                                }}
+                                onMouseOver={(e) => { e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)'; }}
+                                onMouseOut={(e) => { e.currentTarget.style.transform = 'translateX(-50%) scale(1)'; }}
+                            >
+                                Interact with Map
+                            </button>
+                        </div>
+                        <div className="services-div6" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f6f7fa', padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
+                                <div className="service-icon-container" style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <img src="/images/train-station-svgrepo-com.svg" alt="Station" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+                                </div>
+                                <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', textAlign: 'left' }}>Know Your Station</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', fontSize: '1.2rem', marginBottom: '0.5rem', color: '#64748b' }}>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/28/28591.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/9001/9001771.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/2838/2838912.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/13707/13707123.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/1034/1034897.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/562/562678.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                            </div>
+                            <h3 style={{
+                                color: 'black',
+                                fontWeight: '500',
+                                marginTop: '5px',
+                                textAlign: 'left',
+                                fontSize: '0.875rem',
+                                lineHeight: '1.375'
+                            }}>
+                                everything you want to know about any station
+                            </h3>
+                        </div>
+                        <div className="services-div7" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', background: '#f6f7fa', padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div className="service-icon-container" style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <img src="/images/location-pin-svgrepo-com.svg" alt="Location" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', textAlign: 'left' }}>Nearby Places</span>
+                                    <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', textAlign: 'left' }}>Across Stations</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="services-div8" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f6f7fa', padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
+                                <div className="service-icon-container" style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <img src="/images/time-svgrepo-com.svg" alt="Time" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+                                </div>
+                                <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', textAlign: 'left' }}>First & Last<br />Metro Time</span>
+                            </div>
+                            <div style={{
+                                width: '100%',
+                                color: 'black',
+                                fontWeight: '500',
+                                fontSize: '0.875rem',
+                                lineHeight: '1.375',
+                                marginTop: '8px'
+                            }}>
+                                <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span>First metro runs from Aluva at 06:00 AM</span>
+                                    <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/2584/2584049.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span>Last metro runs from SN Junction <br></br>at 10:30 PM</span>
+                                    <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/3982/3982182.png" alt="Wheelchair" style={{ width: '21px', height: '21px', objectFit: 'contain' }} /></a></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="services-div9" style={{ flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-between', background: '#f6f7fa', padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
+                                <div className="service-icon-container" style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <img src="/images/trip-svgrepo-com.svg" alt="Connectivity" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+                                </div>
+                                <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#0f172a', lineHeight: '1.375', textAlign: 'left' }}>First & Last mile<br />connectivity</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', fontSize: '1.2rem', marginBottom: '0.5rem', color: '#64748b' }}>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/3124/3124381.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/1023/1023401.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/1034/1034897.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                                <span><a href='URL'><img src="https://cdn-icons-png.flaticon.com/128/565/565350.png" alt="Wheelchair" style={{ width: '28px', height: '28px', objectFit: 'contain' }} /></a></span>
+                            </div>
+                            <h3 style={{
+                                color: 'black',
+                                fontWeight: '500',
+                                marginTop: '8px',
+                                textAlign: 'left',
+                                fontSize: '0.875rem',
+                                lineHeight: '1.375'
+                            }}>
+                                Taxi, Bus & other public transport services.
+                            </h3>
+                        </div>
+                    </div>
                 </div>
             </section>
 
