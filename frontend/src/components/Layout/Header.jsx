@@ -5,12 +5,11 @@ import EmergencyImg from "../../assets/emergency.png";
 
 const NAV_ITEMS = [
     { label: "Home", page: "home" },
-    { label: "My Account", page: "dashboard" },
+    { label: "Recharge", page: null },
     { label: "Facilities", page: null },
-    { label: "Network", page: "findmetro" },
-    { label: "Plan Your Trip", page: "search" },
+    { label: "Plan Your Trip", page: "findmetro" },
     { label: "Help & Contact", page: null },
-    { label: "Book Ticket", page: "search", highlight: true },
+    { label: "Book Ticket", page: "findmetro", highlight: true },
     { label: "FAQ's", page: null },
 ];
 
@@ -40,7 +39,7 @@ const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPa
                     <span className="divider">|</span>
                     <span>English</span>
                     <span className="divider">|</span>
-                    <span onClick={() => nav(isAuthenticated ? "dashboard" : "signin")}>For Passengers</span>
+                    <span onClick={() => nav(isAuthenticated ? "home" : "signin")}>For Passengers</span>
                     <span className="divider">|</span>
                     <span>For Corporates</span>
                 </div>

@@ -18,7 +18,7 @@ function App() {
     const handleLogin = (userData) => {
         setIsLoggedIn(true);
         setUser(userData);
-        setCurrentPage('dashboard');
+        setCurrentPage('home');
     };
 
     const handleLogout = () => {

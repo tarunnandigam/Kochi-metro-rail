@@ -331,7 +331,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
                 const intermediate = route.slice(Math.max(0, fromIdx - 1), Math.min(route.length, toIdx + 2)).map(name => ({ code: (name || '').slice(0, 3).toUpperCase(), name }));
                 return {
                     lineId: t.trainNumber,
-                    lineColor: '#0066b3',
+                    lineColor: '#0d9488',
                     lineName: `${t.trainNumber} — ${t.name}`,
                     lineRoute: route.join(' → '),
                     crowdLevel: 'Moderate',

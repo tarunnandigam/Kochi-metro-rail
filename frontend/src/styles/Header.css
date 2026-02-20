@@ -12,8 +12,7 @@
 .main-header {
     width: 100%;
     font-family: 'Inter', Arial, Helvetica, sans-serif;
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 1000;
     box-shadow: 0 4px 24px rgba(0, 60, 130, 0.15);
     background: #fff;

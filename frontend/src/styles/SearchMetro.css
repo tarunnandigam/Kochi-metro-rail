@@ -1,10 +1,11 @@
 .search-metro-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    font-family: 'Urbanist', sans-serif;
 }
 
 .search-header {
-    background: linear-gradient(135deg, #0066b3 0%, #003f7f 100%);
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
     color: white;
     padding: 1.5rem 2rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -54,7 +55,7 @@
 
 .btn-back:hover {
     background: white;
-    color: #0066b3;
+    color: #0d9488;
     transform: translateX(-3px);
 }
 
@@ -77,16 +78,17 @@
 .search-section {
     max-width: 1000px;
     margin: 2rem auto;
-    padding: 2rem;
+    padding: 2.5rem;
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
 .search-section h2 {
-    color: #0066b3;
-    font-size: 1.8rem;
+    color: #0d9488;
+    font-size: 2rem;
     margin: 0 0 1.5rem 0;
+    font-weight: 700;
 }
 
 .search-form {
@@ -129,7 +131,7 @@
 
 .form-group select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230066b3' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230d9488' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.85rem center;
     padding-right: 2.5rem;
@@ -138,7 +140,7 @@
 
 .form-group select:hover {
     cursor: pointer;
-    background-color: #f9fbfc;
+    background-color: #f0fdfa;
 }
 
 .form-group select option {
@@ -151,8 +153,8 @@
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #0066b3;
-    box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.1);
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
 }
 
 .form-group input.input-error,
@@ -172,60 +174,71 @@
 
 .swap-button button {
     padding: 0.85rem 1rem;
-    background: #e8f4f8;
-    border: 2px solid #0066b3;
-    color: #0066b3;
-    border-radius: 8px;
+    background: #fff;
+    border: 2px solid #0d9488;
+    color: #0d9488;
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
     cursor: pointer;
     font-size: 1.2rem;
     transition: all 0.3s ease;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
 }
 
 .swap-button button:hover {
-    background: #0066b3;
+    background: #0d9488;
     color: white;
-    transform: rotate(180deg);
+    transform: rotate(180deg) scale(1.05);
+    box-shadow: 0 6px 14px rgba(13, 148, 136, 0.25);
 }
 
 .btn-search {
-    padding: 1rem;
-    background: linear-gradient(135deg, #0066b3 0%, #003f7f 100%);
+    padding: 1.2rem;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25);
+    font-family: 'Urbanist', sans-serif;
+    letter-spacing: 0.04em;
 }
 
 .btn-search:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 102, 179, 0.3);
+    box-shadow: 0 10px 25px rgba(13, 148, 136, 0.35);
 }
 
 .results-section {
     max-width: 1000px;
     margin: 0 auto 2rem;
-    padding: 2rem;
+    padding: 2.5rem;
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
 .results-section h3 {
-    color: #0066b3;
+    color: #0d9488;
     margin: 0 0 1.5rem 0;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .fare-info {
-    background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%);
+    background: linear-gradient(135deg, #f0fdfa 0%, #e6fbf7 100%);
     padding: 1.5rem;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-bottom: 2rem;
-    border-left: 5px solid #0066b3;
+    border-left: 5px solid #0d9488;
 }
 
 .fare-details {
@@ -244,7 +257,7 @@
 }
 
 .fare-item.total {
-    background: linear-gradient(135deg, #0066b3 0%, #003f7f 100%);
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
     color: white;
 }
 
@@ -263,7 +276,7 @@
     display: block;
     font-size: 1.5rem;
     font-weight: bold;
-    color: #0066b3;
+    color: #0d9488;
 }
 
 .fare-item.total .value {
@@ -279,14 +292,14 @@
 .service-card {
     background: white;
     border: 2px solid #ddd;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 1.5rem;
     transition: all 0.3s ease;
 }
 
 .service-card:hover {
-    border-color: #0066b3;
-    box-shadow: 0 8px 20px rgba(0, 102, 179, 0.15);
+    border-color: #0d9488;
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.15);
     transform: translateY(-5px);
 }
 
@@ -305,7 +318,7 @@
 .time .departure,
 .time .arrival {
     font-size: 1.2rem;
-    color: #0066b3;
+    color: #0d9488;
 }
 
 .time .arrow {
@@ -414,7 +427,8 @@
 
 .live-trains-panel h3 {
     margin: 0 0 0.75rem 0;
-    color: #0066b3;
+    color: #0d9488;
+    font-size: 1.4rem;
 }
 
 .live-list {
@@ -483,7 +497,7 @@
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #0066b3 0%, #003f7f 100%);
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
     color: white;
     padding: 2rem;
     display: flex;
@@ -515,16 +529,16 @@
 }
 
 .booking-summary {
-    background: #f0f7ff;
+    background: #f0fdfa;
     padding: 1.5rem;
-    border-radius: 10px;
-    border-left: 5px solid #0066b3;
+    border-radius: 12px;
+    border-left: 5px solid #0d9488;
     margin-bottom: 2rem;
 }
 
 .booking-summary h3 {
     margin-top: 0;
-    color: #0066b3;
+    color: #0d9488;
 }
 
 .booking-summary p {
@@ -575,7 +589,7 @@
 
 .price-breakdown h4 {
     margin: 0 0 1rem 0;
-    color: #0066b3;
+    color: #0d9488;
 }
 
 .price-row {
@@ -590,10 +604,10 @@
     font-weight: 700;
     font-size: 1.2rem;
     border-bottom: none;
-    border-top: 2px solid #0066b3;
+    border-top: 2px solid #0d9488;
     padding-top: 1rem;
     margin-top: 0.5rem;
-    color: #0066b3;
+    color: #0d9488;
 }
 
 .total-price {
@@ -631,13 +645,13 @@
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #0066b3 0%, #003f7f 100%);
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
     color: white;
 }
 
 .btn-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 102, 179, 0.3);
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.3);
 }
 
 .service-details {
@@ -745,17 +759,17 @@
 .dot {
     width: 12px;
     height: 12px;
-    background: #0066b3;
+    background: #0d9488;
     border-radius: 50%;
     border: 3px solid white;
-    box-shadow: 0 0 0 2px #0066b3;
+    box-shadow: 0 0 0 2px #0d9488;
     flex-shrink: 0;
 }
 
 .line {
     flex: 1;
     height: 3px;
-    background: linear-gradient(90deg, #0066b3, #ddd);
+    background: linear-gradient(90deg, #0d9488, #ddd);
     border-radius: 2px;
 }
 
@@ -764,7 +778,7 @@
     top: -25px;
     left: 50%;
     transform: translateX(-50%);
-    background: #0066b3;
+    background: #0d9488;
     color: white;
     padding: 0.3rem 0.8rem;
     border-radius: 15px;
@@ -796,17 +810,16 @@
 
 .detail-item .value {
     font-weight: 700;
-    color: #0066b3;
+    color: #0d9488;
     font-size: 1.1rem;
 }
 
-/* Intermediate Stations */
 .intermediate-stations {
     margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: #f9f9f9;
-    border-radius: 10px;
-    border-left: 4px solid #0066b3;
+    padding: 1.25rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border-left: 4px solid #0d9488;
 }
 
 .intermediate-stations h5 {
@@ -834,9 +847,9 @@
 }
 
 .station-tag:hover {
-    border-color: #0066b3;
-    background: #f0f7ff;
-    color: #0066b3;
+    border-color: #0d9488;
+    background: #f0fdfa;
+    color: #0d9488;
 }
 
 /* Timetable */
@@ -876,7 +889,7 @@
 
 .departure-time {
     font-weight: 700;
-    color: #0066b3;
+    color: #0d9488;
     min-width: 70px;
 }
 
@@ -893,10 +906,10 @@
 
 .timetable-footer {
     padding: 0.8rem 1rem;
-    background: #f0f7ff;
+    background: #f0fdfa;
     text-align: center;
     font-size: 0.85rem;
-    color: #0066b3;
+    color: #0d9488;
     font-weight: 600;
     border-top: 1px solid #ddd;
 }
@@ -933,8 +946,8 @@
 }
 
 .facility-tag:hover {
-    background: #f0f7ff;
-    border-color: #0066b3;
+    background: #f0fdfa;
+    border-color: #0d9488;
 }
 
 /* Travel Guide */

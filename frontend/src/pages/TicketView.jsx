@@ -35,7 +35,7 @@ function TicketView({ onNavigate }) {
         try {
             const headers = {};
             // include Authorization header if present in localStorage
-            try { const token = localStorage.getItem('kmrl_token'); if (token) headers['Authorization'] = `Bearer ${token}`; } catch (e) {}
+            try { const token = localStorage.getItem('kmrl_token'); if (token) headers['Authorization'] = `Bearer ${token}`; } catch (e) { }
             const resp = await fetch(ticketUrl, { headers });
             if (!resp.ok) {
                 // fallback to opening in new tab
@@ -87,21 +87,84 @@ function TicketView({ onNavigate }) {
     };
 
     return (
-        <div className="ticket-view page-content">
-            <div className="ticket-card">
-                <h2>KMRL Ticket</h2>
-                <p><strong>Booking ID:</strong> {booking.bookingId}</p>
-                <p><strong>From:</strong> {booking.fromStation}</p>
-                <p><strong>To:</strong> {booking.toStation}</p>
-                <p><strong>Fare:</strong> ₹{booking.fare}</p>
-                <p><strong>Passenger:</strong> {booking.passengerName || 'N/A'}</p>
-                <div className="ticket-actions">
-                    <button onClick={handleDownload} className="btn-primary">Download / View Ticket</button>
-                    <button onClick={handleEmail} className="btn-secondary" disabled={sendingEmail}>{sendingEmail ? 'Sending...' : 'Send to Email'}</button>
+        <div className="ticket-view">
+            <div className="ticket-wrapper">
+                <div className="ticket-premium-card">
+                    <div className="ticket-header">
+                        <h2 className="ticket-header-title">KOCHI METRO RAIL</h2>
+                        <div className="ticket-header-subtitle">DIGITAL TICKET</div>
+                    </div>
+
+                    <div className="ticket-body">
+                        <div className="ticket-notch-left"></div>
+                        <div className="ticket-notch-right"></div>
+                        <div className="ticket-dash-line"></div>
+
+                        <div className="ticket-route" style={{ marginTop: '12px' }}>
+                            <div className="ticket-station">
+                                <span className="ticket-station-label">FROM</span>
+                                <span className="ticket-station-code" style={{ color: '#4c1d95' }}>{booking.fromStation.substring(0, 4).toUpperCase()}</span>
+                                <span className="ticket-station-name">{booking.fromStation}</span>
+                            </div>
+                            <div className="ticket-arrow-icon">➔</div>
+                            <div className="ticket-station" style={{ alignItems: 'flex-end', textAlign: 'right' }}>
+                                <span className="ticket-station-label">TO</span>
+                                <span className="ticket-station-code" style={{ color: '#4c1d95' }}>{booking.toStation.substring(0, 4).toUpperCase()}</span>
+                                <span className="ticket-station-name">{booking.toStation}</span>
+                            </div>
+                        </div>
+
+                        <div className="ticket-qr-section">
+                            <div className="temp-qr-box">
+                                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" opacity="0.8">
+                                    <path d="M4 4h6v6H4V4zM14 4h6v6h-6V4zM4 14h6v6H4v-6z" stroke="#312e81" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <rect x="6" y="6" width="2" height="2" fill="#312e81" />
+                                    <rect x="16" y="6" width="2" height="2" fill="#312e81" />
+                                    <rect x="6" y="16" width="2" height="2" fill="#312e81" />
+                                    <path d="M14 14h6v6h-6v-6zM16 16h2v2h-2v-2z" fill="#312e81" />
+                                    <path d="M14 14h2v2h-2v-2zM18 14h2v2h-2v-2zM14 18h2v2h-2v-2zM18 18h2v2h-2v-2z" fill="#312e81" />
+                                </svg>
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '12px', fontWeight: 600 }}>
+                                SCAN TO ENTER STATION
+                            </div>
+                        </div>
+
+                        <div className="ticket-info-grid">
+                            <div className="ticket-info-item">
+                                <span className="ticket-info-label">BOOKING ID</span>
+                                <span className="ticket-info-value">{booking.bookingId || 'KMR-8X2M9'}</span>
+                            </div>
+                            <div className="ticket-info-item">
+                                <span className="ticket-info-label">FARE</span>
+                                <span className="ticket-info-value">₹ {booking.fare}</span>
+                            </div>
+                            <div className="ticket-info-item">
+                                <span className="ticket-info-label">PASSENGERS</span>
+                                <span className="ticket-info-value">{booking.passengers || '1'}</span>
+                            </div>
+                            <div className="ticket-info-item">
+                                <span className="ticket-info-label">DATE</span>
+                                <span className="ticket-info-value">{new Date().toLocaleDateString('en-GB')}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {emailResult && <div className="email-result">{emailResult}</div>}
-                <div style={{ marginTop: 12 }}>
-                    <button onClick={() => onNavigate('dashboard')} className="btn-link">Back to Dashboard</button>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <button onClick={handleDownload} className="ticket-btn btn-primary-ticket">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Ticket
+                    </button>
+                    <button onClick={handleEmail} className="ticket-btn btn-secondary-ticket" disabled={sendingEmail}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        {sendingEmail ? 'Sending...' : 'Send to Email'}
+                    </button>
+                    {emailResult && <div className="email-result" style={{ textAlign: 'center', fontSize: '0.85rem' }}>{emailResult}</div>}
+                </div>
+
+                <div className="ticket-view-home">
+                    <span onClick={() => onNavigate('home')}>Return to Home</span>
                 </div>
             </div>
         </div>

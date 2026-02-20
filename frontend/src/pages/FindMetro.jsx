@@ -8,6 +8,8 @@ function FindMetro({ onNavigate, user, onLogout }) {
     const [selectedLine, setSelectedLine] = useState(null);
     const [fromStation, setFromStation] = useState('');
     const [toStation, setToStation] = useState('');
+    const [tripDate, setTripDate] = useState(new Date().toISOString().split('T')[0]);
+    const [passengers, setPassengers] = useState('1');
     const [allStations, setAllStations] = useState([]);
     const [fromSuggestions, setFromSuggestions] = useState([]);
     const [toSuggestions, setToSuggestions] = useState([]);
@@ -26,6 +28,9 @@ function FindMetro({ onNavigate, user, onLogout }) {
     const [selectedStation, setSelectedStation] = useState(null);
     const fromDropdownRef = useRef(null);
     const toDropdownRef = useRef(null);
+    const resultsRef = useRef(null);
+    const [showJourneySummary, setShowJourneySummary] = useState(false);
+    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
     // Load metro lines and stations on component mount
     useEffect(() => {
@@ -230,29 +235,41 @@ function FindMetro({ onNavigate, user, onLogout }) {
                             });
                         }
                     });
-                    if (results.length > 0) setSearchResults(results);
-                    else {
+                    if (results.length > 0) {
+                        setSearchResults(results);
+                        setShowJourneySummary(true);
+                    } else {
                         const localRoute = computeLocalRoute(fromStation, toStation, selectedLine);
-                        if (localRoute) setSearchResults([localRoute]);
-                        else setErrors(prev => ({ ...prev, submit: 'No route found for selected stations' }));
+                        if (localRoute) {
+                            setSearchResults([localRoute]);
+                            setShowJourneySummary(true);
+                        } else setErrors(prev => ({ ...prev, submit: 'No route found for selected stations' }));
                     }
                 }
             } catch (err) {
                 console.error('Local route search failed:', err);
                 const localRoute = computeLocalRoute(fromStation, toStation, selectedLine);
-                if (localRoute) setSearchResults([localRoute]);
-                else setErrors(prev => ({ ...prev, submit: 'No route found for selected stations' }));
+                if (localRoute) {
+                    setSearchResults([localRoute]);
+                    setShowJourneySummary(true);
+                } else setErrors(prev => ({ ...prev, submit: 'No route found for selected stations' }));
             }
         } catch (error) {
             console.error('Error searching route:', error);
             const localRoute = computeLocalRoute(fromStation, toStation, selectedLine);
             if (localRoute) {
                 setSearchResults([localRoute]);
+                setShowJourneySummary(true);
             } else {
                 setErrors(prev => ({ ...prev, submit: 'Error searching routes. Please try again.' }));
             }
         } finally {
             setLoading(false);
+            setTimeout(() => {
+                if (resultsRef.current) {
+                    resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 150);
         }
     };
 
@@ -405,68 +422,242 @@ function FindMetro({ onNavigate, user, onLogout }) {
         const base = Number(selectedTrain?.fare || 0);
         if (!selectedTrain) return 0;
         switch (ticketType) {
-            case 'single':
-                return base;
-            case 'day-pass':
-                return base + 50;
-            case 'weekly-pass':
-                return 300;
-            case 'monthly-pass':
-                return 600;
-            case 'smart-card':
-                return 100; // card issuing price
-            default:
-                return base;
+            case 'single': return base;
+            case 'day-pass': return base + 50;
+            case 'weekly-pass': return 300;
+            case 'monthly-pass': return 600;
+            case 'smart-card': return 100; // card issuing price
+            default: return base;
         }
     };
+
+    if ((showJourneySummary || showPaymentOptions) && searchResults.length > 0) {
+        const route = searchResults[0];
+        const routeFare = route.fare || 10;
+        const totalFare = (routeFare * Number(passengers)).toFixed(0);
+        const distance = ((route.numberOfStops || 1) * 1.24).toFixed(2);
+
+        return (
+            <div className="fm-journey-summary-page">
+                <div className="fm-summary-container">
+                    <button className="fm-back-btn" onClick={() => {
+                        if (showPaymentOptions) {
+                            setShowPaymentOptions(false);
+                            setShowJourneySummary(true);
+                        } else {
+                            setShowJourneySummary(false);
+                        }
+                    }}>
+                        ← {showPaymentOptions ? 'Back to Summary' : 'Back to Search'}
+                    </button>
+
+                    {showJourneySummary && (
+                        <div className="fm-summary-card">
+                            <div className="fm-summary-header">
+                                <h3>JOURNEY SUMMARY</h3>
+                            </div>
+
+                            <div className="fm-stations-row">
+                                <div className="fm-station-col">
+                                    <span className="fm-st-label">FROM STATION</span>
+                                    <span className="fm-st-code" style={{ color: '#4c1d95' }}>{route.fromStation.substring(0, 4).toUpperCase()}</span>
+                                    <span className="fm-st-name">{route.fromStation}</span>
+                                </div>
+                                <div className="fm-st-arrow">➔</div>
+                                <div className="fm-station-col" style={{ alignItems: 'flex-end', textAlign: 'right' }}>
+                                    <span className="fm-st-label">TO STATION</span>
+                                    <span className="fm-st-code" style={{ color: '#4c1d95' }}>{route.toStation.substring(0, 4).toUpperCase()}</span>
+                                    <span className="fm-st-name">{route.toStation}</span>
+                                </div>
+                            </div>
+
+                            <div className="fm-date-row">
+                                <span className="fm-st-label">DATE OF DEPARTURE</span>
+                                <span className="fm-date-val">
+                                    {new Date(tripDate || new Date()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })},{' '}
+                                    {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+
+                            <div className="fm-dashed-divider"></div>
+
+                            <div className="fm-warning-box">
+                                This ticket is valid for the day of purchase.<br />
+                                QR tickets are non-refundable.<br />
+                                Metro Journey should be completed within 2 Hrs after entry.
+                            </div>
+
+                            <div className="fm-stats-box">
+                                <div className="fm-stat">
+                                    <div className="fm-stat-icon text-green">📍</div>
+                                    <div className="fm-stat-info">
+                                        <span className="fm-stat-lbl">Distance</span>
+                                        <span className="fm-stat-val">{distance} km</span>
+                                    </div>
+                                </div>
+                                <div className="fm-stat">
+                                    <div className="fm-stat-icon text-teal">🚆</div>
+                                    <div className="fm-stat-info">
+                                        <span className="fm-stat-lbl">Stations</span>
+                                        <span className="fm-stat-val">{route.numberOfStops || 1}</span>
+                                    </div>
+                                </div>
+                                <div className="fm-stat">
+                                    <div className="fm-stat-icon text-blue">↑</div>
+                                    <div className="fm-stat-info">
+                                        <span className="fm-stat-lbl">Journey</span>
+                                        <span className="fm-stat-val">One way</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="fm-pax-row">
+                                <div className="fm-pax-left">
+                                    <span className="fm-pax-lbl">Passengers</span>
+                                    <span className="fm-pax-sub">You can add up to 6 peoples</span>
+                                </div>
+                                <div className="fm-pax-controls">
+                                    <button type="button" onClick={() => setPassengers(p => Math.max(1, Number(p) - 1))}>−</button>
+                                    <span>{passengers}</span>
+                                    <button type="button" onClick={() => setPassengers(p => Math.min(6, Number(p) + 1))}>+</button>
+                                </div>
+                            </div>
+
+                            <div className="fm-dashed-divider"></div>
+
+                            <div className="fm-price-row">
+                                <div className="fm-price-left">
+                                    <span className="fm-price-val">₹ {totalFare}</span>
+                                    <span className="fm-price-sub">Inclusive of all taxes</span>
+                                </div>
+                                <button className="fm-proceed-btn" onClick={() => {
+                                    setShowJourneySummary(false);
+                                    setShowPaymentOptions(true);
+                                }}>
+                                    PROCEED TO PAY
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {showJourneySummary && !showPaymentOptions && (
+                        <div className="fm-payment-method-card" onClick={() => {
+                            setShowJourneySummary(false);
+                            setShowPaymentOptions(true);
+                        }}>
+                            <span className="fm-pm-lbl">SELECT PAYMENT METHOD</span>
+                            <span className="fm-pm-icon">˅</span>
+                        </div>
+                    )}
+
+                    {showPaymentOptions && (
+                        <>
+                            <div className="fm-summary-card" style={{ padding: '1.5rem 2rem' }}>
+                                <div className="fm-summary-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+                                    <h3 style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 800 }}>JOURNEY SUMMARY</h3>
+                                </div>
+
+                                <div className="fm-stations-row" style={{ marginBottom: '1rem' }}>
+                                    <div className="fm-station-col">
+                                        <span className="fm-st-label" style={{ fontSize: '0.75rem' }}>FROM STATION</span>
+                                        <span className="fm-st-code" style={{ fontSize: '1.8rem', color: '#4c1d95' }}>{route.fromStation.substring(0, 4).toUpperCase()}</span>
+                                        <span className="fm-st-name" style={{ fontSize: '0.85rem' }}>{route.fromStation}</span>
+                                    </div>
+                                    <div className="fm-st-arrow" style={{ fontSize: '1.2rem', marginTop: '1rem' }}>➔</div>
+                                    <div className="fm-station-col" style={{ alignItems: 'flex-end', textAlign: 'right' }}>
+                                        <span className="fm-st-label" style={{ fontSize: '0.75rem' }}>TO STATION</span>
+                                        <span className="fm-st-code" style={{ fontSize: '1.8rem', color: '#4c1d95' }}>{route.toStation.substring(0, 4).toUpperCase()}</span>
+                                        <span className="fm-st-name" style={{ fontSize: '0.85rem' }}>{route.toStation}</span>
+                                    </div>
+                                </div>
+
+                                <div className="fm-dashed-divider" style={{ margin: '1.2rem 0' }}></div>
+
+                                <div className="fm-price-row" style={{ alignItems: 'flex-start' }}>
+                                    <div className="fm-price-left">
+                                        <span className="fm-st-label" style={{ fontSize: '0.75rem', marginBottom: '0.2rem' }}>DATE OF DEPARTURE</span>
+                                        <span className="fm-date-val" style={{ fontSize: '1rem', color: '#312e81' }}>
+                                            {new Date(tripDate || new Date()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })},{' '}
+                                            {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span className="fm-price-val" style={{ fontSize: '1.6rem' }}>₹ {totalFare}</span>
+                                        <div className="fm-price-sub" style={{ fontSize: '0.75rem' }}>Inclusive of all taxes</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="fm-summary-card payment-options-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <span className="fm-pm-lbl" style={{ fontWeight: 800, color: '#334155', fontSize: '1rem', textTransform: 'uppercase' }}>SELECT PAYMENT METHOD</span>
+                                    <span className="fm-pm-icon" style={{ transform: 'rotate(180deg)', fontWeight: 800, color: '#334155' }}>˅</span>
+                                </div>
+
+                                <div className="fm-payment-option" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{ width: '40px', height: '40px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                                            <span style={{ fontWeight: 800, color: '#334155', fontSize: '0.95rem' }}>BillDesk</span>
+                                            <span style={{ fontSize: '0.85rem', color: '#0d9488', fontWeight: 600 }}>Pay with UPI, Card, Net banking Etc.</span>
+                                        </div>
+                                    </div>
+                                    <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#0d9488', boxShadow: 'inset 0 0 0 4px #fff', border: '2px solid #0d9488' }}></div>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                                    <button className="fm-proceed-btn" style={{ borderRadius: '10px', padding: '0.8rem 2rem', fontSize: '1.1rem', background: '#0ea5e9', fontWeight: 800, fontFamily: 'inherit' }} onClick={() => {
+                                        setSelectedTrain({ ...route, fare: routeFare * Number(passengers) });
+                                        submitBooking();
+                                    }}>
+                                        Make payment
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="findmetro-container">
-            <div className="findmetro-content" style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 24 }}>
-                {/* Left column: lines, search, results */}
-                <div>
-                    <div className="lines-section">
-                        <h2>Select Metro Line (Optional)</h2>
-                        <div className="lines-grid">
-                            <div
-                                className={`line-card ${selectedLine === null ? 'active' : ''}`}
-                                onClick={() => setSelectedLine(null)}
-                            >
-                                <div className="line-color" style={{ backgroundColor: '#999' }}></div>
-                                <h3>All Lines</h3>
-                                <p>Search across all lines</p>
-                            </div>
-                            {metroLines.map(line => (
-                                <div
-                                    key={line.id}
-                                    className={`line-card ${selectedLine === line.id ? 'active' : ''}`}
-                                    onClick={() => { setSelectedLine(line.id); setHighlightedRoute(null); }}
-                                >
-                                    <div className="line-color" style={{ backgroundColor: line.color }}></div>
-                                    <h3>{line.name}</h3>
-                                    <p>{(line.stations || []).length} stations</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div style={{ marginTop: 12 }}>
-                        <h3 style={{ marginBottom: 8 }}>Live Trains</h3>
+            {/* New Unified Hero Banner */}
+            <div className="fm-hero-banner">
+                <h1>Network Map & Plan Your Trip</h1>
+                <p>Welcome to the comprehensive hub for exploring Kochi Metro routes, tracking live trains, and finding fast and smart connections across the city.</p>
+            </div>
+
+            {/* Live Trains Marquee */}
+            <div className="fm-live-updates-bar">
+                <span className="live-label">LIVE TRAINS</span>
+                <div className="live-ticker-wrap">
+                    <div className="live-ticker-scroll">
                         {liveTrains && liveTrains.length > 0 ? (
-                            <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
-                                {liveTrains.slice(0, 6).map((t, i) => (
-                                    <div key={i} style={{ minWidth: 150, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 10px rgba(0,0,0,0.06)' }}>
-                                        <div style={{ fontWeight: 700 }}>{t.name}</div>
-                                        <div style={{ fontSize: 12 }}>{t.currentStation || '-'} → {t.nextStop || '-'}</div>
-                                        <div style={{ fontSize: 12, color: t.delayedByMinutes ? '#c0392b' : '#2ecc71' }}>{t.delayedByMinutes ? `Delay ${t.delayedByMinutes}m` : t.status || 'Running'}</div>
-                                    </div>
-                                ))}
-                            </div>
+                            liveTrains.map((t, i) => (
+                                <div key={i} className="live-item-badge">
+                                    <span style={{ fontWeight: 700 }}>{t.name}</span>
+                                    <span>{t.currentStation || '-'} → {t.nextStop || '-'}</span>
+                                    <span style={{ color: t.delayedByMinutes ? '#ef4444' : '#10b981' }}>
+                                        {t.delayedByMinutes ? `Delay ${t.delayedByMinutes}m` : t.status || 'Running'}
+                                    </span>
+                                </div>
+                            ))
                         ) : (
-                            <div style={{ color: '#666' }}>No live train data</div>
+                            <div className="live-item-badge">No active live train updates right now.</div>
                         )}
                     </div>
+                </div>
+            </div>
 
+            <div className="fm-main-layout">
+                {/* Left Column: Plan Your Trip Form & Services */}
+                <div className="fm-left-column">
                     <div className="search-section">
-                        <h2>Search Route</h2>
+                        <h2>Plan Your Journey</h2>
                         <form onSubmit={handleSearch} className="search-form">
                             {errors.submit && <div className="error-message">{errors.submit}</div>}
 
@@ -481,21 +672,15 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                             onChange={(e) => handleSelectChange('from', e.target.value)}
                                             onFocus={() => {
                                                 setShowFromDropdown(true);
-                                                if (fromStation.trim() === '') {
-                                                    setFromSuggestions(allStations);
-                                                }
+                                                if (fromStation.trim() === '') setFromSuggestions(allStations);
                                             }}
-                                            placeholder="Search or select station..."
+                                            placeholder="Search origin..."
                                             autoComplete="off"
                                         />
                                         {showFromDropdown && fromSuggestions.length > 0 && (
                                             <div className="dropdown-list">
                                                 {fromSuggestions.map((station, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className="dropdown-item"
-                                                        onClick={() => selectFromStation(station)}
-                                                    >
+                                                    <div key={idx} className="dropdown-item" onClick={() => selectFromStation(station)}>
                                                         <div className="station-info">
                                                             <strong>{station.name}</strong>
                                                             <span className="station-code">{station.code}</span>
@@ -509,17 +694,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                 </div>
 
                                 <div className="swap-btn">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const temp = fromStation;
-                                            setFromStation(toStation);
-                                            setToStation(temp);
-                                        }}
-                                        title="Swap stations"
-                                    >
-                                        ⇅
-                                    </button>
+                                    <button type="button" onClick={() => { const temp = fromStation; setFromStation(toStation); setToStation(temp); }} title="Swap stations">⇅</button>
                                 </div>
 
                                 <div className="form-group" ref={toDropdownRef}>
@@ -532,21 +707,15 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                             onChange={(e) => handleSelectChange('to', e.target.value)}
                                             onFocus={() => {
                                                 setShowToDropdown(true);
-                                                if (toStation.trim() === '') {
-                                                    setToSuggestions(allStations);
-                                                }
+                                                if (toStation.trim() === '') setToSuggestions(allStations);
                                             }}
-                                            placeholder="Search or select station..."
+                                            placeholder="Search destination..."
                                             autoComplete="off"
                                         />
                                         {showToDropdown && toSuggestions.length > 0 && (
                                             <div className="dropdown-list">
                                                 {toSuggestions.map((station, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className="dropdown-item"
-                                                        onClick={() => selectToStation(station)}
-                                                    >
+                                                    <div key={idx} className="dropdown-item" onClick={() => selectToStation(station)}>
                                                         <div className="station-info">
                                                             <strong>{station.name}</strong>
                                                             <span className="station-code">{station.code}</span>
@@ -560,172 +729,200 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                 </div>
                             </div>
 
-                            <button type="submit" className="btn-search" disabled={loading}>
-                                {loading ? 'Searching...' : '🔍 Search Routes'}
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="tripDate">Journey Date *</label>
+                                    <input type="date" id="tripDate" value={tripDate} onChange={(e) => setTripDate(e.target.value)} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="passengers">Passengers *</label>
+                                    <select id="passengers" value={passengers} onChange={(e) => setPassengers(e.target.value)}>
+                                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="btn-search fm-glow-btn" disabled={loading}>
+                                <div className="btn-content">
+                                    <span className="btn-icon">{loading ? '⌛' : '🧭'}</span>
+                                    <span className="btn-text">{loading ? 'Searching Networks...' : 'Explore Routes'}</span>
+                                </div>
                             </button>
                         </form>
 
-                        {/* Selected Stations Info */}
-                        <div className="selected-stations-info" style={{ marginTop: 18 }}>
-                            <div className="station-card">
-                                <div className="card-header">📍 Selected Stations</div>
-                                <div className="card-body">
-                                    <h4>From: {fromStation || '—'}</h4>
-                                    <h4>To: {toStation || '—'}</h4>
-                                    {fromStation && allStations.filter(s => s.name === fromStation).map(s => (
-                                        <div key={s.code} style={{ marginTop: 8 }}>
-                                            <p className="station-detail"><strong>Code:</strong> {s.code}</p>
-                                            {s.location && <p className="station-detail"><strong>Location:</strong> {s.location}</p>}
-                                            {s.area && <p className="station-detail"><strong>Area:</strong> {s.area}</p>}
-                                        </div>
-                                    ))}
-                                    {toStation && allStations.filter(s => s.name === toStation).map(s => (
-                                        <div key={s.code} style={{ marginTop: 8 }}>
-                                            <p className="station-detail"><strong>Code:</strong> {s.code}</p>
-                                            {s.location && <p className="station-detail"><strong>Location:</strong> {s.location}</p>}
-                                            {s.area && <p className="station-detail"><strong>Area:</strong> {s.area}</p>}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Search Results */}
-                        {searchResults.length > 0 && (
-                            <div className="results-section" style={{ marginTop: 20 }}>
-                                <h2>Available Routes</h2>
-                                <div className="results-grid">
-                                    {searchResults.map((route, index) => (
-                                        <div key={index} className="route-card">
-                                            <div className="route-header">
-                                                <div
-                                                    className="line-indicator"
-                                                    style={{ backgroundColor: route.lineColor }}
-                                                ></div>
-                                                <h3>{route.lineName}</h3>
-                                            </div>
-
-                                            <div className="route-journey">
-                                                <div className="station-info">
-                                                    <span className="station-name">{route.fromStation}</span>
-                                                    <span className="station-code">FROM</span>
-                                                </div>
-                                                <div className="journey-line"></div>
-                                                <div className="station-info">
-                                                    <span className="station-name">{route.toStation}</span>
-                                                    <span className="station-code">TO</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="route-details">
-                                                <div className="detail-item">
-                                                    <span className="label">⏱️ Time</span>
-                                                    <span className="value">{route.estimatedTime} mins</span>
-                                                </div>
-                                                <div className="detail-item">
-                                                    <span className="label">🛑 Stops</span>
-                                                    <span className="value">{route.numberOfStops}</span>
-                                                </div>
-                                                <div className="detail-item">
-                                                    <span className="label">💰 Fare</span>
-                                                    <span className="value">₹{route.fare}</span>
-                                                </div>
-                                            </div>
-
-                                            {route.intermediateStations && route.intermediateStations.length > 0 && (
-                                                <div className="intermediate-stations">
-                                                    <p className="label">Intermediate Stations:</p>
-                                                    <div className="stations-list">
-                                                        {route.intermediateStations.map((station, idx) => (
-                                                            <span key={idx} className="station-badge">
-                                                                {station.name}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div style={{ marginTop: 12 }}>
-                                                <button
-                                                    type="button"
-                                                    className="btn-book"
-                                                    onClick={() => handleBookTicket(route)}
-                                                >
-                                                    📱 Book Ticket
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn-show-map"
-                                                    onClick={() => showRouteOnMap(route)}
-                                                    style={{ marginLeft: 8 }}
-                                                >
-                                                    🗺️ Show on Map
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                        {/* Selected Stations Highlight Mini Cards */}
+                        {(fromStation || toStation) && (
+                            <div className="selected-stations-info" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px dashed #ddd' }}>
+                                <div className="station-card">
+                                    <div className="card-header">📍 Selected Stations</div>
+                                    <div className="card-body">
+                                        <h4>From: {fromStation || '—'}</h4>
+                                        <h4>To: {toStation || '—'}</h4>
+                                    </div>
                                 </div>
                             </div>
                         )}
-
-                        {searchResults.length === 0 && !loading && (
-                            <div className="no-results" style={{ marginTop: 12 }}>
-                                <p>Enter station names and click search to find routes</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Right column: Map + Station Services */}
-                <div>
-                    <div style={{ marginBottom: 16 }}>
-                        <h2 style={{ margin: '0 0 8px 0' }}>Route</h2>
-                        <div style={{ height: 420, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
-                            <MapMetro
-                                height={420}
-                                selectedLineId={selectedLine}
-                                highlightedRoute={highlightedRoute}
-                                onStationClick={handleMapStationClick}
-                            />
-                        </div>
                     </div>
 
-                    <div className="station-card" style={{ padding: 16 }}>
-                        <div className="card-header">🛎️ Station Services</div>
-                        <div className="card-body" style={{ paddingTop: 12 }}>
-                            <label style={{ display: 'block', marginBottom: 8 }}>Select Station to view services</label>
+                    {/* Integrated Station Services */}
+                    <div className="station-services-panel">
+                        <div className="card-header">🛎️ Check Station Facilities</div>
+                        <div className="card-body">
+                            <label style={{ display: 'block', marginBottom: 8, fontSize: '0.9rem', color: '#666' }}>Select any station to explore its available services</label>
                             <select value={selectedStation?.name || ''} onChange={(e) => {
                                 const name = e.target.value;
                                 const st = allStations.find(s => s.name === name);
                                 setSelectedStation(st || null);
-                            }} style={{ width: '100%', padding: '8px 10px', marginBottom: 12 }}>
-                                <option value="">-- Select station --</option>
+                            }} className="services-select">
+                                <option value="">-- Choose a station --</option>
                                 {allStations.map((s, idx) => (
-                                    <option key={idx} value={s.name}>{s.name}</option>
+                                    <option key={idx} value={s.name}>{s.name} ({s.code})</option>
                                 ))}
                             </select>
 
                             {selectedStation ? (
-                                <div>
-                                    <h4 style={{ marginTop: 0 }}>{selectedStation.name}</h4>
-                                    <ul style={{ marginLeft: 18 }}>
-                                        <li>ATM / Payment</li>
-                                        <li>Food Court</li>
-                                        <li>WiFi</li>
-                                        <li>Customer Care / Help Desk</li>
-                                        <li>Parking</li>
-                                    </ul>
-                                    <p style={{ fontSize: 13, color: '#666' }}>Line: {selectedStation.lineName || '—'}</p>
+                                <div className="services-preview">
+                                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#0d9488' }}>{selectedStation.name}</h4>
+                                    <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>Line: <strong style={{ color: '#333' }}>{selectedStation.lineName || '—'}</strong></p>
+                                    <div className="facilities-grid-mini">
+                                        <span className="fm-tag">🏧 ATM</span>
+                                        <span className="fm-tag">🍔 Food Court</span>
+                                        <span className="fm-tag">📶 WiFi</span>
+                                        <span className="fm-tag">💬 Help Desk</span>
+                                        <span className="fm-tag">🅿️ Parking</span>
+                                    </div>
                                 </div>
                             ) : (
-                                <div>
-                                    <p>Select a station from the list or click a station marker on the map to view services.</p>
-                                </div>
+                                <p style={{ fontSize: '0.9rem', color: '#888', fontStyle: 'italic', marginTop: '1rem' }}>No station selected. Choose one to see amenities like ATM, WiFi, etc.</p>
                             )}
                         </div>
                     </div>
                 </div>
+
+                {/* Right Column: Network Map and Line Controls */}
+                <div className="fm-right-column">
+                    <div className="fm-map-header">
+                        <h2>Interactive Network Map</h2>
+                        <div className="lines-pills">
+                            <button
+                                className={`line-pill ${selectedLine === null ? 'active' : ''}`}
+                                onClick={() => setSelectedLine(null)}
+                                style={{ '--pill-color': '#64748b' }}
+                            >
+                                All Lines
+                            </button>
+                            {metroLines.map(line => (
+                                <button
+                                    key={line.id}
+                                    className={`line-pill ${selectedLine === line.id ? 'active' : ''}`}
+                                    onClick={() => { setSelectedLine(line.id); setHighlightedRoute(null); }}
+                                    style={{ '--pill-color': line.color || '#0d9488' }}
+                                >
+                                    {line.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="fm-map-wrapper">
+                        <MapMetro
+                            height="100%"
+                            selectedLineId={selectedLine}
+                            highlightedRoute={highlightedRoute}
+                            onStationClick={handleMapStationClick}
+                        />
+                    </div>
+                </div>
             </div>
+
+            {/* Bottom Full-Width Results Section */}
+            {searchResults.length > 0 && (
+                <div className="fm-results-layout" ref={resultsRef}>
+                    <h2>Available Journey Routes</h2>
+                    <div className="results-grid">
+                        {searchResults.map((route, index) => (
+                            <div key={index} className="route-card">
+                                <div className="route-header">
+                                    <div className="line-indicator" style={{ backgroundColor: route.lineColor || '#0d9488' }}></div>
+                                    <h3>{route.lineName}</h3>
+                                </div>
+
+                                <div className="route-journey">
+                                    <div className="station-info">
+                                        <span className="station-name">{route.fromStation}</span>
+                                        <span className="station-code">START</span>
+                                    </div>
+                                    <div className="journey-line"></div>
+                                    <div className="station-info">
+                                        <span className="station-name">{route.toStation}</span>
+                                        <span className="station-code">END</span>
+                                    </div>
+                                </div>
+
+                                <div className="route-details">
+                                    <div className="detail-item">
+                                        <span className="label">⏱️ Journey</span>
+                                        <span className="value">{route.estimatedTime} min</span>
+                                    </div>
+                                    <div className="detail-item">
+                                        <span className="label">🛑 Stops</span>
+                                        <span className="value">{route.numberOfStops}</span>
+                                    </div>
+                                    <div className="detail-item">
+                                        <span className="label">👥 Passengers</span>
+                                        <span className="value">{passengers}</span>
+                                    </div>
+                                </div>
+
+                                {/* Dynamic Fare info considering passengers */}
+                                <div className="fm-fare-panel">
+                                    <div className="fare-row">
+                                        <span>Per Passenger: </span>
+                                        <span>₹{route.fare}</span>
+                                    </div>
+                                    <div className="fare-row total">
+                                        <span>Total Est. Fare: </span>
+                                        <span>₹{route.fare * Number(passengers)}</span>
+                                    </div>
+                                </div>
+
+                                {route.intermediateStations && route.intermediateStations.length > 0 && (
+                                    <div className="intermediate-stations">
+                                        <p className="label">Route Path:</p>
+                                        <div className="stations-list">
+                                            {route.intermediateStations.map((station, idx) => (
+                                                <span key={idx} className="station-badge">
+                                                    {station.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="route-actions" style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
+                                    <button type="button" className="btn-book flex-1" onClick={() => handleBookTicket({ ...route, fare: route.fare * Number(passengers) })}>
+                                        📱 Book Ticket
+                                    </button>
+                                    <button type="button" className="btn-show-map flex-1" onClick={() => showRouteOnMap(route)}>
+                                        🗺️ Check on Map
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {searchResults.length === 0 && !loading && (
+                <div className="fm-no-results" ref={resultsRef}>
+                    <div className="fm-empty-state">
+                        <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🛤️</span>
+                        <h3>Ready to Explore?</h3>
+                        <p>Enter your origin and destination in the 'Plan Your Journey' panel above to discover routes, check fares, and instantly book your metro tickets.</p>
+                    </div>
+                </div>
+            )}
+
 
             {/* Booking Modal */}
             {showBookingModal && selectedTrain && (

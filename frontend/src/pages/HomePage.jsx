@@ -27,6 +27,16 @@ function HomePage({ onNavigate }) {
     const toDropdownRef = useRef(null);
     const [imageAvailable, setImageAvailable] = useState(true);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [showFareModal, setShowFareModal] = useState(false);
+    const [fareModalFrom, setFareModalFrom] = useState('');
+    const [fareModalTo, setFareModalTo] = useState('');
+    const [fareModalFromSuggestions, setFareModalFromSuggestions] = useState([]);
+    const [fareModalToSuggestions, setFareModalToSuggestions] = useState([]);
+    const [showFareFromDropdown, setShowFareFromDropdown] = useState(false);
+    const [showFareToDropdown, setShowFareToDropdown] = useState(false);
+    const [fareResult, setFareResult] = useState({ fare: 0, distance: 0, calculated: false });
+    const fareFromRef = useRef(null);
+    const fareToRef = useRef(null);
 
     const sliderImages = [
         '/images/homepagesliderimages/image1.png',
@@ -79,6 +89,53 @@ function HomePage({ onNavigate }) {
         }
     }
 
+    const calculateFare = () => {
+        const dist = parseFloat(fareDistance);
+        if (isNaN(dist) || dist <= 0) return;
+        let fare;
+        if (dist <= 2) fare = 20;
+        else if (dist <= 6) fare = 25;
+        else if (dist <= 10) fare = 30;
+        else if (dist <= 14) fare = 35;
+        else if (dist <= 18) fare = 40;
+        else fare = 50;
+        setCalculatedFare(fare);
+    };
+
+    const calculateFareByStations = () => {
+        if (!fareModalFrom || !fareModalTo) return;
+        const fromIdx = allStations.findIndex(s => s.name === fareModalFrom);
+        const toIdx = allStations.findIndex(s => s.name === fareModalTo);
+        if (fromIdx === -1 || toIdx === -1) return;
+
+        const hops = Math.abs(toIdx - fromIdx);
+        // Kochi Metro avg ~1.3 km per station
+        const distance = parseFloat((hops * 1.3).toFixed(1));
+        let fare;
+        if (distance <= 2) fare = 20;
+        else if (distance <= 6) fare = 25;
+        else if (distance <= 10) fare = 30;
+        else if (distance <= 14) fare = 35;
+        else if (distance <= 18) fare = 40;
+        else fare = 50;
+        setFareResult({ fare, distance, calculated: true });
+    };
+
+    const resetFareModal = () => {
+        setFareModalFrom('');
+        setFareModalTo('');
+        setFareResult({ fare: 0, distance: 0, calculated: false });
+        setShowFareFromDropdown(false);
+        setShowFareToDropdown(false);
+    };
+
+    const swapFareStations = () => {
+        const tmp = fareModalFrom;
+        setFareModalFrom(fareModalTo);
+        setFareModalTo(tmp);
+        setFareResult({ fare: 0, distance: 0, calculated: false });
+    };
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (fromDropdownRef.current && !fromDropdownRef.current.contains(event.target)) {
@@ -86,6 +143,12 @@ function HomePage({ onNavigate }) {
             }
             if (toDropdownRef.current && !toDropdownRef.current.contains(event.target)) {
                 setShowToDropdown(false);
+            }
+            if (fareFromRef.current && !fareFromRef.current.contains(event.target)) {
+                setShowFareFromDropdown(false);
+            }
+            if (fareToRef.current && !fareToRef.current.contains(event.target)) {
+                setShowFareToDropdown(false);
             }
         };
 
@@ -214,14 +277,6 @@ function HomePage({ onNavigate }) {
         setLoading(false);
     };
 
-    const calculateFare = () => {
-        if (!fareDistance) return;
-        const distance = parseFloat(fareDistance);
-        const baseFare = 10;
-        const perKmFare = 2;
-        const fare = baseFare + (distance * perKmFare);
-        setCalculatedFare(fare.toFixed(2));
-    };
 
     const handleBookTicket = (train) => {
         setSelectedTrain(train);
@@ -505,7 +560,10 @@ function HomePage({ onNavigate }) {
                     <div className="services-grid-parent">
                         <div
                             className="services-div1"
-                            style={{ position: 'relative', background: '#f6f7fa' }}
+                            style={{ position: 'relative', background: '#f6f7fa', cursor: 'pointer', transition: 'box-shadow 0.2s, transform 0.2s' }}
+                            onClick={() => { setShowFareModal(true); setCalculatedFare(null); setFareDistance(''); }}
+                            onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,102,179,0.13)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = ''; }}
                         >
                             {/* Radial Gradient Background */}
                             <div
@@ -1101,6 +1159,199 @@ function HomePage({ onNavigate }) {
                     </div>
                 </div>
             </section>
+
+            {/* Fare Calculator Modal */}
+            {showFareModal && (
+                <div
+                    className="fare-modal-overlay"
+                    onClick={() => { setShowFareModal(false); resetFareModal(); }}
+                >
+                    <div
+                        className="fare-modal-popup"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {/* ── Top Header Bar ── */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
+                            {/* Teal pill */}
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: '#0d9488', color: '#fff', fontWeight: 700, fontSize: '0.88rem', padding: '0.4rem 1rem', borderRadius: '999px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                </svg>
+                                Fare Calculator
+                            </div>
+                            {/* Subtitle */}
+                            <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', flex: 1, lineHeight: 1.4 }}>Select your station to calculate fare and view journey details.</p>
+                            {/* Close button */}
+                            <button
+                                onClick={() => { setShowFareModal(false); resetFareModal(); }}
+                                aria-label="Close"
+                                style={{ flexShrink: 0, background: '#e2e8f0', backgroundColor: '#e2e8f0', border: 'none', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#334155', fontSize: '1rem', fontWeight: 700, padding: 0, lineHeight: 1 }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        {/* ── Station Inputs ── */}
+                        <div className="fare-modal-body">
+                            <div className="fare-station-block">
+                                {/* From Input */}
+                                <div className="fare-station-input-wrap" ref={fareFromRef}>
+                                    <label className="fare-station-label">From</label>
+                                    <input
+                                        id="fare-from-input"
+                                        className="fare-station-input"
+                                        type="text"
+                                        placeholder="Search From Station"
+                                        value={fareModalFrom}
+                                        autoComplete="off"
+                                        onChange={e => {
+                                            const v = e.target.value;
+                                            setFareModalFrom(v);
+                                            setFareResult({ fare: 0, distance: 0, calculated: false });
+                                            const filtered = v.trim() === '' ? allStations : allStations.filter(s => s.name.toLowerCase().includes(v.toLowerCase()));
+                                            setFareModalFromSuggestions(filtered);
+                                            setShowFareFromDropdown(true);
+                                        }}
+                                        onFocus={() => {
+                                            setFareModalFromSuggestions(allStations);
+                                            setShowFareFromDropdown(true);
+                                        }}
+                                    />
+                                    {showFareFromDropdown && fareModalFromSuggestions.length > 0 && (
+                                        <div className="fare-dropdown">
+                                            {fareModalFromSuggestions.map((s, i) => (
+                                                <div key={i} className="fare-dropdown-item"
+                                                    onMouseDown={e => { e.preventDefault(); setFareModalFrom(s.name); setShowFareFromDropdown(false); setFareResult({ fare: 0, distance: 0, calculated: false }); }}
+                                                >
+                                                    <span className="fare-dropdown-name">{s.name}</span>
+                                                    <span className="fare-dropdown-code">{s.code}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Swap Button */}
+                                <div className="fare-swap-btn-wrap">
+                                    <button
+                                        className="fare-swap-btn"
+                                        onClick={swapFareStations}
+                                        title="Swap stations"
+                                        type="button"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M8 3 4 7l4 4" />
+                                            <path d="M4 7h16" />
+                                            <path d="M16 21l4-4-4-4" />
+                                            <path d="M20 17H4" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* To Input */}
+                                <div className="fare-station-input-wrap" ref={fareToRef}>
+                                    <label className="fare-station-label">To</label>
+                                    <input
+                                        id="fare-to-input"
+                                        className="fare-station-input"
+                                        type="text"
+                                        placeholder="Search To Station"
+                                        value={fareModalTo}
+                                        autoComplete="off"
+                                        onChange={e => {
+                                            const v = e.target.value;
+                                            setFareModalTo(v);
+                                            setFareResult({ fare: 0, distance: 0, calculated: false });
+                                            const filtered = v.trim() === '' ? allStations : allStations.filter(s => s.name.toLowerCase().includes(v.toLowerCase()));
+                                            setFareModalToSuggestions(filtered);
+                                            setShowFareToDropdown(true);
+                                        }}
+                                        onFocus={() => {
+                                            setFareModalToSuggestions(allStations);
+                                            setShowFareToDropdown(true);
+                                        }}
+                                    />
+                                    {showFareToDropdown && fareModalToSuggestions.length > 0 && (
+                                        <div className="fare-dropdown">
+                                            {fareModalToSuggestions.map((s, i) => (
+                                                <div key={i} className="fare-dropdown-item"
+                                                    onMouseDown={e => { e.preventDefault(); setFareModalTo(s.name); setShowFareToDropdown(false); setFareResult({ fare: 0, distance: 0, calculated: false }); }}
+                                                >
+                                                    <span className="fare-dropdown-name">{s.name}</span>
+                                                    <span className="fare-dropdown-code">{s.code}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* ── Action Buttons ── */}
+                            <div className="fare-action-row">
+                                <button className="fare-reset-btn" onClick={resetFareModal}>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                        <path d="M3 3v5h5" />
+                                    </svg>
+                                    RESET
+                                </button>
+                                <button
+                                    className="fare-getfare-btn"
+                                    onClick={calculateFareByStations}
+                                    disabled={!fareModalFrom || !fareModalTo || fareModalFrom === fareModalTo}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                                        <path d="M7 15h0" />
+                                        <path d="M2 9.5h20" />
+                                    </svg>
+                                    GET FARE
+                                </button>
+                            </div>
+
+                            {/* ── Fare & Journey Details ── */}
+                            <div className="fare-details-section">
+                                <h3 className="fare-details-heading">FARE &amp; JOURNEY DETAILS</h3>
+                                <div className="fare-details-cards">
+                                    {/* Journey Fare Card */}
+                                    <div className="fare-detail-card">
+                                        <div className="fare-detail-icon fare-detail-icon--purple">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+                                                <path d="M13 5v2M13 17v2M13 11v2" />
+                                            </svg>
+                                        </div>
+                                        <div className="fare-detail-info">
+                                            <span className="fare-detail-label">Journey Fare</span>
+                                            <span className="fare-detail-value">₹{fareResult.calculated ? fareResult.fare : 0}</span>
+                                        </div>
+                                    </div>
+                                    {/* Distance Card */}
+                                    <div className="fare-detail-card">
+                                        <div className="fare-detail-icon fare-detail-icon--green">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                                                <circle cx="12" cy="9" r="2.5" />
+                                            </svg>
+                                        </div>
+                                        <div className="fare-detail-info">
+                                            <span className="fare-detail-label">Distance</span>
+                                            <span className="fare-detail-value">{fareResult.calculated ? fareResult.distance : 0} km</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ── City Skyline Illustration ── */}
+                            <div className="fare-skyline">
+                                <img src="/images/footer1.png" alt="City Skyline" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Booking Modal */}
             {showBookingModal && selectedTrain && (
