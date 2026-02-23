@@ -2,3 +2,13 @@ node_modules/
 .env
 dist/
 build/
+
+# Log and debug output files
+*.log
+*.txt
+db_out*.txt
+server_log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
