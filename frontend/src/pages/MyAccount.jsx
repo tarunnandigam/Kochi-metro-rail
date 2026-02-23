@@ -9,20 +9,64 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
     const [transactions, setTransactions] = useState([]);
 
     useEffect(() => {
-        const storedTxns = JSON.parse(localStorage.getItem('kmrl_all_transactions') || '[]');
-        // map and sort by date descending
-        const mapped = storedTxns.map(t => ({
-            from: t.fromStation || 'Network',
-            to: t.toStation || 'Network',
-            id: t.bookingId || 'TXN1029384756',
-            dateTime: t.date || new Date().toLocaleString(),
-            method: t.method || 'Bill Desk / UPI',
-            status: t.status || 'Success',
-            amount: `₹ ${t.fare || 0}`,
-            rawDate: new Date(t.date || new Date())
-        })).sort((a, b) => b.rawDate - a.rawDate);
-        setTransactions(mapped);
-    }, []);
+        const fetchBookings = async () => {
+            const token = localStorage.getItem('kmrl_token');
+            let apiData = [];
+            try {
+                if (token) {
+                    const resp = await fetch('/api/metro/my-bookings', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (resp.ok) {
+                        apiData = await resp.json();
+                    }
+                }
+            } catch (err) {
+                console.warn('API error, relying solely on local storage', err);
+            }
+
+            // Local storage demo mode fallback
+            const storedTxns = JSON.parse(localStorage.getItem('kmrl_all_transactions') || '[]');
+            const userTxns = storedTxns.filter(t => user && (t.email === user.email || t.passengerName === user.fullName));
+
+            // Map API data
+            const mappedApi = apiData.map(t => ({
+                from: t.fromStation || 'Network',
+                to: t.toStation || 'Network',
+                id: t.bookingId || 'TXN',
+                dateTime: new Date(t.createdAt).toLocaleString(),
+                method: t.method || 'Bill Desk / UPI',
+                status: t.status || 'Success',
+                amount: `₹ ${t.fare || 0}`,
+                rawDate: new Date(t.createdAt)
+            }));
+
+            // Map Local data
+            const mappedLocal = userTxns.map(t => ({
+                from: t.fromStation || 'Network',
+                to: t.toStation || 'Network',
+                id: t.bookingId || 'TXN',
+                dateTime: t.date || new Date().toLocaleString(),
+                method: t.method || 'Bill Desk / UPI',
+                status: t.status || 'Success',
+                amount: `₹ ${t.fare || 0}`,
+                rawDate: new Date(t.date || new Date())
+            }));
+
+            // Combine filtering duplicates by bookingId
+            const combined = [...mappedLocal];
+            mappedApi.forEach(apiTxn => {
+                if (!combined.find(c => c.id === apiTxn.id)) {
+                    combined.push(apiTxn);
+                }
+            });
+
+            combined.sort((a, b) => b.rawDate - a.rawDate);
+            setTransactions(combined);
+
+        };
+        fetchBookings();
+    }, [user]);
 
     const filterTransactions = () => {
         if (transactionTab === 'all') return transactions;

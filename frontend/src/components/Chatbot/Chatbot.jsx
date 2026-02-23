@@ -509,7 +509,7 @@ function Chatbot() {
 
     const getStationMasterUpdates = async (stationName) => {
         try {
-            const resp = await fetch('/mock-api/news_all.json');
+            const resp = await fetch('/api/news/all');
             if (!resp.ok) return [];
             const data = await resp.json();
             const filtered = data.filter(n => {

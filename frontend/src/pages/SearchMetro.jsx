@@ -61,7 +61,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
     const fetchStations = async () => {
         try {
             try {
-                const response = await fetch('/mock-api/stations.json');
+                const response = await fetch('/api/metro/stations');
                 if (response.ok) {
                     const data = await response.json();
                     // Normalize station objects to ensure `id`, `code`, `name` exist
@@ -88,7 +88,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
 
     const fetchLiveTrains = async () => {
         try {
-            let url = '/mock-api/metro_trains.json';
+            let url = '/api/metro/trains/live';
             if (externalFeed && externalFeed.trim()) {
                 const base = externalFeed.trim().replace(/\/$/, '');
                 url = base.includes('://') ? `${base}/live` : `${base}/live`;
@@ -224,27 +224,37 @@ function SearchMetro({ onLogout, user, onNavigate }) {
         };
 
         try {
-            // Simulate successful booking locally (mock)
-            const mockBooking = {
-                bookingId: 'MOCK-' + Date.now(),
-                fare: payload.type === 'single' ? 25 : 50,
-                ticketUrl: '/mock-api/tickets/' + (Date.now()) + '.pdf'
-            };
-            setBookingResponse({ success: true, data: mockBooking });
-            const bookingObj = {
-                bookingId: mockBooking.bookingId,
-                fare: mockBooking.fare,
-                ticketUrl: mockBooking.ticketUrl,
-                fromStation: payload.fromStation,
-                toStation: payload.toStation,
-                passengerName: payload.passengerName,
-                email: payload.email,
-                type: payload.type
-            };
-            localStorage.setItem('kmrl_latest_booking', JSON.stringify(bookingObj));
+            const headers = { 'Content-Type': 'application/json' };
+            const token = localStorage.getItem('kmrl_token');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const resp = await fetch('/api/metro/book', { method: 'POST', headers, body: JSON.stringify(payload) });
+            if (resp.ok) {
+                const data = await resp.json();
+                setBookingResponse({ success: true, data });
+                const bookingObj = {
+                    bookingId: data.bookingId,
+                    fare: data.fare,
+                    ticketUrl: data.ticketUrl,
+                    fromStation: payload.fromStation,
+                    toStation: payload.toStation,
+                    passengerName: payload.passengerName,
+                    email: payload.email,
+                    type: payload.type,
+                    date: new Date().toLocaleString(),
+                    status: 'Success',
+                    method: 'Card/UPI'
+                };
+                localStorage.setItem('kmrl_latest_booking', JSON.stringify(bookingObj));
+                const txns = JSON.parse(localStorage.getItem('kmrl_all_transactions') || '[]');
+                txns.push(bookingObj);
+                localStorage.setItem('kmrl_all_transactions', JSON.stringify(txns));
+            } else {
+                throw new Error('Booking failed on server');
+            }
         } catch (err) {
             console.error('Booking error', err);
-            setBookingResponse({ success: false, error: 'Network error' });
+            setBookingResponse({ success: false, error: 'Network error or backend issue' });
         }
     };
 

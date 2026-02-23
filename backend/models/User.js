@@ -43,7 +43,11 @@ const UserSchema = new mongoose.Schema({
         type: [
             {
                 bookingId: { type: String },
+                fromStation: { type: String },
+                toStation: { type: String },
                 type: { type: String },
+                status: { type: String, default: 'Success' },
+                method: { type: String, default: 'Card/UPI' },
                 fare: { type: Number },
                 createdAt: { type: Date, default: Date.now }
             }
@@ -57,9 +61,9 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
-    
+
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
@@ -70,7 +74,7 @@ UserSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-UserSchema.methods.comparePassword = async function(candidatePassword) {
+UserSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 

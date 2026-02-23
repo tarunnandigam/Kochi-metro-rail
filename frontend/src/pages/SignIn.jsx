@@ -86,42 +86,11 @@ function SignIn({ onNavigate, onLogin }) {
                 })
             });
 
-            // handle server error: try local/mock demo users first, otherwise show server message
+            // handle server error: show server message
             if (!response.ok) {
-                // try fallback to local demo users
-                try {
-                    const demoUsers = JSON.parse(localStorage.getItem('kmrl_demo_users') || '[]');
-                    const found = demoUsers.find(u => (u.email === formData.usernameOrEmail || u.username === formData.usernameOrEmail) && u.password === formData.password);
-                    if (found) {
-                        const user = { id: found.id || 'demo-' + found.username, fullName: found.fullName, email: found.email, username: found.username, userType: found.userType || 'customer' };
-                        localStorage.setItem('kmrl_token', 'demo-token');
-                        localStorage.setItem('kmrl_user', JSON.stringify(user));
-                        onLogin(user);
-                        setLoading(false);
-                        return;
-                    }
-                } catch (e) { /* ignore */ }
-
-                // try bundled mock users JSON
-                try {
-                    const resp = await fetch('/mock-api/users.json');
-                    if (resp.ok) {
-                        const users = await resp.json();
-                        const u = users.find(x => (x.email === formData.usernameOrEmail || x.username === formData.usernameOrEmail) && x.password === formData.password);
-                        if (u) {
-                            const user = { id: u.id, fullName: u.fullName, email: u.email, username: u.username, userType: u.userType || 'customer' };
-                            localStorage.setItem('kmrl_token', 'demo-token');
-                            localStorage.setItem('kmrl_user', JSON.stringify(user));
-                            onLogin(user);
-                            setLoading(false);
-                            return;
-                        }
-                    }
-                } catch (e) { /* ignore */ }
-
-                const data = await response.json().catch(() => ({}));
-                const errorMessage = data.message || data.errors?.[0]?.msg || 'Sign in failed';
-                setErrors({ submit: errorMessage || 'Sign in failed. Please try again.' });
+                const errData = await response.json().catch(() => ({}));
+                const errorMessage = errData.message || errData.errors?.[0]?.msg || 'Sign in failed. Invalid username or password.';
+                setErrors({ submit: errorMessage });
                 setLoading(false);
                 return;
             }
@@ -135,37 +104,7 @@ function SignIn({ onNavigate, onLogin }) {
 
         } catch (error) {
             console.error('Sign in error:', error);
-            // Network error — try local demo users and bundled mock users to allow offline signin
-            try {
-                const demoUsers = JSON.parse(localStorage.getItem('kmrl_demo_users') || '[]');
-                const found = demoUsers.find(u => (u.email === formData.usernameOrEmail || u.username === formData.usernameOrEmail) && u.password === formData.password);
-                if (found) {
-                    const user = { id: found.id || 'demo-' + found.username, fullName: found.fullName, email: found.email, username: found.username, userType: found.userType || 'customer' };
-                    localStorage.setItem('kmrl_token', 'demo-token');
-                    localStorage.setItem('kmrl_user', JSON.stringify(user));
-                    onLogin(user);
-                    setLoading(false);
-                    return;
-                }
-            } catch (e) { /* ignore */ }
-
-            try {
-                const resp = await fetch('/mock-api/users.json');
-                if (resp.ok) {
-                    const users = await resp.json();
-                    const u = users.find(x => (x.email === formData.usernameOrEmail || x.username === formData.usernameOrEmail) && x.password === formData.password);
-                    if (u) {
-                        const user = { id: u.id, fullName: u.fullName, email: u.email, username: u.username, userType: u.userType || 'customer' };
-                        localStorage.setItem('kmrl_token', 'demo-token');
-                        localStorage.setItem('kmrl_user', JSON.stringify(user));
-                        onLogin(user);
-                        setLoading(false);
-                        return;
-                    }
-                }
-            } catch (e) { /* ignore */ }
-
-            setErrors({ submit: 'Unable to reach server. If you created a local demo account previously, use that. Or try again later.' });
+            setErrors({ submit: 'Unable to reach the server. Please try again later.' });
         } finally {
             setLoading(false);
         }

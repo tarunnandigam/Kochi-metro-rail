@@ -94,7 +94,7 @@ function FareCalculator() {
     useEffect(() => {
         const fetchStations = async () => {
             try {
-                const response = await axios.get('/mock-api/stations.json');
+                const response = await axios.get('/api/metro/stations');
                 setStations(response.data || []);
             } catch (err) {
                 console.error('Error fetching stations:', err);

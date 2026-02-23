@@ -41,9 +41,9 @@ function SignUp({ onNavigate }) {
         const hasLowerCase = /[a-z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
         const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-        
+
         const strength = [hasUpperCase, hasLowerCase, hasNumber, hasSpecialChar].filter(Boolean).length;
-        
+
         if (strength <= 1) return 'Weak';
         if (strength <= 2) return 'Fair';
         if (strength <= 3) return 'Good';
@@ -109,7 +109,7 @@ function SignUp({ onNavigate }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -135,29 +135,11 @@ function SignUp({ onNavigate }) {
 
             if (!response.ok) {
                 // Server returned an error — parse message if available
-                const data = await response.json().catch(() => ({}));
-                const errorMessage = data.message || data.errors?.[0]?.msg || 'Sign up failed';
+                const errData = await response.json().catch(() => ({}));
+                const errorMessage = errData.message || errData.errors?.[0]?.msg || 'Sign up failed due to validation rules. Please check your inputs.';
 
-                // Create a local demo user fallback so signup works even when backend returns error
-                try {
-                    const demoUsers = JSON.parse(localStorage.getItem('kmrl_demo_users') || '[]');
-                    const demoUser = {
-                        id: 'demo-' + Date.now(),
-                        fullName: formData.fullName,
-                        email: formData.email,
-                        username: formData.username,
-                        password: formData.password,
-                        userType: formData.role
-                    };
-                    demoUsers.push(demoUser);
-                    localStorage.setItem('kmrl_demo_users', JSON.stringify(demoUsers));
-                    alert(`Account created (demo).\nUsername: ${demoUser.username}\nPassword: ${demoUser.password}\n\nPlease sign in.`);
-                    onNavigate('signin');
-                    return;
-                } catch (e) {
-                    setErrors({ submit: errorMessage || 'Sign up failed. Please try again later.' });
-                    return;
-                }
+                setErrors({ submit: errorMessage });
+                return;
             }
 
             const data = await response.json();

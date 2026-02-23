@@ -78,7 +78,7 @@ function HomePage({ onNavigate }) {
 
     const fetchLiveTrains = async () => {
         try {
-            const resp = await fetch('/mock-api/metro_trains.json');
+            const resp = await fetch('/api/metro/trains/live');
             if (!resp.ok) return;
             const data = await resp.json();
             setLiveTrains(data);
@@ -158,7 +158,7 @@ function HomePage({ onNavigate }) {
 
     const fetchStations = async () => {
         try {
-            const response = await fetch('/mock-api/fare_stations.json');
+            const response = await fetch('/api/metro/stations');
             if (response.ok) {
                 const data = await response.json();
                 setAllStations(data);
@@ -220,7 +220,7 @@ function HomePage({ onNavigate }) {
         try {
             // Local route search using mock lines.json
             try {
-                const linesResp = await fetch('/mock-api/lines.json');
+                const linesResp = await fetch('/api/lines/lines');
                 if (linesResp.ok) {
                     const lines = await linesResp.json();
                     const results = [];

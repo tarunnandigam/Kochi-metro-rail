@@ -15,7 +15,7 @@ const TrainList = ({ from, to }) => {
     const fetchTrains = async () => {
         setLoading(true);
         try {
-            const resp = await axios.get('/mock-api/metro_trains.json');
+            const resp = await axios.get('/api/metro/trains/live');
             const data = resp.data || [];
 
             // Filter trains that serve both stations in order

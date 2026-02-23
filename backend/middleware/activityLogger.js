@@ -7,7 +7,10 @@ module.exports = async function activityLogger(req, res, next) {
         const toLogMethods = ['POST', 'PUT', 'DELETE'];
         const shouldLog = toLogMethods.includes(req.method) || req.path.startsWith('/api/news') || req.path.startsWith('/api/auth');
 
-        if (!shouldLog) return next();
+        if (!shouldLog) {
+            next();
+            return;
+        }
 
         const activity = new Activity({
             userId: req.body.userId || req.headers['x-user-id'] || null,
@@ -22,9 +25,9 @@ module.exports = async function activityLogger(req, res, next) {
         });
 
         await activity.save();
+        next();
     } catch (err) {
         console.error('Activity logger error:', err);
-    } finally {
         next();
     }
 };

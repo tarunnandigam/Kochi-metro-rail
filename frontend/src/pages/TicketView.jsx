@@ -29,7 +29,7 @@ function TicketView({ onNavigate }) {
 
     const ticketUrl = booking.ticketUrl && (booking.ticketUrl.startsWith('http') || booking.ticketUrl.startsWith('/'))
         ? (booking.ticketUrl.startsWith('http') ? booking.ticketUrl : `${window.location.origin}${booking.ticketUrl}`)
-        : `${window.location.origin}/mock-api/tickets/${booking.bookingId}.pdf`;
+        : `${window.location.origin}/api/metro/bookings/${booking.bookingId}/ticket`;
 
     const handleDownload = async () => {
         try {

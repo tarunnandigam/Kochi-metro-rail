@@ -42,7 +42,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
 
     const fetchTrains = async () => {
         try {
-            const resp = await fetch('/mock-api/metro_trains.json');
+            const resp = await fetch('/api/metro/trains/live');
             if (resp.ok) {
                 const data = await resp.json();
                 setAvailableTrains(data || []);
@@ -54,7 +54,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
 
     const fetchLiveTrains = async () => {
         try {
-            const resp = await fetch('/mock-api/metro_trains.json');
+            const resp = await fetch('/api/metro/trains/live');
             if (resp.ok) {
                 const data = await resp.json();
                 setLiveTrains(data || []);
@@ -100,7 +100,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
 
         // Try to fetch from backend (optional enhancement)
         try {
-            const response = await fetch('/mock-api/lines.json');
+            const response = await fetch('/api/lines/lines');
             if (response.ok) {
                 const data = await response.json();
                 if (Array.isArray(data) && data.length > 0) {
@@ -214,7 +214,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
         try {
             // Use local lines data to compute route (mock)
             try {
-                const linesResp = await fetch('/mock-api/lines.json');
+                const linesResp = await fetch('/api/lines/lines');
                 if (linesResp.ok) {
                     const lines = await linesResp.json();
                     const results = [];
@@ -348,11 +348,11 @@ function FindMetro({ onNavigate, user, onLogout }) {
             const getCodeFor = (stationNameOrCode) => {
                 if (!stationNameOrCode) return null;
                 // if it's already a code (3-5 chars uppercase) prefer it
-                const maybe = allStations.find(s => s.code === stationNameOrCode || s.name === stationNameOrCode);
-                if (maybe) return maybe.code || stationNameOrCode;
+                const maybe = allStations.find(s => (s.code || s.id) === stationNameOrCode || s.name === stationNameOrCode);
+                if (maybe) return (maybe.code || maybe.id) || stationNameOrCode;
                 // try case-insensitive name match
                 const found = allStations.find(s => s.name.toLowerCase() === String(stationNameOrCode).toLowerCase());
-                return found ? found.code : stationNameOrCode;
+                return found ? (found.code || found.id) : stationNameOrCode;
             };
 
             const payload = {

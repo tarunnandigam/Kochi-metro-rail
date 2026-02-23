@@ -173,7 +173,7 @@ const RouteSearch = () => {
 
     const fetchStations = async () => {
         try {
-            const response = await axios.get('/mock-api/stations.json');
+            const response = await axios.get('/api/metro/stations');
             setStations(response.data || []);
             if ((response.data || []).length > 0) {
                 setSelectedFrom(response.data[0].code);
