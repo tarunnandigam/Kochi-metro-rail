@@ -196,10 +196,18 @@
     font-weight: 700;
     font-family: inherit;
     border-radius: 6px;
-    cursor: pointer;
+    cursor: default;
+    /* Note: cursor: default removes the hover clicking effect */
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: 0.2px;
+}
+
+.feedback-btn:hover {
+    background: #e63946 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: default !important;
 }
 
 .feedback-icon {

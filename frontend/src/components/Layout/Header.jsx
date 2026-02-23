@@ -5,7 +5,7 @@ import EmergencyImg from "../../assets/emergency.png";
 
 const NAV_ITEMS = [
     { label: "Home", page: "home" },
-    { label: "Recharge", page: null },
+    { label: "Recharge", page: "recharge" },
     { label: "Facilities", page: null },
     { label: "Plan Your Trip", page: "findmetro" },
     { label: "Help & Contact", page: null },
@@ -121,6 +121,14 @@ const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPa
                                 {item.label}
                             </a>
                         ))}
+                        {isAuthenticated && (
+                            <a
+                                className={["nav-link", currentPage === "myaccount" ? "active" : ""].filter(Boolean).join(" ")}
+                                onClick={() => nav("myaccount")}
+                            >
+                                My Account
+                            </a>
+                        )}
                     </nav>
                 </div>
 
@@ -128,25 +136,9 @@ const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPa
                 <div className="header-right">
                     {isAuthenticated ? (
                         <div className="user-section">
-                            <span className="user-name">
+                            <span className="user-name" onClick={() => nav("myaccount")} style={{ cursor: "pointer" }}>
                                 {fullName}
-                                <svg className="user-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
                             </span>
-                            <div className="user-dropdown">
-                                <button className="logout-btn" onClick={onLogout}>
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" strokeWidth="2.5"
-                                        strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                                        <polyline points="16 17 21 12 16 7" />
-                                        <line x1="21" y1="12" x2="9" y2="12" />
-                                    </svg>
-                                    Logout
-                                </button>
-                            </div>
                         </div>
                     ) : (
                         <div className="auth-panel">

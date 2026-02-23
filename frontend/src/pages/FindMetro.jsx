@@ -381,9 +381,17 @@ function FindMetro({ onNavigate, user, onLogout }) {
                         toStation: ticketType === 'single' ? (selectedTrain.toStation || payload.toStation) : '',
                         passengerName: payload.passengerName,
                         email: payload.email,
-                        type: payload.type
+                        type: payload.type,
+                        date: new Date().toLocaleString(),
+                        status: 'Success',
+                        method: 'Card/UPI'
                     };
                     localStorage.setItem('kmrl_latest_booking', JSON.stringify(bookingObj));
+
+                    const txns = JSON.parse(localStorage.getItem('kmrl_all_transactions') || '[]');
+                    txns.push(bookingObj);
+                    localStorage.setItem('kmrl_all_transactions', JSON.stringify(txns));
+
                     closeBookingModal();
                     onNavigate('ticket');
                     return;
@@ -406,9 +414,17 @@ function FindMetro({ onNavigate, user, onLogout }) {
                 toStation: ticketType === 'single' ? (selectedTrain.toStation || payload.toStation) : '',
                 passengerName: payload.passengerName,
                 email: payload.email,
-                type: payload.type
+                type: payload.type,
+                date: new Date().toLocaleString(),
+                status: 'Success',
+                method: 'Card/UPI'
             };
             localStorage.setItem('kmrl_latest_booking', JSON.stringify(bookingObj));
+
+            const txns = JSON.parse(localStorage.getItem('kmrl_all_transactions') || '[]');
+            txns.push(bookingObj);
+            localStorage.setItem('kmrl_all_transactions', JSON.stringify(txns));
+
             closeBookingModal();
             onNavigate('ticket');
         } catch (err) {
@@ -531,6 +547,11 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                     <span className="fm-price-sub">Inclusive of all taxes</span>
                                 </div>
                                 <button className="fm-proceed-btn" onClick={() => {
+                                    if (!user) {
+                                        alert("Please sign in to proceed with booking.");
+                                        onNavigate("signin");
+                                        return;
+                                    }
                                     setShowJourneySummary(false);
                                     setShowPaymentOptions(true);
                                 }}>
@@ -694,7 +715,14 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                 </div>
 
                                 <div className="swap-btn">
-                                    <button type="button" onClick={() => { const temp = fromStation; setFromStation(toStation); setToStation(temp); }} title="Swap stations">⇅</button>
+                                    <button type="button" onClick={() => { const temp = fromStation; setFromStation(toStation); setToStation(temp); }} title="Swap stations">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="16 3 21 8 16 13"></polyline>
+                                            <line x1="21" y1="8" x2="9" y2="8"></line>
+                                            <polyline points="8 21 3 16 8 11"></polyline>
+                                            <line x1="3" y1="16" x2="15" y2="16"></line>
+                                        </svg>
+                                    </button>
                                 </div>
 
                                 <div className="form-group" ref={toDropdownRef}>
@@ -744,7 +772,6 @@ function FindMetro({ onNavigate, user, onLogout }) {
 
                             <button type="submit" className="btn-search fm-glow-btn" disabled={loading}>
                                 <div className="btn-content">
-                                    <span className="btn-icon">{loading ? '⌛' : '🧭'}</span>
                                     <span className="btn-text">{loading ? 'Searching Networks...' : 'Explore Routes'}</span>
                                 </div>
                             </button>
@@ -754,7 +781,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                         {(fromStation || toStation) && (
                             <div className="selected-stations-info" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px dashed #ddd' }}>
                                 <div className="station-card">
-                                    <div className="card-header">📍 Selected Stations</div>
+                                    <div className="card-header">Selected Stations</div>
                                     <div className="card-body">
                                         <h4>From: {fromStation || '—'}</h4>
                                         <h4>To: {toStation || '—'}</h4>
@@ -900,7 +927,14 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                 )}
 
                                 <div className="route-actions" style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
-                                    <button type="button" className="btn-book flex-1" onClick={() => handleBookTicket({ ...route, fare: route.fare * Number(passengers) })}>
+                                    <button type="button" className="btn-book flex-1" onClick={() => {
+                                        if (!user) {
+                                            alert("Please sign in to book tickets.");
+                                            onNavigate("signin");
+                                            return;
+                                        }
+                                        handleBookTicket({ ...route, fare: route.fare * Number(passengers) });
+                                    }}>
                                         📱 Book Ticket
                                     </button>
                                     <button type="button" className="btn-show-map flex-1" onClick={() => showRouteOnMap(route)}>

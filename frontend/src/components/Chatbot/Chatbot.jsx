@@ -73,7 +73,7 @@ function Chatbot() {
         setLoading(true);
         const lowerInput = input.toLowerCase();
         const hindiInput = input;
-        
+
         let response = null;
 
         // If user asks to email a ticket: "email ticket <id> to <email>"
@@ -82,7 +82,7 @@ function Chatbot() {
             const emailMatch = input.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
             if (!m || !emailMatch) {
                 setLoading(false);
-                return { type: 'info', text: language === 'hindi' ? 'कृपया सही Booking ID और ईमेल पता दें।' : 'Please provide Booking ID and an email address.' , language };
+                return { type: 'info', text: language === 'hindi' ? 'कृपया सही Booking ID और ईमेल पता दें।' : 'Please provide Booking ID and an email address.', language };
             }
             const bookingId = m[1];
             const email = emailMatch[1];
@@ -125,34 +125,34 @@ function Chatbot() {
             if (!stFrom || !stTo) {
                 // Ask for clarification
                 setLoading(false);
-                return { type: 'info', text: language === 'hindi' ? 'कृपया स्रोत और गंतव्य स्टेशन बताइए (उदा: Aluva से M.G. Road).' : 'Please provide from and to stations (eg: Book ticket from Aluva to M.G. Road).' , language };
+                return { type: 'info', text: language === 'hindi' ? 'कृपया स्रोत और गंतव्य स्टेशन बताइए (उदा: Aluva से M.G. Road).' : 'Please provide from and to stations (eg: Book ticket from Aluva to M.G. Road).', language };
             }
 
+            try {
+                let passengerEmail = null;
                 try {
-                    let passengerEmail = null;
-                    try {
-                        const u = localStorage.getItem('kmrl_user');
-                        if (u) passengerEmail = JSON.parse(u).email;
-                    } catch (e) {}
-                    // Simulate booking locally
-                    const data = { bookingId: 'MOCK-' + Date.now(), ticketUrl: '/mock-api/tickets/' + Date.now() + '.pdf' };
-                    setLoading(false);
-                    if (passengerEmail) {
-                        // simulate email queued
-                    }
-                    return {
-                        type: 'info',
-                        text: language === 'hindi' ? `बुकिंग सफल! Booking ID: ${data.bookingId}. टिकट डाउनलोड: ${data.ticketUrl}` : `Booking successful! Booking ID: ${data.bookingId}. Download ticket: ${data.ticketUrl}`,
-                        language
-                    };
-                } catch (err) {
-                    setLoading(false);
-                    return { type: 'error', text: 'Booking failed. Please try again later.', language };
+                    const u = localStorage.getItem('kmrl_user');
+                    if (u) passengerEmail = JSON.parse(u).email;
+                } catch (e) { }
+                // Simulate booking locally
+                const data = { bookingId: 'MOCK-' + Date.now(), ticketUrl: '/mock-api/tickets/' + Date.now() + '.pdf' };
+                setLoading(false);
+                if (passengerEmail) {
+                    // simulate email queued
                 }
+                return {
+                    type: 'info',
+                    text: language === 'hindi' ? `बुकिंग सफल! Booking ID: ${data.bookingId}. टिकट डाउनलोड: ${data.ticketUrl}` : `Booking successful! Booking ID: ${data.bookingId}. Download ticket: ${data.ticketUrl}`,
+                    language
+                };
+            } catch (err) {
+                setLoading(false);
+                return { type: 'error', text: 'Booking failed. Please try again later.', language };
+            }
         }
 
         // Route search / Distance / ETA
-        if (lowerInput.includes('distance') || lowerInput.includes('route') || 
+        if (lowerInput.includes('distance') || lowerInput.includes('route') ||
             hindiInput.includes('दूरी') || hindiInput.includes('रूट') ||
             lowerInput.includes('से') || lowerInput.includes('to') || lowerInput.includes('eta') || lowerInput.includes('time') || lowerInput.includes('arrival')) {
             // If user asked for ETA specifically, prefer ETA function
@@ -180,12 +180,12 @@ function Chatbot() {
         }
         // Ticket prices
         else if (lowerInput.includes('price') || lowerInput.includes('fare') ||
-                 hindiInput.includes('कीमत') || hindiInput.includes('किराया')) {
+            hindiInput.includes('कीमत') || hindiInput.includes('किराया')) {
             response = getTicketInfo(input);
         }
         // Opening hours
         else if (lowerInput.includes('open') || lowerInput.includes('hour') ||
-                 hindiInput.includes('खुला') || hindiInput.includes('समय')) {
+            hindiInput.includes('खुला') || hindiInput.includes('समय')) {
             response = {
                 type: 'info',
                 text: getText('openingTime'),
@@ -194,12 +194,12 @@ function Chatbot() {
         }
         // Live metro status / running status
         else if (lowerInput.includes('running') || lowerInput.includes('status') || lowerInput.includes('operational') ||
-                 hindiInput.includes('चल रहा') || hindiInput.includes('स्थिति') || hindiInput.includes('चलायमान')) {
+            hindiInput.includes('चल रहा') || hindiInput.includes('स्थिति') || hindiInput.includes('चलायमान')) {
             response = getLiveMetroStatus(input);
         }
         // Live location / train tracking
         else if (lowerInput.includes('location') || lowerInput.includes('where') || lowerInput.includes('track') || lowerInput.includes('live location') ||
-                 hindiInput.includes('स्थान') || hindiInput.includes('कहाँ') || hindiInput.includes('ट्रैक')) {
+            hindiInput.includes('स्थान') || hindiInput.includes('कहाँ') || hindiInput.includes('ट्रैक')) {
             response = getLiveLocationInfo(input);
         }
         // Station info / line mapping / platform
@@ -273,7 +273,7 @@ function Chatbot() {
         else {
             response = {
                 type: 'info',
-                text: language === 'hindi' ? 
+                text: language === 'hindi' ?
                     'क्षमा करें, मुझे समझ नहीं आया। कृपया "मेट्रो खोजें", "किराया", "लाइव स्टेटस", या "स्टेशन" बारे में पूछें।' :
                     'Sorry, I did not understand. Please ask about "metro search", "fare", "live status", "live location", or "stations".',
                 language: language
@@ -295,10 +295,10 @@ function Chatbot() {
             const from = parts[0].trim();
             const to = parts[parts.length - 1].trim();
 
-            fromStn = metroLinesData.flatMap(l => l.stations || []).find(s => 
+            fromStn = metroLinesData.flatMap(l => l.stations || []).find(s =>
                 s.name.toLowerCase().includes(from.toLowerCase())
             );
-            toStn = metroLinesData.flatMap(l => l.stations || []).find(s => 
+            toStn = metroLinesData.flatMap(l => l.stations || []).find(s =>
                 s.name.toLowerCase().includes(to.toLowerCase())
             );
         }
@@ -323,12 +323,12 @@ function Chatbot() {
                 const distance = Math.abs(toIdx - fromIdx);
                 const fare = Math.max(20, distance * 5);
                 const estimatedTime = distance * 3; // 3 min per station
-                
+
                 // Calculate actual distance in km (approximate)
                 const fromCoord = fromStn;
                 const toCoord = toStn;
                 const actualDistance = Math.sqrt(
-                    Math.pow(toCoord.lat - fromCoord.lat, 2) + 
+                    Math.pow(toCoord.lat - fromCoord.lat, 2) +
                     Math.pow(toCoord.lng - fromCoord.lng, 2)
                 ) * 111; // Convert lat/lng difference to approximate km
 
@@ -469,7 +469,7 @@ function Chatbot() {
         // Extract station name if provided
         const parts = input.split(/at|in|par|पर/i).map(p => p.trim()).filter(Boolean);
         const stationName = parts.length > 0 ? parts[parts.length - 1] : null;
-        
+
         if (stationName) {
             const station = findBestStationMatch(stationName);
             if (station) {
@@ -478,11 +478,11 @@ function Chatbot() {
                     const trainIndex = Math.floor(Math.random() * (lineInfo.line.stations.length - 1));
                     const nextStation = lineInfo.line.stations[trainIndex + 1];
                     const timeToNextStop = Math.floor(Math.random() * 5) + 1;
-                    
+
                     const text = language === 'hindi' ?
                         `📍 लाइव ट्रैकिंग - ${station.name}:\n\n🚆 आसन्न ट्रेन:\n• वर्तमान स्थिति: ${nextStation?.name || 'अगला स्टेशन'}\n• अगला स्टॉप: ${lineInfo.line.stations[trainIndex + 2]?.name || 'अंतिम स्टेशन'}\n• अनुमानित समय: ${timeToNextStop} मिनट\n• लाइन: ${lineInfo.line.name}\n• क्षमता: ${Math.floor(Math.random() * 40 + 50)}%` :
                         `📍 Live Tracking - ${station.name}:\n\nUpcoming Train:\n• Current Location: ${nextStation?.name || 'Next Station'}\n• Next Stop: ${lineInfo.line.stations[trainIndex + 2]?.name || 'Final Station'}\n• Estimated Time: ${timeToNextStop} minutes\n• Line: ${lineInfo.line.name}\n• Capacity: ${Math.floor(Math.random() * 40 + 50)}%`;
-                    
+
                     return { type: 'info', text, language };
                 }
             }
@@ -492,7 +492,7 @@ function Chatbot() {
         const text = language === 'hindi' ?
             `📍 लाइव ट्रेन ट्रैकिंग:\n\n🚆 सभी ट्रेनें रीयल-टाइम में चल रही हैं\n\n📊 लाइन स्थिति:\n${metroLinesData.map(line => `• ${line.name}: सक्रिय (${Math.floor(Math.random() * 40 + 50)}% क्षमता)`).join('\n')}\n\n💡 किसी विशेष स्टेशन के लिए बताएं और मैं लाइव ट्रेन की जानकारी दूंगा।` :
             `📍 Live Train Tracking:\n\n🚆 All trains are running in real-time\n\n📊 Line Status:\n${metroLinesData.map(line => `• ${line.name}: Active (${Math.floor(Math.random() * 40 + 50)}% capacity)`).join('\n')}\n\n💡 Tell me a specific station and I'll show live train information.`;
-        
+
         return { type: 'info', text, language };
     };
 
@@ -572,7 +572,7 @@ function Chatbot() {
     return (
         <div className="chatbot-container">
             {/* Chat Button */}
-            <button 
+            <button
                 className="chatbot-toggle-btn"
                 onClick={() => setIsOpen(!isOpen)}
                 title="KMRL Assistant"
@@ -587,20 +587,20 @@ function Chatbot() {
                     <div className="chatbot-header">
                         <h3>🚇 KMRL Assistant</h3>
                         <div className="language-toggle">
-                            <button 
+                            <button
                                 className={language === 'hindi' ? 'active' : ''}
                                 onClick={() => setLanguage('hindi')}
                             >
                                 हिंदी
                             </button>
-                            <button 
+                            <button
                                 className={language === 'english' ? 'active' : ''}
                                 onClick={() => setLanguage('english')}
                             >
                                 English
                             </button>
                         </div>
-                        <button 
+                        <button
                             className="close-btn"
                             onClick={() => setIsOpen(false)}
                         >
@@ -659,7 +659,7 @@ function Chatbot() {
                             placeholder={language === 'hindi' ? 'अपना सवाल पूछें...' : 'Ask your question...'}
                             className="chatbot-input"
                         />
-                        <button 
+                        <button
                             onClick={handleSendMessage}
                             className="btn-send"
                             disabled={!inputValue.trim() || loading}
@@ -673,13 +673,13 @@ function Chatbot() {
                         <button onClick={() => sendAndProcess(language === 'hindi' ? 'दूरी बताओ Aluva से M.G. Road' : 'Distance from Aluva to M.G. Road')}>
                             🗺️ {language === 'hindi' ? 'दूरी' : 'Distance'}
                         </button>
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'किराया क्या है' : 'What is the fare') }>
+                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'किराया क्या है' : 'What is the fare')}>
                             💰 {language === 'hindi' ? 'किराया' : 'Fare'}
                         </button>
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव स्टेटस' : 'Live metro status') }>
+                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव स्टेटस' : 'Live metro status')}>
                             🟢 {language === 'hindi' ? 'स्टेटस' : 'Status'}
                         </button>
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव ट्रैकिंग' : 'Live train tracking') }>
+                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव ट्रैकिंग' : 'Live train tracking')}>
                             📍 {language === 'hindi' ? 'ट्रैक' : 'Track'}
                         </button>
                     </div>

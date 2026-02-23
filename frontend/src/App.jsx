@@ -9,6 +9,8 @@ import Dashboard from './pages/Dashboard';
 import FindMetro from './pages/FindMetro';
 import TicketView from './pages/TicketView';
 import Chatbot from './components/Chatbot/Chatbot';
+import Recharge from './pages/Recharge';
+import MyAccount from './pages/MyAccount';
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -47,6 +49,10 @@ function App() {
                 return <TicketView onNavigate={setCurrentPage} />;
             case 'search':
                 return <SearchMetro onLogout={handleLogout} user={user} onNavigate={setCurrentPage} />;
+            case 'recharge':
+                return <Recharge onNavigate={setCurrentPage} />;
+            case 'myaccount':
+                return <MyAccount user={user} onLogout={handleLogout} onNavigate={setCurrentPage} />;
             default:
                 return <HomePage onNavigate={setCurrentPage} />;
         }
