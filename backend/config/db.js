@@ -10,8 +10,6 @@ const connectDB = async () => {
         console.log('MongoDB Connected Successfully');
     } catch (error) {
         console.error('MongoDB Connection Error:', error.message || error);
-        // Do not exit the process in development - allow server to run with in-memory fallbacks
-        // so frontend can function for UI testing when MongoDB is not available.
         return;
     }
 };
