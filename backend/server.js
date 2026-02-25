@@ -17,34 +17,52 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Create default test users if none exist (development convenience)
+// Create default users if they don't exist (development convenience)
 const User = require('./models/User');
-const ensureTestUsers = async () => {
+const ensureDefaultUsers = async () => {
     try {
-        const count = await User.countDocuments();
-        if (count === 0) {
-            console.log('No users found — creating default test users');
+        // ── Customer test accounts ──────────────────────────────────────────
+        const customerCount = await User.countDocuments({ userType: 'customer' });
+        if (customerCount === 0) {
+            await User.create({ fullName: 'Test User', email: 'test@example.com', username: 'testuser', password: 'Test@1234', userType: 'customer' });
+            await User.create({ fullName: 'Z A B', email: 'zab@example.com', username: 'ZAB', password: 'Zab@1234', userType: 'customer' });
+            console.log('Default customer accounts created: testuser / ZAB');
+        }
+
+        // ── Station Master default account ──────────────────────────────────
+        const smExists = await User.findOne({ userType: 'station_master' });
+        if (!smExists) {
             await User.create({
-                fullName: 'Test User',
-                email: 'test@example.com',
-                username: 'testuser',
-                password: 'Test@1234',
-                userType: 'customer'
+                fullName: 'Station Master',
+                email: 'stationmaster@kmrl.com',
+                username: 'stationmaster',
+                password: 'MASTER123',
+                userType: 'station_master',
+                designation: 'Station Master',
+                stationAssigned: 'Aluva'
             });
+            console.log('Default Station Master created — username: stationmaster | password: MASTER123');
+        }
+
+        // ── KMRL Officer default account ────────────────────────────────────
+        const officerExists = await User.findOne({ userType: 'officer' });
+        if (!officerExists) {
             await User.create({
-                fullName: 'Z A B',
-                email: 'zab@example.com',
-                username: 'ZAB',
-                password: 'Zab@1234',
-                userType: 'customer'
+                fullName: 'KMRL Officer',
+                email: 'officer@kmrl.com',
+                username: 'kmrlofficer',
+                password: 'OFFICER456',
+                userType: 'officer',
+                designation: 'Operations Officer',
+                stationAssigned: 'Head Office'
             });
-            console.log('Default users created: testuser / ZAB (passwords: Test@1234 / Zab@1234)');
+            console.log('Default KMRL Officer created — username: kmrlofficer | password: OFFICER456');
         }
     } catch (err) {
-        console.error('Error creating test users:', err.message);
+        console.error('Error creating default users:', err.message);
     }
 };
-ensureTestUsers();
+ensureDefaultUsers();
 
 // Middleware
 app.use(cors());

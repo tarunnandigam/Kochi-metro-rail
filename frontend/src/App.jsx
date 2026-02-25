@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Header from './components/Layout/Header';
 import HomePage from './pages/HomePage';
@@ -11,70 +12,104 @@ import TicketView from './pages/TicketView';
 import Chatbot from './components/Chatbot/Chatbot';
 import Recharge from './pages/Recharge';
 import MyAccount from './pages/MyAccount';
+import StationMasterDashboard from './pages/StationMasterDashboard';
+import OfficerDashboard from './pages/OfficerDashboard';
 
-function App() {
-    const [currentPage, setCurrentPage] = useState('home');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState(null);
+// Inner app that has access to router hooks
+function AppInner() {
+    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(() => {
+        // Persist login state across page refreshes
+        return !!localStorage.getItem('kmrl_token');
+    });
+    const [user, setUser] = useState(() => {
+        try {
+            const stored = localStorage.getItem('kmrl_user');
+            return stored ? JSON.parse(stored) : null;
+        } catch {
+            return null;
+        }
+    });
 
     const handleLogin = (userData) => {
         setIsLoggedIn(true);
         setUser(userData);
-        setCurrentPage('home');
+        // Redirect to role-specific dashboard
+        if (userData.userType === 'station_master') {
+            navigate('/station-master');
+        } else if (userData.userType === 'officer') {
+            navigate('/officer-dashboard');
+        } else {
+            navigate('/');
+        }
     };
 
     const handleLogout = () => {
         setIsLoggedIn(false);
         setUser(null);
-        setCurrentPage('home');
+        localStorage.removeItem('kmrl_token');
+        localStorage.removeItem('kmrl_user');
+        navigate('/');
     };
 
-    // Pages that handle their own full-screen layout (auth pages)
-    const authPages = ['signin', 'signup'];
-    const isAuthPage = authPages.includes(currentPage);
-
-    const renderPage = () => {
-        switch (currentPage) {
-            case 'home':
-                return <HomePage onNavigate={setCurrentPage} />;
-            case 'signup':
-                return <SignUp onNavigate={setCurrentPage} />;
-            case 'signin':
-                return <SignIn onNavigate={setCurrentPage} onLogin={handleLogin} />;
-            case 'dashboard':
-                return <Dashboard user={user} onLogout={handleLogout} onNavigate={setCurrentPage} />;
-            case 'findmetro':
-                return <FindMetro user={user} onLogout={handleLogout} onNavigate={setCurrentPage} />;
-            case 'ticket':
-                return <TicketView onNavigate={setCurrentPage} />;
-            case 'search':
-                return <SearchMetro onLogout={handleLogout} user={user} onNavigate={setCurrentPage} />;
-            case 'recharge':
-                return <Recharge onNavigate={setCurrentPage} />;
-            case 'myaccount':
-                return <MyAccount user={user} onLogout={handleLogout} onNavigate={setCurrentPage} />;
-            default:
-                return <HomePage onNavigate={setCurrentPage} />;
-        }
+    // onNavigate maps page keys to URL paths (keeps all existing components working unchanged)
+    const onNavigate = (page) => {
+        const routes = {
+            home: '/',
+            signin: '/signin',
+            signup: '/signup',
+            dashboard: '/dashboard',
+            findmetro: '/findmetro',
+            ticket: '/ticket',
+            search: '/search',
+            recharge: '/recharge',
+            myaccount: '/myaccount',
+        };
+        navigate(routes[page] || '/');
     };
+
+    // Auth pages and staff dashboards don't show the public header
+    const location = useLocation();
+    const noHeaderPaths = ['/signin', '/signup', '/station-master', '/officer-dashboard'];
+    const isAuthPage = noHeaderPaths.includes(location.pathname);
 
     return (
         <div className="App">
-            {/* Global Header — shown on all pages except auth pages */}
             {!isAuthPage && (
                 <Header
                     isAuthenticated={isLoggedIn}
                     user={user}
                     onLogout={handleLogout}
-                    onNavigate={setCurrentPage}
-                    currentPage={currentPage}
+                    onNavigate={onNavigate}
                 />
             )}
             <main className={!isAuthPage ? 'app-main' : ''}>
-                {renderPage()}
+                <Routes>
+                    <Route path="/" element={<HomePage onNavigate={onNavigate} />} />
+                    <Route path="/signup" element={<SignUp onNavigate={onNavigate} />} />
+                    <Route path="/signin" element={<SignIn onNavigate={onNavigate} onLogin={handleLogin} />} />
+                    <Route path="/dashboard" element={<Dashboard user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
+                    <Route path="/findmetro" element={<FindMetro user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
+                    <Route path="/ticket" element={<TicketView onNavigate={onNavigate} />} />
+                    <Route path="/search" element={<SearchMetro onLogout={handleLogout} user={user} onNavigate={onNavigate} />} />
+                    <Route path="/recharge" element={<Recharge onNavigate={onNavigate} />} />
+                    <Route path="/myaccount" element={<MyAccount user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
+                    <Route path="/station-master" element={<StationMasterDashboard user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
+                    <Route path="/officer-dashboard" element={<OfficerDashboard user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
+                    {/* Catch-all: redirect unknown URLs to home */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
             </main>
             <Chatbot />
         </div>
+    );
+}
+
+function App() {
+    return (
+        <BrowserRouter>
+            <AppInner />
+        </BrowserRouter>
     );
 }
 
