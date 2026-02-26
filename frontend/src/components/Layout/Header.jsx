@@ -8,9 +8,9 @@ const NAV_ITEMS = [
     { label: "Recharge", page: "recharge" },
     { label: "Facilities", page: null },
     { label: "Plan Your Trip", page: "findmetro" },
-    { label: "Help & Contact", page: null },
+    { label: "Help & Contact", page: "help" },
     { label: "Book Ticket", page: "findmetro", highlight: true },
-    { label: "FAQ's", page: null },
+    { label: "FAQ's", page: "faq" },
 ];
 
 const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPage }) => {
