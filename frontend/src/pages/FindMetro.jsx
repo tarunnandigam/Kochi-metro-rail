@@ -647,9 +647,13 @@ function FindMetro({ onNavigate, user, onLogout }) {
     return (
         <div className="findmetro-container">
             {/* New Unified Hero Banner */}
-            <div className="fm-hero-banner">
-                <h1>Network Map & Plan Your Trip</h1>
-                <p>Welcome to the comprehensive hub for exploring Kochi Metro routes, tracking live trains, and finding fast and smart connections across the city.</p>
+            <div className="fm-hero-wrapper">
+                <img src="/images/p1.png" alt="Metro Illustration Left" className="fm-hero-img-left" />
+                <div className="fm-hero-center">
+                    <h1>Plan Your Trip & Network Map</h1>
+                    <p>Welcome to the comprehensive hub for exploring Kochi Metro routes, tracking live trains, and finding fast and smart connections across the city.</p>
+                </div>
+                <img src="/images/p2.png" alt="Metro Illustration Right" className="fm-hero-img-right" />
             </div>
 
             {/* Live Trains Marquee */}
@@ -838,7 +842,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                             >
                                 All Lines
                             </button>
-                            {metroLines.map(line => (
+                            {metroLines.filter(line => line.stations && line.stations.length > 0 && line.stations.some(s => s.lat)).map(line => (
                                 <button
                                     key={line.id}
                                     className={`line-pill ${selectedLine === line.id ? 'active' : ''}`}

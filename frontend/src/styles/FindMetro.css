@@ -1,40 +1,63 @@
 .findmetro-container {
     min-height: 100vh;
-    background: #f8fafc;
+    background: #ecfdfd;
     padding-bottom: 4rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Hero Section */
-.fm-hero-banner {
-    background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%);
-    color: white;
-    padding: 4rem 2rem 6rem 2rem;
+.fm-hero-wrapper {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 40px;
+    height: 180px;
+}
+
+.fm-hero-img-left {
+    height: 110px;
+    object-fit: contain;
+    position: absolute;
+    left: 60px;
+    top: 35px;
+}
+
+.fm-hero-img-right {
+    height: 110px;
+    object-fit: contain;
+    position: absolute;
+    right: 60px;
+    top: 35px;
+}
+
+.fm-hero-center {
+    flex: 1;
     text-align: center;
-    border-radius: 0 0 40px 40px;
-    box-shadow: 0 10px 30px rgba(13, 148, 136, 0.2);
+    z-index: 2;
+    padding: 0 320px;
 }
 
-.fm-hero-banner h1 {
-    font-size: 3.2rem;
-    font-weight: 800;
-    margin: 0 0 1rem 0;
-    letter-spacing: -0.5px;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+.fm-hero-center h1 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
 }
 
-.fm-hero-banner p {
-    font-size: 1.2rem;
-    font-weight: 500;
-    opacity: 0.9;
-    max-width: 700px;
+.fm-hero-center p {
+    font-size: 1rem;
+    color: #475569;
+    max-width: 500px;
     margin: 0 auto;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 /* Live Updates Bar */
 .fm-live-updates-bar {
     max-width: 1400px;
-    margin: -2.5rem auto 3rem auto;
+    margin: 20px auto 40px auto;
     background: white;
     padding: 0.8rem 1.5rem;
     border-radius: 100px;
@@ -49,10 +72,10 @@
 .live-label {
     background: #ef4444;
     color: white;
-    padding: 0.4rem 1.2rem;
+    padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     white-space: nowrap;
     z-index: 2;
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
@@ -114,29 +137,20 @@
     gap: 2.5rem;
 }
 
-.search-section {
-    background: #ffffff;
-    padding: 2.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-}
-
+.search-section,
 .station-services-panel {
     background: #ffffff;
-    padding: 2.5rem;
+    padding: 35px 40px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    border: none;
 }
 
 .search-section h2 {
     color: #1e293b;
-    background: none;
-    -webkit-text-fill-color: initial;
     margin: 0 0 1.5rem 0;
-    font-size: 1.8rem;
-    font-weight: 500;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
 .fm-map-header h2 {
@@ -165,24 +179,24 @@
 }
 
 .form-group label {
-    font-weight: 500;
+    font-size: 0.85rem;
     color: #334155;
-    font-size: 0.95rem;
+    margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .form-group input,
 .form-group select,
 .services-select {
-    padding: 1rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 400;
-    color: #1e293b;
-    transition: none;
-    background: #ffffff;
     width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background-color: #f8fafc;
+    color: #1e293b;
+    transition: border-color 0.2s;
     box-sizing: border-box;
 }
 
@@ -191,7 +205,7 @@
 .services-select:focus {
     outline: none;
     border-color: #0ea5e9;
-    background: white;
+    background-color: #ffffff;
     box-shadow: none;
 }
 
@@ -205,17 +219,22 @@
     background: #f1f5f9;
     border: 1px solid #cbd5e1;
     color: #64748b;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
-    transition: none;
     flex-shrink: 0;
-    margin-top: 1.5rem;
+    margin-top: 1.8rem;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.swap-btn button:hover {
+    background: #e2e8f0;
+    transform: rotate(180deg);
 }
 
 .dropdown-list {
@@ -262,18 +281,27 @@
 }
 
 .btn-search {
-    background: #003f7f;
+    background-color: #0ea5e9;
     color: white;
-    padding: 1.2rem;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
+    padding: 12px 36px;
     font-family: inherit;
-    font-size: 1.15rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: none;
-    margin-top: 0.5rem;
-    transition: none;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.btn-search:hover {
+    background-color: #0284c7;
+}
+
+.btn-search:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .btn-content {
@@ -346,6 +374,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
     background: white;
     padding: 1.5rem 2.5rem;
     border-radius: 24px;
@@ -358,6 +388,7 @@
 
 .lines-pills {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.8rem;
 }
 
@@ -773,14 +804,26 @@
     }
 }
 
-@media (max-width: 768px) {
-    .fm-hero-banner {
-        padding: 3rem 1.5rem 4rem 1.5rem;
-        border-radius: 0 0 30px 30px;
+@media (max-width: 992px) {
+
+    .fm-hero-img-left,
+    .fm-hero-img-right {
+        display: none;
     }
 
-    .fm-hero-banner h1 {
-        font-size: 2.2rem;
+    .fm-hero-center {
+        padding: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .fm-hero-wrapper {
+        padding: 20px 15px;
+        height: auto;
+    }
+
+    .fm-hero-center h1 {
+        font-size: 1.8rem;
     }
 
     .form-row {
