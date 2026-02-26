@@ -9,6 +9,7 @@ const newsRoutes = require('./routes/news');
 const fareRoutes = require('./routes/fare');
 const activityLogger = require('./middleware/activityLogger');
 const activityRoutes = require('./routes/activity');
+const adminRoutes = require('./routes/admin');
 require('dotenv').config();
 
 const app = express();
@@ -80,6 +81,7 @@ app.use('/api/lines', linesRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/fare', fareRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Welcome route
 app.get('/api/welcome', (req, res) => {
