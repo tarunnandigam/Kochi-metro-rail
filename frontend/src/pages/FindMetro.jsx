@@ -842,7 +842,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                             >
                                 All Lines
                             </button>
-                            {metroLines.filter(line => line.stations && line.stations.length > 0 && line.stations.some(s => s.lat)).map(line => (
+                            {metroLinesData.map(line => (
                                 <button
                                     key={line.id}
                                     className={`line-pill ${selectedLine === line.id ? 'active' : ''}`}
