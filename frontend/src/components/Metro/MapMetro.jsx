@@ -24,8 +24,8 @@ function MapController({ highlightedRoute, selectedLineId }) {
         console.warn('Error fitting bounds:', e);
       }
     } else if (selectedLineId) {
-      // fit to selected line
-      const line = metroLines.find(l => l.id === selectedLineId);
+      // fit to selected line handling both local 'line-1' and backend '1'
+      const line = metroLines.find(l => String(l.id) === String(selectedLineId) || l.id.replace('line-', '') === String(selectedLineId));
       if (line) {
         const bounds = line.stations.map(s => [s.lat, s.lng]);
         map.fitBounds(bounds, { padding: [40, 40] });
@@ -52,33 +52,49 @@ function MapMetro({ height = 400, selectedLineId = null, highlightedRoute = null
 
         {metroLines.map((line) => {
           const latlngs = line.stations.map(s => [s.lat, s.lng]);
-          const isSelected = selectedLineId === line.id;
+          let isSelected = false;
+          if (selectedLineId !== null) {
+            const strId = String(selectedLineId);
+            isSelected = String(line.id) === strId || line.id.replace('line-', '') === strId;
+          }
+          const isDimmed = selectedLineId !== null && !isSelected;
+
+          if (isDimmed) return null;
 
           return (
             <React.Fragment key={line.id}>
               <Polyline
                 positions={latlngs}
-                pathOptions={{ color: line.color, weight: isSelected ? 7 : 4, opacity: isSelected ? 0.95 : 0.6 }}
+                pathOptions={{
+                  color: line.color,
+                  weight: isSelected ? 8 : (isDimmed ? 3 : 5),
+                  opacity: isSelected ? 1 : (isDimmed ? 0.2 : 0.8)
+                }}
               />
 
-              {line.stations.map((station, idx) => (
-                <Marker
-                  key={`${line.id}-${idx}`}
-                  position={[station.lat, station.lng]}
-                  eventHandlers={{
-                    click: () => {
-                      if (typeof onStationClick === 'function') onStationClick(station, line);
-                    }
-                  }}
-                >
-                  <Popup>
-                    <div>
-                      <strong>{station.name}</strong>
-                      <div style={{ fontSize: '0.9em', marginTop: '4px' }}>{line.name}</div>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
+              {line.stations.map((station, idx) => {
+                // Hide stations for non-selected lines if a specific line is highlighted
+                if (isDimmed) return null;
+
+                return (
+                  <Marker
+                    key={`${line.id}-${idx}`}
+                    position={[station.lat, station.lng]}
+                    eventHandlers={{
+                      click: () => {
+                        if (typeof onStationClick === 'function') onStationClick(station, line);
+                      }
+                    }}
+                  >
+                    <Popup>
+                      <div>
+                        <strong>{station.name}</strong>
+                        <div style={{ fontSize: '0.9em', marginTop: '4px' }}>{line.name}</div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
             </React.Fragment>
           );
         })}
