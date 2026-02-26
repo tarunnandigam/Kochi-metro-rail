@@ -1,65 +1,109 @@
 import React from "react";
 import Footer from "../components/Layout/Footer";
-import "../styles/HelpAndContact.css"; // We'll create this CSS file later
+import "../styles/HelpAndContact.css";
+import KMRLogo from "../assets/KMRlogo.png";
+import { Mail01Icon, Location01Icon, ReloadIcon, VolumeHighIcon } from "hugeicons-react";
 
 const HelpAndContact = ({ onNavigate }) => {
     return (
-        <div className="help-contact-page">
-            <div className="hc-hero">
-                <div className="hc-hero-content">
-                    <h1>Help & Contact</h1>
-                    <p>We are here to assist you with any inquiries, suggestions, or issues related to Kochi Metro.</p>
+        <div className="contact-page">
+            <div className="contact-hero-wrapper">
+                <img src="/images/c1.png" alt="Metro Illustration Left" className="hero-img-left" />
+                <div className="contact-hero-center">
+                    <h1>Get in Touch with Us!</h1>
+                    <p>We're here to help and answer any questions you might have. Reach out to us and we'll respond as soon as we can.</p>
                 </div>
+                <img src="/images/c2.png" alt="Metro Illustration Right" className="hero-img-right" />
             </div>
 
-            <div className="hc-main-content">
-                <div className="hc-section hc-contact-info">
-                    <h2>Reach Out to Us</h2>
-                    <div className="hc-cards">
-                        <div className="hc-card">
-                            <div className="hc-icon">📞</div>
-                            <h3>24x7 Helpline</h3>
-                            <p>Call us toll-free anytime for instant support and emergencies.</p>
-                            <span className="hc-highlight">1800-425-8022</span>
+            <div className="contact-container">
+                {/* LEFT: Form Card */}
+                <div className="contact-form-card">
+                    <h2>Fill this form and we'll get back to you!</h2>
+                    <form className="contact-form" onSubmit={(e) => { e.preventDefault(); alert('Message sent!'); }}>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>First Name<span>*</span></label>
+                                <input type="text" placeholder="First Name" required />
+                            </div>
+                            <div className="form-group">
+                                <label>Last Name<span>*</span></label>
+                                <input type="text" placeholder="Last Name" required />
+                            </div>
                         </div>
-                        <div className="hc-card">
-                            <div className="hc-icon">✉️</div>
-                            <h3>Email Support</h3>
-                            <p>Send us your detailed queries, business proposals, or feedback.</p>
-                            <span className="hc-highlight">contact@kochimetro.org</span>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>Contact Number<span>*</span></label>
+                                <div className="phone-input">
+                                    <div className="phone-prefix">+91</div>
+                                    <input type="tel" placeholder="Contact Number" required />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>E-Mail Address<span>*</span></label>
+                                <input type="email" placeholder="E-Mail Address" required />
+                            </div>
                         </div>
-                        <div className="hc-card">
-                            <div className="hc-icon">📍</div>
-                            <h3>Head Office</h3>
-                            <p>Kochi Metro Rail Limited<br />JLN Stadium Metro Station<br />Kaloor, Ernakulam, Kerala 682017</p>
+
+                        <div className="form-group">
+                            <label>Subject<span>*</span></label>
+                            <input type="text" placeholder="Start Typing" required />
                         </div>
-                    </div>
+
+                        <div className="form-group">
+                            <label>Message<span>*</span></label>
+                            <textarea rows="4" placeholder="Start Typing" required></textarea>
+                        </div>
+
+                        <div className="form-group attachment-group">
+                            <label>Add attachment</label>
+                            <div className="attachment-box">
+                                <label htmlFor="file-upload" className="upload-btn">Upload File</label>
+                                <input id="file-upload" type="file" style={{ display: 'none' }} />
+                                <span className="attachment-info">PDF, DOC, DOCX, PNG, JPG, JPEG | <strong>Max 5MB</strong></span>
+                            </div>
+                        </div>
+
+                        <div className="form-footer">
+                            <div className="captcha-wrapper">
+                                <div className="captcha-input-row">
+                                    <div className="captcha-box">
+                                        <span className="captcha-text">pWSg</span>
+                                    </div>
+                                    <input type="text" placeholder="Enter Captcha" required className="captcha-input" />
+                                </div>
+                                <div className="captcha-icons">
+                                    <button type="button" className="icon-btn"><ReloadIcon size={16} color="#64748b" strokeWidth={2} /></button>
+                                    <button type="button" className="icon-btn"><VolumeHighIcon size={16} color="#64748b" strokeWidth={2} /></button>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="submit-btn">Submit</button>
+                        </div>
+                    </form>
                 </div>
 
-                <div className="hc-section hc-form-section">
-                    <h2>Send Us a Message</h2>
-                    <p>Got a specific question or complaint? Fill out the form below and our team will get back to you shortly.</p>
-                    <form className="hc-form" onSubmit={(e) => { e.preventDefault(); alert('Message sent successfully! We will get back to you soon.'); }}>
-                        <div className="hc-form-row">
-                            <div className="hc-form-group">
-                                <label>Full Name</label>
-                                <input type="text" placeholder="Enter your full name" required />
-                            </div>
-                            <div className="hc-form-group">
-                                <label>Email Address</label>
-                                <input type="email" placeholder="Enter your email address" required />
-                            </div>
+                {/* RIGHT: Contact Info elements */}
+                <div className="contact-info-side">
+                    <img src={KMRLogo} alt="KMRL Logo" className="info-logo" />
+
+                    <div className="info-block" style={{ marginTop: '30px' }}>
+                        <h3 className="red-title">Drop us a mail</h3>
+                        <div className="info-item">
+                            <Mail01Icon size={18} color="#475569" strokeWidth={2} style={{ marginTop: '2px' }} />
+                            <a href="mailto:customercare@kochimetro.org">customercare@kochimetro.org</a>
                         </div>
-                        <div className="hc-form-group">
-                            <label>Subject</label>
-                            <input type="text" placeholder="What is this regarding?" required />
+                    </div>
+
+                    <div className="info-block" style={{ marginTop: '40px' }}>
+                        <h3 className="dark-title">Registered Office</h3>
+                        <div className="info-item location-item">
+                            <Location01Icon size={18} color="#475569" strokeWidth={2} style={{ marginTop: '3px', flexShrink: 0 }} />
+                            <p>Kochi Metro Rail Limited. JLN Stadium Metro Station, Kaloor, Ernakulam, Kerala 682017</p>
                         </div>
-                        <div className="hc-form-group">
-                            <label>Message</label>
-                            <textarea rows="5" placeholder="Write your message here..." required></textarea>
-                        </div>
-                        <button type="submit" className="hc-submit-btn">Send Message</button>
-                    </form>
+                    </div>
                 </div>
             </div>
 
