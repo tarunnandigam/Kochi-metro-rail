@@ -51,38 +51,38 @@ router.post('/signup', validateSignup, async (req, res) => {
 
         const { fullName, email, password, username, userType, designation, stationAssigned } = req.body;
 
-            // If registering as station_master or officer, require a passKey to verify authenticity
-            if (userType === 'station_master' || userType === 'officer') {
-                // Allow protected signup by default in development/local environments.
-                // In production, provide PASS_KEYS or set ALLOW_PROTECTED_SIGNUP=true explicitly.
-                const allowOpenEnv = (process.env.ALLOW_PROTECTED_SIGNUP || '').toLowerCase() === 'true';
-                const isDev = (process.env.NODE_ENV || 'development') !== 'production';
-                const allowOpen = allowOpenEnv || isDev;
-                if (!allowOpen) {
-                    const providedKey = req.body.passKey || '';
-                    const allowedFromEnv = (process.env.PASS_KEYS || process.env.PASS_KEY || '').split(',').map(s => s.trim()).filter(Boolean);
-                    if (!providedKey) {
-                        return res.status(403).json({ message: 'Pass key is required to register as station master or officer' });
-                    }
-                    if (allowedFromEnv.length === 0) {
-                        console.warn('No PASS_KEYS configured in environment — rejecting protected signup attempts');
-                        return res.status(403).json({ message: 'Registration for this role is currently disabled. Contact admin.' });
-                    }
-                    if (!allowedFromEnv.includes(providedKey)) {
-                        return res.status(403).json({ message: 'You are not authorised to create this account — invalid pass key' });
-                    }
+        // If registering as station_master or officer, require a passKey to verify authenticity
+        if (userType === 'station_master' || userType === 'officer') {
+            // Allow protected signup by default in development/local environments.
+            // In production, provide PASS_KEYS or set ALLOW_PROTECTED_SIGNUP=true explicitly.
+            const allowOpenEnv = (process.env.ALLOW_PROTECTED_SIGNUP || '').toLowerCase() === 'true';
+            const isDev = (process.env.NODE_ENV || 'development') !== 'production';
+            const allowOpen = allowOpenEnv || isDev;
+            if (!allowOpen) {
+                const providedKey = req.body.passKey || '';
+                const allowedFromEnv = (process.env.PASS_KEYS || process.env.PASS_KEY || '').split(',').map(s => s.trim()).filter(Boolean);
+                if (!providedKey) {
+                    return res.status(403).json({ message: 'Pass key is required to register as station master or officer' });
+                }
+                if (allowedFromEnv.length === 0) {
+                    console.warn('No PASS_KEYS configured in environment — rejecting protected signup attempts');
+                    return res.status(403).json({ message: 'Registration for this role is currently disabled. Contact admin.' });
+                }
+                if (!allowedFromEnv.includes(providedKey)) {
+                    return res.status(403).json({ message: 'You are not authorised to create this account — invalid pass key' });
                 }
             }
+        }
 
         // Check if user already exists
-        const userExists = await User.findOne({ 
-            $or: [{ email }, { username }] 
+        const userExists = await User.findOne({
+            $or: [{ email }, { username }]
         });
 
         if (userExists) {
             return res.status(400).json({
-                message: userExists.email === email 
-                    ? 'Email already registered' 
+                message: userExists.email === email
+                    ? 'Email already registered'
                     : 'Username already taken'
             });
         }
@@ -95,7 +95,8 @@ router.post('/signup', validateSignup, async (req, res) => {
             password,
             userType: userType || 'customer',
             designation: designation || null,
-            stationAssigned: stationAssigned || null
+            stationAssigned: stationAssigned || null,
+            accountStatus: userType === 'station_master' ? 'pending' : 'active'
         });
 
         // Generate token
@@ -144,6 +145,10 @@ router.post('/login', validateLogin, async (req, res) => {
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        if (user.accountStatus === 'pending') {
+            return res.status(403).json({ message: 'Your account is pending approval by KMRL Officer' });
         }
 
         // Check password

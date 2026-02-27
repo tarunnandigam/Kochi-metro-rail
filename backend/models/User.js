@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema({
         default: 'customer',
         required: true
     },
+    accountStatus: {
+        type: String,
+        enum: ['active', 'pending'],
+        default: 'active'
+    },
     designation: {
         type: String,
         default: null

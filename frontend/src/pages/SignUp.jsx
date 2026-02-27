@@ -148,7 +148,11 @@ function SignUp({ onNavigate }) {
             localStorage.setItem('kmrl_token', data.token);
             localStorage.setItem('kmrl_user', JSON.stringify(data.user));
             // Notify user with username (and remind about password they entered)
-            alert(`Account created successfully!\nUsername: ${formData.username}\nPlease remember your password (the one you entered).`);
+            if (formData.role === 'station_master') {
+                alert(`Account created successfully!\nUsername: ${formData.username}\n\nYour Station Master account has been submitted and is Pending Approval by a KMRL Officer. You can log in once it is approved.`);
+            } else {
+                alert(`Account created successfully!\nUsername: ${formData.username}\nPlease remember your password (the one you entered).`);
+            }
             onNavigate('signin');
         } catch (error) {
             console.error('Sign up error:', error);
@@ -179,16 +183,11 @@ function SignUp({ onNavigate }) {
             {/* Left side: Image/Video Area */}
             <div className="signup-media-side">
                 <div className="signup-media-overlay"></div>
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="signup-video-bg"
-                    poster="/images/oip3.jpg"
-                >
-                    <source src="/images/oip3.mp4" type="video/mp4" />
-                </video>
+                <img
+                    src="/images/login-img.png"
+                    alt="Metro train background"
+                    className="signup-image-bg"
+                />
             </div>
 
             {/* Right side: Registration Form */}
@@ -252,7 +251,6 @@ function SignUp({ onNavigate }) {
                             >
                                 <option value="customer">👤 Customer / Passenger</option>
                                 <option value="station_master">🚇 Station Master</option>
-                                <option value="officer">👮 KMRL Officer</option>
                             </select>
                         </div>
 

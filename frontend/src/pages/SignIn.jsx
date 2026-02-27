@@ -115,17 +115,11 @@ function SignIn({ onNavigate, onLogin }) {
             {/* Left side: Image/Video Area */}
             <div className="signin-media-side">
                 <div className="signin-media-overlay"></div>
-                {/* Fallback pattern/color if video fails */}
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="signin-video-bg"
-                    poster="/images/oip2.jpg"
-                >
-                    <source src="/images/oip2.mp4" type="video/mp4" />
-                </video>
+                <img
+                    src="/images/login-img.png"
+                    alt="Metro train background"
+                    className="signin-image-bg"
+                />
             </div>
 
             {/* Right side: Login Form */}
@@ -140,7 +134,7 @@ function SignIn({ onNavigate, onLogin }) {
                         {errors.submit && <div className="error-message">{errors.submit}</div>}
 
                         <div className="form-group">
-                            <label htmlFor="usernameOrEmail">Email Address</label>
+                            <label htmlFor="usernameOrEmail">Email Address or Username</label>
                             <input
                                 type="text"
                                 id="usernameOrEmail"
