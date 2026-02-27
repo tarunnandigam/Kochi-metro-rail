@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { generateCaptcha, generateCaptchaImage } from '../utils/captcha';
+import '@fontsource/caudex';
 import '../styles/SignIn.css';
-import VideoBackground from '../components/VideoBackground';
 
 function SignIn({ onNavigate, onLogin }) {
     const [formData, setFormData] = useState({
@@ -111,93 +111,108 @@ function SignIn({ onNavigate, onLogin }) {
     };
 
     return (
-        <div className="signin-container page-content-above-video">
-            <VideoBackground src="/images/oip2.mp4" poster="/images/oip2.jpg" overlayOpacity={0.5} />
-            <div className="signin-box">
-                <div className="signin-header">
-                    <h1>Welcome Back</h1>
-                    <p>Sign in to KMRL Metro</p>
-                </div>
+        <div className="signin-container">
+            {/* Left side: Image/Video Area */}
+            <div className="signin-media-side">
+                <div className="signin-media-overlay"></div>
+                {/* Fallback pattern/color if video fails */}
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="signin-video-bg"
+                    poster="/images/oip2.jpg"
+                >
+                    <source src="/images/oip2.mp4" type="video/mp4" />
+                </video>
+            </div>
 
-                <form onSubmit={handleSubmit} className="signin-form">
-                    {errors.submit && <div className="error-message">{errors.submit}</div>}
-
-                    <div className="form-group">
-                        <label htmlFor="usernameOrEmail">Username or Email *</label>
-                        <input
-                            type="text"
-                            id="usernameOrEmail"
-                            name="usernameOrEmail"
-                            value={formData.usernameOrEmail}
-                            onChange={handleInputChange}
-                            placeholder="Enter username or email"
-                            className={errors.usernameOrEmail ? 'input-error' : ''}
-                        />
-                        {errors.usernameOrEmail && <span className="error-text">{errors.usernameOrEmail}</span>}
+            {/* Right side: Login Form */}
+            <div className="signin-form-side">
+                <div className="signin-form-wrapper">
+                    <div className="signin-header">
+                        <h1>Login</h1>
+                        <p>Welcome! Please enter the details to login to account.</p>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password">Password *</label>
-                        <div className="password-input-wrapper">
-                            <input
-                                type={showPassword ? 'text' : 'password'}
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                placeholder="Enter password"
-                                className={errors.password ? 'input-error' : ''}
-                            />
-                            <button
-                                type="button"
-                                className="toggle-password"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? '👁️' : '👁️‍🗨️'}
-                            </button>
-                        </div>
-                        {errors.password && <span className="error-text">{errors.password}</span>}
-                    </div>
+                    <form onSubmit={handleSubmit} className="signin-form">
+                        {errors.submit && <div className="error-message">{errors.submit}</div>}
 
-                    <div className="form-group">
-                        <label>CAPTCHA *</label>
-                        <div className="captcha-section">
-                            <div className="captcha-image-wrapper">
-                                {captchaImage && <img src={captchaImage} alt="CAPTCHA" />}
-                                <button
-                                    type="button"
-                                    className="refresh-captcha"
-                                    onClick={generateNewCaptcha}
-                                    title="Refresh CAPTCHA"
-                                >
-                                    🔄
-                                </button>
-                            </div>
+                        <div className="form-group">
+                            <label htmlFor="usernameOrEmail">Email Address</label>
                             <input
                                 type="text"
-                                name="captcha"
-                                value={formData.captcha}
+                                id="usernameOrEmail"
+                                name="usernameOrEmail"
+                                value={formData.usernameOrEmail}
                                 onChange={handleInputChange}
-                                placeholder="Enter CAPTCHA"
-                                maxLength="6"
-                                className={`captcha-input ${errors.captcha ? 'input-error' : ''}`}
+                                className={errors.usernameOrEmail ? 'input-error' : ''}
                             />
+                            {errors.usernameOrEmail && <span className="error-text">{errors.usernameOrEmail}</span>}
                         </div>
-                        {errors.captcha && <span className="error-text">{errors.captcha}</span>}
-                    </div>
 
-                    <button type="submit" className="btn-signin-submit" disabled={loading}>
-                        {loading ? 'Signing in...' : 'Sign In'}
-                    </button>
+                        <div className="form-group">
+                            <label htmlFor="password">Password</label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className={errors.password ? 'input-error' : ''}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                            {errors.password && <span className="error-text">{errors.password}</span>}
+                        </div>
 
-                    <p className="signup-link">
-                        Don't have an account? <a href="#" onClick={() => onNavigate('signup')}>Sign Up</a>
-                    </p>
+                        <div className="form-group captcha-group">
+                            <label>CAPTCHA</label>
+                            <div className="captcha-section">
+                                <div className="captcha-image-wrapper">
+                                    {captchaImage && <img src={captchaImage} alt="CAPTCHA" />}
+                                    <button
+                                        type="button"
+                                        className="refresh-captcha"
+                                        onClick={generateNewCaptcha}
+                                        title="Refresh CAPTCHA"
+                                    >
+                                        🔄
+                                    </button>
+                                </div>
+                                <input
+                                    type="text"
+                                    name="captcha"
+                                    value={formData.captcha}
+                                    onChange={handleInputChange}
+                                    maxLength="6"
+                                    className={`captcha-input ${errors.captcha ? 'input-error' : ''}`}
+                                />
+                            </div>
+                            {errors.captcha && <span className="error-text">{errors.captcha}</span>}
+                        </div>
 
-                    <p className="forgot-password">
-                        <a href="#" onClick={() => alert('Password reset feature coming soon!')}>Forgot password?</a>
-                    </p>
-                </form>
+                        <div className="forgot-password">
+                            <span className="forgot-text">Forgot Password?</span> <a href="#" onClick={(e) => { e.preventDefault(); alert('Password reset feature coming soon!'); }}>Reset Password</a>
+                        </div>
+
+                        <button type="submit" className="btn-signin-submit" disabled={loading}>
+                            {loading ? 'Signing in...' : 'Login'}
+                        </button>
+
+                        <p className="signup-link">
+                            Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('signup'); }}>Register Here</a>
+                        </p>
+                    </form>
+                </div>
             </div>
         </div>
     );

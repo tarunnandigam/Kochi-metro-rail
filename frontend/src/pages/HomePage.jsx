@@ -1167,41 +1167,34 @@ function HomePage({ onNavigate }) {
                     onClick={() => { setShowFareModal(false); resetFareModal(); }}
                 >
                     <div
-                        className="fare-modal-popup"
+                        className="fare-modal-wrapper"
                         onClick={e => e.stopPropagation()}
                     >
-                        {/* ── Top Header Bar ── */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
-                            {/* Teal pill */}
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: '#0d9488', color: '#fff', fontWeight: 700, fontSize: '0.88rem', padding: '0.4rem 1rem', borderRadius: '999px', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="2" y="3" width="20" height="14" rx="2" />
-                                    <line x1="8" y1="21" x2="16" y2="21" />
-                                    <line x1="12" y1="17" x2="12" y2="21" />
-                                </svg>
+                        {/* ── Tab Header ── */}
+                        <div className="fare-tab-header">
+                            <div className="fare-tab-active">
                                 Fare Calculator
                             </div>
-                            {/* Subtitle */}
-                            <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', flex: 1, lineHeight: 1.4 }}>Select your station to calculate fare and view journey details.</p>
-                            {/* Close button */}
-                            <button
-                                onClick={() => { setShowFareModal(false); resetFareModal(); }}
-                                aria-label="Close"
-                                style={{ flexShrink: 0, background: '#e2e8f0', backgroundColor: '#e2e8f0', border: 'none', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#334155', fontSize: '1rem', fontWeight: 700, padding: 0, lineHeight: 1 }}
-                            >
-                                ×
-                            </button>
+                            <div className="fare-tab-inactive">
+                                <span className="fare-tab-desc">Select your station to calculate fare and view your journey details.</span>
+                                <button className="fare-close-icon" onClick={() => { setShowFareModal(false); resetFareModal(); }}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a0aec0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
-                        {/* ── Station Inputs ── */}
-                        <div className="fare-modal-body">
-                            <div className="fare-station-block">
+                        {/* ── Main Body ── */}
+                        <div className="fare-main-body">
+                            {/* Inputs Group */}
+                            <div className="fare-inputs-group">
                                 {/* From Input */}
-                                <div className="fare-station-input-wrap" ref={fareFromRef}>
-                                    <label className="fare-station-label">From</label>
+                                <div className="fare-input-row" ref={fareFromRef}>
+                                    <label>From</label>
                                     <input
-                                        id="fare-from-input"
-                                        className="fare-station-input"
                                         type="text"
                                         placeholder="Search From Station"
                                         value={fareModalFrom}
@@ -1233,29 +1226,17 @@ function HomePage({ onNavigate }) {
                                     )}
                                 </div>
 
-                                {/* Swap Button */}
-                                <div className="fare-swap-btn-wrap">
-                                    <button
-                                        className="fare-swap-btn"
-                                        onClick={swapFareStations}
-                                        title="Swap stations"
-                                        type="button"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M8 3 4 7l4 4" />
-                                            <path d="M4 7h16" />
-                                            <path d="M16 21l4-4-4-4" />
-                                            <path d="M20 17H4" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                <div className="fare-input-divider"></div>
+
+                                {/* Swap Circle */}
+                                <button className="fare-swap-circle" onClick={swapFareStations} title="Swap stations" type="button">
+                                    <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#1a3a5c', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>⇅</span>
+                                </button>
 
                                 {/* To Input */}
-                                <div className="fare-station-input-wrap" ref={fareToRef}>
-                                    <label className="fare-station-label">To</label>
+                                <div className="fare-input-row" ref={fareToRef}>
+                                    <label>To</label>
                                     <input
-                                        id="fare-to-input"
-                                        className="fare-station-input"
                                         type="text"
                                         placeholder="Search To Station"
                                         value={fareModalTo}
@@ -1288,9 +1269,9 @@ function HomePage({ onNavigate }) {
                                 </div>
                             </div>
 
-                            {/* ── Action Buttons ── */}
-                            <div className="fare-action-row">
-                                <button className="fare-reset-btn" onClick={resetFareModal}>
+                            {/* Actions */}
+                            <div className="fare-actions-container">
+                                <button className="fare-reset-text-btn" onClick={resetFareModal}>
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                                         <path d="M3 3v5h5" />
@@ -1298,54 +1279,49 @@ function HomePage({ onNavigate }) {
                                     RESET
                                 </button>
                                 <button
-                                    className="fare-getfare-btn"
+                                    className="fare-getfare-solid-btn"
                                     onClick={calculateFareByStations}
                                     disabled={!fareModalFrom || !fareModalTo || fareModalFrom === fareModalTo}
                                 >
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="2" y="4" width="20" height="16" rx="2" />
-                                        <path d="M7 15h0" />
-                                        <path d="M2 9.5h20" />
-                                    </svg>
                                     GET FARE
                                 </button>
                             </div>
 
-                            {/* ── Fare & Journey Details ── */}
-                            <div className="fare-details-section">
-                                <h3 className="fare-details-heading">FARE &amp; JOURNEY DETAILS</h3>
-                                <div className="fare-details-cards">
-                                    {/* Journey Fare Card */}
-                                    <div className="fare-detail-card">
-                                        <div className="fare-detail-icon fare-detail-icon--purple">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
-                                                <path d="M13 5v2M13 17v2M13 11v2" />
+                            {/* Details Container */}
+                            <div className="fare-details-wrapper">
+                                <h4>FARE &amp; JOURNEY DETAILS</h4>
+                                <div className="fare-cards-flex">
+                                    <div className="fare-card-item">
+                                        <div className="fc-icon fc-purple">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <rect x="2" y="8" width="20" height="8" rx="2" ry="2" />
+                                                <line x1="6" y1="8" x2="6" y2="16" />
+                                                <line x1="18" y1="8" x2="18" y2="16" />
+                                                <line x1="2" y1="12" x2="22" y2="12" strokeDasharray="2 2" />
                                             </svg>
                                         </div>
-                                        <div className="fare-detail-info">
-                                            <span className="fare-detail-label">Journey Fare</span>
-                                            <span className="fare-detail-value">₹{fareResult.calculated ? fareResult.fare : 0}</span>
+                                        <div className="fc-text">
+                                            <span className="fc-lbl">Journey Fare</span>
+                                            <span className="fc-val">₹ {fareResult.calculated ? fareResult.fare : 0}</span>
                                         </div>
                                     </div>
-                                    {/* Distance Card */}
-                                    <div className="fare-detail-card">
-                                        <div className="fare-detail-icon fare-detail-icon--green">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <div className="fare-card-item">
+                                        <div className="fc-icon fc-green">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                                                 <circle cx="12" cy="9" r="2.5" />
                                             </svg>
                                         </div>
-                                        <div className="fare-detail-info">
-                                            <span className="fare-detail-label">Distance</span>
-                                            <span className="fare-detail-value">{fareResult.calculated ? fareResult.distance : 0} km</span>
+                                        <div className="fc-text">
+                                            <span className="fc-lbl">Distance</span>
+                                            <span className="fc-val">{fareResult.calculated ? fareResult.distance : 0} km</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* ── City Skyline Illustration ── */}
-                            <div className="fare-skyline">
+                            {/* Skyline */}
+                            <div className="fare-skyline-bottom">
                                 <img src="/images/footer1.png" alt="City Skyline" />
                             </div>
                         </div>

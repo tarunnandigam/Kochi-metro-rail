@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import '@fontsource/caudex';
 import '../styles/SignUp.css';
-import VideoBackground from '../components/VideoBackground';
 
 function SignUp({ onNavigate }) {
     const [formData, setFormData] = useState({
@@ -175,205 +175,219 @@ function SignUp({ onNavigate }) {
     };
 
     return (
-        <div className="signup-container page-content-above-video">
-            <VideoBackground src="/images/oip3.mp4" poster="/images/oip3.jpg" overlayOpacity={0.5} />
-            <div className="signup-box">
-                <div className="signup-header">
-                    <h1>Create Account</h1>
-                    <p>Join KMRL Metro</p>
-                </div>
+        <div className="signup-container">
+            {/* Left side: Image/Video Area */}
+            <div className="signup-media-side">
+                <div className="signup-media-overlay"></div>
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="signup-video-bg"
+                    poster="/images/oip3.jpg"
+                >
+                    <source src="/images/oip3.mp4" type="video/mp4" />
+                </video>
+            </div>
 
-                <form onSubmit={handleSubmit} className="signup-form">
-                    {errors.submit && <div className="error-message">{errors.submit}</div>}
-
-                    <div className="form-group">
-                        <label htmlFor="fullName">Full Name (As per Aadhaar) *</label>
-                        <input
-                            type="text"
-                            id="fullName"
-                            name="fullName"
-                            value={formData.fullName}
-                            onChange={handleInputChange}
-                            placeholder="Enter your full name"
-                            className={errors.fullName ? 'input-error' : ''}
-                        />
-                        {errors.fullName && <span className="error-text">{errors.fullName}</span>}
+            {/* Right side: Registration Form */}
+            <div className="signup-form-side">
+                <div className="signup-form-wrapper">
+                    <div className="signup-header">
+                        <h1>Create Account</h1>
+                        <p>Welcome! Please join KMRL Metro to continue.</p>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="email">Email ID *</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            placeholder="Enter your email"
-                            className={errors.email ? 'input-error' : ''}
-                        />
-                        {errors.email && <span className="error-text">{errors.email}</span>}
-                    </div>
+                    <form onSubmit={handleSubmit} className="signup-form">
+                        {errors.submit && <div className="error-message">{errors.submit}</div>}
 
-                    <div className="form-group">
-                        <label htmlFor="username">Username *</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                            placeholder="Choose a username"
-                            className={errors.username ? 'input-error' : ''}
-                        />
-                        {errors.username && <span className="error-text">{errors.username}</span>}
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="role">User Type *</label>
-                        <select
-                            id="role"
-                            name="role"
-                            value={formData.role}
-                            onChange={handleInputChange}
-                            className="form-select"
-                        >
-                            <option value="customer">👤 Customer / Passenger</option>
-                            <option value="station_master">🚇 Station Master</option>
-                            <option value="officer">👮 KMRL Officer</option>
-                        </select>
-                    </div>
-
-                    {formData.role !== 'customer' && (
-                        <>
-                            <div className="form-group">
-                                <label htmlFor="designation">Designation *</label>
-                                <input
-                                    type="text"
-                                    id="designation"
-                                    name="designation"
-                                    value={formData.designation}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter your designation"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="stationAssigned">Assigned Station/Area *</label>
-                                <input
-                                    type="text"
-                                    id="stationAssigned"
-                                    name="stationAssigned"
-                                    value={formData.stationAssigned}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter assigned station or area"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="passKey">Pass Key (for verification) *</label>
-                                <input
-                                    type="text"
-                                    id="passKey"
-                                    name="passKey"
-                                    value={formData.passKey || ''}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter pass key provided by admin"
-                                />
-                                {errors.passKey && <span className="error-text">{errors.passKey}</span>}
-                            </div>
-                        </>
-                    )}
-
-                    <div className="form-group">
-                        <label htmlFor="password">Password *</label>
-                        <div className="password-input-wrapper">
+                        <div className="form-group">
+                            <label htmlFor="fullName">Full Name</label>
                             <input
-                                type={showPassword ? 'text' : 'password'}
-                                id="password"
-                                name="password"
-                                value={formData.password}
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                value={formData.fullName}
                                 onChange={handleInputChange}
-                                placeholder="Enter password"
-                                className={errors.password ? 'input-error' : ''}
+                                className={errors.fullName ? 'input-error' : ''}
                             />
-                            <button
-                                type="button"
-                                className="toggle-password"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? '👁️' : '👁️‍🗨️'}
-                            </button>
+                            {errors.fullName && <span className="error-text">{errors.fullName}</span>}
                         </div>
-                        {formData.password && (
-                            <div className={`strength-indicator strength-${passwordStrength.toLowerCase()}`}>
-                                Strength: <strong>{passwordStrength}</strong>
-                            </div>
+
+                        <div className="form-group">
+                            <label htmlFor="email">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                className={errors.email ? 'input-error' : ''}
+                            />
+                            {errors.email && <span className="error-text">{errors.email}</span>}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="username">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleInputChange}
+                                className={errors.username ? 'input-error' : ''}
+                            />
+                            {errors.username && <span className="error-text">{errors.username}</span>}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="role">User Type *</label>
+                            <select
+                                id="role"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleInputChange}
+                                className="form-select"
+                            >
+                                <option value="customer">👤 Customer / Passenger</option>
+                                <option value="station_master">🚇 Station Master</option>
+                                <option value="officer">👮 KMRL Officer</option>
+                            </select>
+                        </div>
+
+                        {formData.role !== 'customer' && (
+                            <>
+                                <div className="form-group">
+                                    <label htmlFor="designation">Designation *</label>
+                                    <input
+                                        type="text"
+                                        id="designation"
+                                        name="designation"
+                                        value={formData.designation}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your designation"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="stationAssigned">Assigned Station/Area *</label>
+                                    <input
+                                        type="text"
+                                        id="stationAssigned"
+                                        name="stationAssigned"
+                                        value={formData.stationAssigned}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter assigned station or area"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="passKey">Pass Key (for verification) *</label>
+                                    <input
+                                        type="text"
+                                        id="passKey"
+                                        name="passKey"
+                                        value={formData.passKey || ''}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter pass key provided by admin"
+                                    />
+                                    {errors.passKey && <span className="error-text">{errors.passKey}</span>}
+                                </div>
+                            </>
                         )}
-                        <div className="password-requirements">
-                            <p>Password must contain:</p>
-                            <ul>
-                                <li className={/[A-Z]/.test(formData.password) ? 'valid' : ''}>
-                                    ✓ Uppercase letter
-                                </li>
-                                <li className={/[a-z]/.test(formData.password) ? 'valid' : ''}>
-                                    ✓ Lowercase letter
-                                </li>
-                                <li className={/[0-9]/.test(formData.password) ? 'valid' : ''}>
-                                    ✓ Number
-                                </li>
-                                <li className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) ? 'valid' : ''}>
-                                    ✓ Special character
-                                </li>
-                                <li className={formData.password.length >= 8 ? 'valid' : ''}>
-                                    ✓ At least 8 characters
-                                </li>
-                            </ul>
-                        </div>
-                        {errors.password && <span className="error-text">{errors.password}</span>}
-                    </div>
 
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm Password *</label>
-                        <div className="password-input-wrapper">
+                        <div className="form-group">
+                            <label htmlFor="password">Password *</label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter password"
+                                    className={errors.password ? 'input-error' : ''}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                            {formData.password && (
+                                <div className={`strength-indicator strength-${passwordStrength.toLowerCase()}`}>
+                                    Strength: <strong>{passwordStrength}</strong>
+                                </div>
+                            )}
+                            <div className="password-requirements">
+                                <p>Password must contain:</p>
+                                <ul>
+                                    <li className={/[A-Z]/.test(formData.password) ? 'valid' : ''}>
+                                        ✓ Uppercase letter
+                                    </li>
+                                    <li className={/[a-z]/.test(formData.password) ? 'valid' : ''}>
+                                        ✓ Lowercase letter
+                                    </li>
+                                    <li className={/[0-9]/.test(formData.password) ? 'valid' : ''}>
+                                        ✓ Number
+                                    </li>
+                                    <li className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) ? 'valid' : ''}>
+                                        ✓ Special character
+                                    </li>
+                                    <li className={formData.password.length >= 8 ? 'valid' : ''}>
+                                        ✓ At least 8 characters
+                                    </li>
+                                </ul>
+                            </div>
+                            {errors.password && <span className="error-text">{errors.password}</span>}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="confirmPassword">Confirm Password *</label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleInputChange}
+                                    placeholder="Confirm password"
+                                    className={errors.confirmPassword ? 'input-error' : ''}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
+                            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+                        </div>
+
+                        <div className="form-group checkbox">
                             <input
-                                type={showPassword ? 'text' : 'password'}
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
+                                type="checkbox"
+                                id="savePassword"
+                                name="savePassword"
+                                checked={formData.savePassword}
                                 onChange={handleInputChange}
-                                placeholder="Confirm password"
-                                className={errors.confirmPassword ? 'input-error' : ''}
                             />
-                            <button
-                                type="button"
-                                className="toggle-password"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? '👁️' : '👁️‍🗨️'}
-                            </button>
+                            <label htmlFor="savePassword">Save password securely</label>
                         </div>
-                        {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
-                    </div>
 
-                    <div className="form-group checkbox">
-                        <input
-                            type="checkbox"
-                            id="savePassword"
-                            name="savePassword"
-                            checked={formData.savePassword}
-                            onChange={handleInputChange}
-                        />
-                        <label htmlFor="savePassword">Save password securely</label>
-                    </div>
+                        <button type="submit" className="btn-create-account">
+                            Create Account
+                        </button>
 
-                    <button type="submit" className="btn-create-account">
-                        Create Account
-                    </button>
-
-                    <p className="signin-link">
-                        Already have an account? <a href="#" onClick={() => onNavigate('signin')}>Sign In</a>
-                    </p>
-                </form>
+                        <p className="signin-link">
+                            Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('signin'); }}>Login Here</a>
+                        </p>
+                    </form>
+                </div>
             </div>
         </div>
     );

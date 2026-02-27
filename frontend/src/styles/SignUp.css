@@ -1,38 +1,85 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Caudex', serif;
+}
+
 .signup-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    display: flex;
+    background: #ffffff;
+    align-items: stretch;
+}
+
+/* ── Media Side (Left) ── */
+.signup-media-side {
+    flex: 1;
+    position: relative;
+    display: none;
+    /* hidden on small screens */
+}
+
+@media (min-width: 900px) {
+    .signup-media-side {
+        display: block;
+    }
+}
+
+.signup-media-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(192, 244, 251, 0.4) 0%, rgba(185, 132, 250, 0.3) 100%);
+    z-index: 2;
+}
+
+.signup-video-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* ── Form Side (Right) ── */
+.signup-form-side {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #ffffff;
     padding: 2rem;
+    overflow-y: auto;
 }
 
-.signup-box {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
+.signup-form-wrapper {
+    max-width: 480px;
     width: 100%;
-    padding: 2.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 .signup-header {
-    text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
 .signup-header h1 {
-    color: #0066b3;
-    font-size: 1.8rem;
+    color: #630c5e;
+    /* Deep purple matching image logic */
+    font-size: 3.2rem;
     margin: 0 0 0.5rem 0;
+    font-weight: 700;
 }
 
 .signup-header p {
     color: #666;
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-family: 'Urbanist', sans-serif;
 }
 
+/* ── Form Inputs ── */
 .signup-form {
     display: flex;
     flex-direction: column;
@@ -42,79 +89,83 @@
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
 
 .form-group label {
     font-weight: 500;
-    color: #333;
+    color: #718096;
     font-size: 0.95rem;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="password"] {
-    padding: 0.9rem;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
+    width: 100%;
+    padding: 1.1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1.05rem;
     transition: all 0.3s ease;
     font-family: inherit;
+    color: #2d3748;
+    box-sizing: border-box;
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="email"]:focus,
-.form-group input[type="password"]:focus {
+.form-group input:focus {
     outline: none;
-    border-color: #0066b3;
-    box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.1);
+    background: #ffffff;
+    border-color: #b984fa;
+    box-shadow: 0 0 0 3px rgba(185, 132, 250, 0.2);
 }
 
 .form-group input.input-error {
     border-color: #dc3545;
 }
 
+/* ── Password Toggle ── */
 .password-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.password-input-wrapper input {
-    width: 100%;
-}
-
 .toggle-password {
     position: absolute;
-    right: 10px;
+    right: 15px;
     background: none;
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
-    padding: 0.5rem;
+    color: #a0aec0;
 }
 
+
+/* ── Messages & Links ── */
 .error-text {
-    color: #dc3545;
+    color: #e53e3e;
     font-size: 0.85rem;
-    margin-top: 0.25rem;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .error-message {
-    background: #f8d7da;
-    color: #721c24;
-    padding: 0.75rem;
-    border-radius: 5px;
-    border: 1px solid #f5c6cb;
-    margin-bottom: 1rem;
+    background: #fff5f5;
+    color: #c53030;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #feb2b2;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .strength-indicator {
     font-size: 0.85rem;
     margin-top: 0.5rem;
     padding: 0.5rem;
-    border-radius: 5px;
+    border-radius: 8px;
     text-align: center;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .strength-indicator.strength-weak {
@@ -140,8 +191,9 @@
 .password-requirements {
     background: #f8f9fa;
     padding: 0.75rem;
-    border-radius: 5px;
+    border-radius: 8px;
     margin-top: 0.5rem;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .password-requirements p {
@@ -167,10 +219,36 @@
     color: #28a745;
 }
 
+/* User Type Selection Styles */
+.form-select {
+    padding: 1.1rem;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    color: #2d3748;
+    font-family: 'Urbanist', sans-serif;
+}
+
+.form-select:hover {
+    border-color: #b984fa;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #b984fa;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(185, 132, 250, 0.2);
+}
+
 .form-group.checkbox {
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .form-group.checkbox input[type="checkbox"] {
@@ -184,74 +262,46 @@
     cursor: pointer;
 }
 
+/* ── Submit Button ── */
 .btn-create-account {
-    padding: 1rem;
-    background: linear-gradient(135deg, #0066b3 0%, #003f7f 100%);
+    padding: 1.1rem;
+    background: #630c5e;
+    /* Matching the deep purple button */
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
+    transition: background 0.3s ease;
+    margin-top: 5px;
+    font-family: 'Urbanist', sans-serif;
 }
 
 .btn-create-account:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 102, 179, 0.3);
+    background: #4a0746;
 }
 
 .btn-create-account:active {
     transform: translateY(0);
 }
 
+/* ── Bottom Link ── */
 .signin-link {
     text-align: center;
-    margin: 1rem 0 0 0;
-    color: #666;
+    color: #718096;
     font-size: 0.95rem;
+    font-family: 'Urbanist', sans-serif;
+    margin-top: 10px;
 }
 
 .signin-link a {
-    color: #0066b3;
+    color: #630c5e;
     text-decoration: none;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: color 0.3s;
 }
 
 .signin-link a:hover {
-    color: #003f7f;
     text-decoration: underline;
-}
-
-/* User Type Selection Styles */
-.form-select {
-    padding: 0.75rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.form-select:hover {
-    border-color: #0066b3;
-}
-
-.form-select:focus {
-    outline: none;
-    border-color: #0066b3;
-    box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.1);
-}
-
-@media (max-width: 600px) {
-    .signup-box {
-        padding: 1.5rem;
-    }
-
-    .signup-header h1 {
-        font-size: 1.5rem;
-    }
 }
