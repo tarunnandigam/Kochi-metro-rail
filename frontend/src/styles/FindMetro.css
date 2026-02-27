@@ -857,7 +857,7 @@
     padding: 3rem 1.5rem;
     display: flex;
     justify-content: center;
-    font-family: 'Urbanist', sans-serif;
+    font-family: 'Source Sans 3', sans-serif;
 }
 
 .fm-summary-container {
@@ -903,6 +903,7 @@
     font-size: 1.1rem;
     font-weight: 800;
     letter-spacing: 0.5px;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .fm-stations-row {
@@ -1099,7 +1100,7 @@
 }
 
 .fm-proceed-btn {
-    background: #0d9488;
+    background: #0f8b8d;
     color: white;
     border: none;
     padding: 1rem 1.5rem;
@@ -1108,21 +1109,259 @@
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.3s;
+    font-family: 'Source Sans 3', sans-serif;
+    text-transform: uppercase;
 }
 
 .fm-proceed-btn:hover {
-    background: #0f766e;
+    background: #0d7375;
 }
 
 .fm-payment-method-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 12px;
     padding: 1.5rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     font-weight: 800;
     color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+/* Trip Planner Custom Design */
+.tp-card-container {
+    background: #0f8b8d;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+.tp-header {
+    background: #0f8b8d;
+    padding: 20px 30px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.tp-header h2 {
+    color: white;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin: 0;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.tp-body {
+    background: #f5f5f5;
+    margin: 0 5px 5px 5px;
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.tp-toggle-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.tp-toggle-btn {
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid #cbd5e1;
+    background: transparent;
+    color: #64748b;
+}
+
+.tp-toggle-btn.active {
+    background: white;
+    color: #1e293b;
+    border: 1px solid #0ea5e9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tp-toggle-btn.inactive {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #cbd5e1;
+}
+
+.tp-select-label {
+    font-size: 0.9rem;
+    color: #475569;
+    margin-bottom: 12px;
+    font-weight: 500;
+    margin-top: 0;
+}
+
+.tp-form {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 2;
+}
+
+.tp-inputs-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 20;
+}
+
+.tp-input-group {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s;
+    position: relative;
+    min-height: 55px;
+    justify-content: center;
+    z-index: 2;
+}
+
+.tp-input-group:focus-within {
+    border-color: #0ea5e9;
+    z-index: 10;
+}
+
+.tp-input-group label {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 2px;
+    font-weight: 600;
+}
+
+.tp-input-group input,
+.tp-input-group select {
+    border: none;
+    font-size: 1.05rem;
+    color: #1e293b;
+    font-weight: 500;
+    padding: 0;
+    background: transparent;
+    outline: none;
+    width: 100%;
+}
+
+.tp-input-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+
+.tp-bottom-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.tp-bottom-row .tp-input-group {
+    flex: 1;
+}
+
+.tp-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.tp-reset-btn {
+    background: transparent;
+    border: none;
+    color: #f87171;
+    /* coral */
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    letter-spacing: 0.5px;
+}
+
+.tp-reset-btn:hover {
+    background: transparent;
+    transform: none;
+    color: #ef4444;
+    /* slightly darker coral instead of blue */
+}
+
+.tp-submit-btn {
+    background: #232223;
+    /* Dark grey/black */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.tp-submit-btn:hover {
+    background: #111111;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.tp-footer-img {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.2;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+/* Override existing form styles that clash */
+.tp-inputs-wrapper .dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
 }
