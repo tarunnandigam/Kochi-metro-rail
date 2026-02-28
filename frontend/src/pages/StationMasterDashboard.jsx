@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
-=======
-git commit -m "Station master dashboard UI updates"
-import React, { useState, useEffect } from 'react';
->>>>>>> officerdashboard
 import '../styles/StationMasterDashboard.css';
 import {
     Train01Icon, SpeedTrain01Icon, MetroIcon,
@@ -44,12 +39,7 @@ const KMRL_STATIONS = [
     { name: 'Petta', factor: 0.55 },
 ];
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-const mockIncidents = [
-=======
->>>>>>> officerdashboard
+
 // Ordered list of all stations (North→South)
 const STATION_NAMES = KMRL_STATIONS.map(s => s.name);
 const getStationFactor = (name) => KMRL_STATIONS.find(s => s.name === name)?.factor ?? 1;
@@ -191,17 +181,10 @@ const NAV = [
     { key: 'incidents', icon: Alert01Icon, label: 'Incidents' },
     { key: 'facilities', icon: Settings01Icon, label: 'Facilities' },
     { key: 'announcements', icon: Megaphone01Icon, label: 'Announcements' },
-<<<<<<< HEAD
-];
-
-const INITIAL_INCIDENTS = [
-=======
     { key: 'grievances', icon: LegalDocument01Icon, label: 'Grievances' }
 ];
 
 const INITIAL_INCIDENTS = [
->>>>>>> Stashed changes
->>>>>>> officerdashboard
     { id: 1, type: 'Overcrowding', platform: '1', time: '10:20 AM', status: 'Resolved' },
     { id: 2, type: 'Lift Malfunction', platform: 'Entry Gate', time: '09:55 AM', status: 'Active' },
 ];
@@ -384,20 +367,6 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
     const [trainSearch, setTrainSearch] = useState('');
     const [aiQuery, setAiQuery] = useState('');
 
-<<<<<<< HEAD
-    /* Live clock */
-=======
-<<<<<<< Updated upstream
->>>>>>> officerdashboard
-    useEffect(() => {
-        const t = setInterval(() => setNow(new Date()), 1000);
-        return () => clearInterval(t);
-    }, []);
-
-<<<<<<< HEAD
-=======
-    const filteredTrains = mockTrains.filter(t =>
-=======
     const [grievances, setGrievances] = useState([]);
 
     /* Live clock & Load grievances */
@@ -417,8 +386,6 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
         localStorage.setItem('kmrl_complaints', JSON.stringify(updated));
         setGrievances(updated.filter(c => c.type === 'Grievance'));
     };
-
->>>>>>> officerdashboard
     /* Compute data for selected date — scaled by station busyness */
     const stationFactor = getStationFactor(selectedStation);
     const selData = seedDate(selectedDate, stationFactor);
@@ -439,40 +406,7 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
         { label: 'Active Incidents', value: activeIncidents, Icon: Alert01Icon, color: activeIncidents > 0 ? '#f59e0b' : '#10b981', bg: activeIncidents > 0 ? '#fefce8' : '#f0fdf4', trend: activeIncidents > 0 ? 'Needs Attention' : 'All Clear', trendClass: activeIncidents > 0 ? 'warn' : '' },
         { label: 'Facilities OK', value: `${opFacilities}/${FACILITIES.length}`, Icon: CheckmarkCircle01Icon, color: '#8b5cf6', bg: '#f5f3ff', trend: `${FACILITIES.length - opFacilities} issues`, trendClass: FACILITIES.length - opFacilities > 0 ? 'warn' : '' },
     ];
-<<<<<<< HEAD
-=======
 
-    const handleReportIncident = (e) => {
-        e.preventDefault();
-        if (!incidentForm.type || !incidentForm.platform) return;
-        setIncidents(p => [{
-            id: Date.now(), type: incidentForm.type,
-            platform: incidentForm.platform,
-            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            status: 'Active'
-        }, ...p]);
-        setIncidentForm({ type: '', platform: '', description: '' });
-    };
-
-    const resolveIncident = (id) =>
-        setIncidents(p => p.map(i => i.id === id ? { ...i, status: 'Resolved' } : i));
-
-    const postAnnouncement = (e) => {
-        e.preventDefault();
-        if (!announcement.trim()) return;
-        setAnnouncements(p => [{
-            id: Date.now(), text: announcement,
-            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-        }, ...p]);
-        setAnnouncement('');
-    };
-
-    const filteredTrains = upcomingTrains.filter(t =>
->>>>>>> Stashed changes
-        t.id.toLowerCase().includes(trainSearch.toLowerCase()) ||
-        t.route.toLowerCase().includes(trainSearch.toLowerCase())
-    );
->>>>>>> officerdashboard
 
     const handleReportIncident = (e) => {
         e.preventDefault();

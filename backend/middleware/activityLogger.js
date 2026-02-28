@@ -12,17 +12,6 @@ module.exports = async function activityLogger(req, res, next) {
             return;
         }
 
-<<<<<<< HEAD
-        let safePayload = undefined;
-        if (req.body && Object.keys(req.body).length) {
-            safePayload = { ...req.body };
-            if (safePayload.password) safePayload.password = '[REDACTED]';
-            if (safePayload.confirmPassword) safePayload.confirmPassword = '[REDACTED]';
-        }
-
-=======
-<<<<<<< Updated upstream
-=======
         let safePayload = undefined;
         if (req.body && Object.keys(req.body).length) {
             const sanitize = (obj) => {
@@ -40,9 +29,6 @@ module.exports = async function activityLogger(req, res, next) {
             };
             safePayload = sanitize(req.body);
         }
-
->>>>>>> Stashed changes
->>>>>>> officerdashboard
         const activity = new Activity({
             userId: req.body.userId || req.headers['x-user-id'] || null,
             userName: req.body.postedByName || req.body.username || null,

@@ -12,20 +12,11 @@ import TicketView from './pages/TicketView';
 import Chatbot from './components/Chatbot/Chatbot';
 import Recharge from './pages/Recharge';
 import MyAccount from './pages/MyAccount';
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> officerdashboard
 import StationMasterDashboard from './pages/StationMasterDashboard';
 import OfficerDashboard from './pages/OfficerDashboard';
 import HelpAndContact from './pages/HelpAndContact';
 import FAQs from './pages/FAQs';
-<<<<<<< HEAD
-=======
 import Footer from './components/Layout/Footer';
->>>>>>> Stashed changes
->>>>>>> officerdashboard
 
 // Inner app that has access to router hooks
 function AppInner() {
@@ -94,17 +85,8 @@ function AppInner() {
                     isAuthenticated={isLoggedIn}
                     user={user}
                     onLogout={handleLogout}
-<<<<<<< HEAD
-                    onNavigate={onNavigate}
-=======
-<<<<<<< Updated upstream
-                    onNavigate={setCurrentPage}
-                    currentPage={currentPage}
-=======
                     onNavigate={onNavigate}
                     currentPage={location.pathname.replace('/', '') || 'home'}
->>>>>>> Stashed changes
->>>>>>> officerdashboard
                 />
             )}
             <main className={!isAuthPage ? 'app-main' : ''}>

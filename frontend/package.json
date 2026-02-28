@@ -9,15 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@fontsource/caudex": "^5.2.8",
-=======
-<<<<<<< Updated upstream
->>>>>>> officerdashboard
     "axios": "^1.5.0",
-=======
-    "@fontsource/caudex": "^5.2.8",
->>>>>>> Stashed changes
     "hugeicons-react": "^0.4.0",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
