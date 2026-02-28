@@ -44,6 +44,18 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    // Additional Profile Details
+    firstName: { type: String, default: '' },
+    lastName: { type: String, default: '' },
+    fathersName: { type: String, default: '' },
+    dateOfBirth: { type: String, default: '' },
+    gender: { type: String, default: '' },
+    maritalStatus: { type: String, default: '' },
+    contactNumber: { type: String, default: '' },
+    address: { type: String, default: '' },
+    city: { type: String, default: '' },
+    state: { type: String, default: '' },
+    pinCode: { type: String, default: '' },
     bookings: {
         type: [
             {

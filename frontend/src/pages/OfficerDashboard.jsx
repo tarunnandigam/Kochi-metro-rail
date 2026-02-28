@@ -39,6 +39,7 @@ const NAV = [
     { key: 'journeys', Icon: Ticket01Icon, label: 'User Journeys' },
     { key: 'news', Icon: DocumentAttachmentIcon, label: 'News & Updates' },
     { key: 'reports', Icon: AnalyticsUpIcon, label: 'Reports' },
+    { key: 'complaints', Icon: Alert01Icon, label: 'Complaints Hub' }
 ];
 
 const HOUR_LABELS = ['7AM', '8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'];
@@ -251,6 +252,7 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
     const [stationFilter, setStationFilter] = useState('All');
     const [aiQuery, setAiQuery] = useState('');
     const [userSearch, setUserSearch] = useState('');
+    const [journeySearch, setJourneySearch] = useState('');
 
     /* Real-time user management */
     const [liveUsers, setLiveUsers] = useState([]);
@@ -258,11 +260,31 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
     const [usersError, setUsersError] = useState(null);
     const [lastRefresh, setLastRefresh] = useState(null);
 
-    /* Clock */
+    /* Real-time journeys / transactions */
+    const [liveJourneys, setLiveJourneys] = useState([]);
+    const [journeysLoading, setJourneysLoading] = useState(false);
+    const [journeysError, setJourneysError] = useState(null);
+    const [lastJourneyRefresh, setLastJourneyRefresh] = useState(null);
+
+    const [allComplaints, setAllComplaints] = useState([]);
+
+    /* Clock & Complaints */
     useEffect(() => {
         const t = setInterval(() => setCurrentTime(new Date()), 1000);
+
+        // Load combined complaints
+        const saved = JSON.parse(localStorage.getItem('kmrl_complaints') || '[]');
+        setAllComplaints(saved);
+
         return () => clearInterval(t);
     }, []);
+
+    const updateVigilanceStatus = (id, newStatus) => {
+        const saved = JSON.parse(localStorage.getItem('kmrl_complaints') || '[]');
+        const updated = saved.map(c => c.id === id ? { ...c, status: newStatus } : c);
+        localStorage.setItem('kmrl_complaints', JSON.stringify(updated));
+        setAllComplaints(updated);
+    };
 
     /* Fetch users from backend */
     const fetchUsers = useCallback(async () => {
@@ -298,6 +320,38 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
         return () => clearInterval(t);
     }, [activeTab, fetchUsers]);
 
+    /* Fetch journeys from backend */
+    const fetchJourneys = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('kmrl_token');
+            if (!token) return;
+
+            setJourneysLoading(true);
+            setJourneysError(null);
+            const res = await fetch(`${API}/metro/bookings`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error(`Server error ${res.status}`);
+            const data = await res.json();
+            setLiveJourneys(data || []);
+            setLastJourneyRefresh(new Date());
+        } catch (err) {
+            setJourneysError(err.message);
+        } finally {
+            setJourneysLoading(false);
+        }
+    }, [API]);
+
+    useEffect(() => {
+        if (activeTab === 'journeys') fetchJourneys();
+    }, [activeTab, fetchJourneys]);
+
+    useEffect(() => {
+        if (activeTab !== 'journeys') return;
+        const t = setInterval(fetchJourneys, 30000);
+        return () => clearInterval(t);
+    }, [activeTab, fetchJourneys]);
+
     /* Derived stats */
     const totalPassengers = MOCK_STATIONS.reduce((s, st) => s + st.passengers, 0);
     const totalRevenue = MOCK_STATIONS.reduce((s, st) => s + st.revenue, 0);
@@ -317,6 +371,16 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
             u.fullName?.toLowerCase().includes(q) ||
             u.email?.toLowerCase().includes(q) ||
             u.role?.toLowerCase().includes(q);
+    });
+
+    const displayJourneys = liveJourneys.filter(j => {
+        if (!journeySearch) return true;
+        const q = journeySearch.toLowerCase();
+        return j.bookingId?.toLowerCase().includes(q) ||
+            (j.passengerName || 'Guest').toLowerCase().includes(q) ||
+            j.fromStation?.toLowerCase().includes(q) ||
+            j.toStation?.toLowerCase().includes(q) ||
+            j.userEmail?.toLowerCase().includes(q);
     });
 
     const publishNews = (e) => {
@@ -380,6 +444,7 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
                             {activeTab === 'users' && 'User Management'}
                             {activeTab === 'news' && 'News & Updates'}
                             {activeTab === 'reports' && 'Reports & Analytics'}
+                            {activeTab === 'complaints' && 'Complaints Hub'}
                         </h1>
                         <p className="od-page-sub">
                             Kochi Metro Rail Limited &middot;{' '}
@@ -711,75 +776,128 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
                 )}
 
                 {/* ════════════════════════ USER JOURNEYS ══════════════════ */}
-                {activeTab === 'journeys' && (
-                    <div className="od-content">
-                        <div className="od-stats-grid">
-                            {[
-                                { label: 'Total Journeys (Today)', value: '8,421', Icon: Ticket01Icon, color: '#7c3aed', trend: 'Growing' },
-                                { label: 'Ticket Revenue', value: '₹3,84,000', Icon: MoneyBag01Icon, color: '#10b981', trend: '+5.2%', trendClass: '' },
-                                { label: 'Active In Transit', value: '1,204', Icon: Train01Icon, color: '#f59e0b', trend: 'Live users', trendClass: 'warn' },
-                                { label: 'Failed Payments', value: '12', Icon: Alert01Icon, color: '#ef4444', trend: 'Needs check', trendClass: 'danger' },
-                            ].map(s => (
-                                <div key={s.label} className="od-stat-card" style={{ '--stat-color': s.color }}>
-                                    <div className="od-stat-top">
-                                        <div className="od-stat-icon"><s.Icon size={20} color={s.color} strokeWidth={1.5} /></div>
-                                        <span className={`od-stat-trend ${s.trendClass || ''}`}>{s.trend}</span>
-                                    </div>
-                                    <div className="od-stat-value">{s.value}</div>
-                                    <div className="od-stat-label">{s.label}</div>
-                                </div>
-                            ))}
-                        </div>
+                {activeTab === 'journeys' && (() => {
+                    const todayStr = currentTime.toLocaleDateString();
+                    const todayJourneys = liveJourneys.filter(j => new Date(j.createdAt).toLocaleDateString() === todayStr);
+                    const todayRevenue = todayJourneys.reduce((sum, j) => sum + (j.fare || 0), 0);
+                    const activeJourneys = todayJourneys.filter(j => j.status === 'Success').length;
+                    const failedPayments = liveJourneys.filter(j => j.status === 'Failed').length;
 
-                        <div className="od-card">
-                            <div className="od-card-head">
-                                <span className="od-card-title">Live User Journeys & Transactions</span>
-                                <div className="od-users-head-right">
-                                    <span className="od-card-badge">Recent 50</span>
+                    return (
+                        <div className="od-content">
+                            <div className="od-stats-grid">
+                                {[
+                                    { label: 'Total Journeys (Today)', value: todayJourneys.length.toLocaleString(), Icon: Ticket01Icon, color: '#7c3aed', trend: 'Network' },
+                                    { label: 'Ticket Revenue', value: `₹${todayRevenue.toLocaleString()}`, Icon: MoneyBag01Icon, color: '#10b981', trend: 'Today', trendClass: '' },
+                                    { label: 'Active Today', value: activeJourneys.toLocaleString(), Icon: Train01Icon, color: '#f59e0b', trend: 'Success Txns', trendClass: 'warn' },
+                                    { label: 'Failed Payments', value: failedPayments.toLocaleString(), Icon: Alert01Icon, color: '#ef4444', trend: 'Needs check', trendClass: 'danger' },
+                                ].map(s => (
+                                    <div key={s.label} className="od-stat-card" style={{ '--stat-color': s.color }}>
+                                        <div className="od-stat-top">
+                                            <div className="od-stat-icon"><s.Icon size={20} color={s.color} strokeWidth={1.5} /></div>
+                                            <span className={`od-stat-trend ${s.trendClass || ''}`}>{s.trend}</span>
+                                        </div>
+                                        <div className="od-stat-value">{s.value}</div>
+                                        <div className="od-stat-label">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="od-card">
+                                <div className="od-card-head">
+                                    <span className="od-card-title">Live User Journeys & Transactions</span>
+                                    <div className="od-users-head-right">
+                                        {lastJourneyRefresh && (
+                                            <span className="od-refresh-time">
+                                                Updated {lastJourneyRefresh.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        )}
+                                        <button
+                                            className="od-refresh-btn"
+                                            onClick={fetchJourneys}
+                                            disabled={journeysLoading}
+                                            title="Refresh journeys"
+                                        >
+                                            <RefreshIcon size={14} color="currentColor" strokeWidth={2}
+                                                style={{ animation: journeysLoading ? 'od-spin 0.8s linear infinite' : 'none' }} />
+                                            {journeysLoading ? 'Loading…' : 'Refresh'}
+                                        </button>
+                                        <span className="od-card-badge">{liveJourneys.length} total</span>
+                                    </div>
                                 </div>
+
+                                <div className="od-users-search-wrap">
+                                    <Search01Icon size={14} color="#94a3b8" style={{ position: 'absolute', left: '14px' }} />
+                                    <input
+                                        className="od-users-search"
+                                        type="text"
+                                        placeholder="Search by transaction ID, user, or station..."
+                                        style={{ paddingLeft: '36px' }}
+                                        value={journeySearch}
+                                        onChange={e => setJourneySearch(e.target.value)}
+                                    />
+                                </div>
+
+                                {journeysError && (
+                                    <div className="od-users-error">
+                                        ⚠ Could not load journeys: {journeysError}
+                                        <button className="od-retry-btn" onClick={fetchJourneys}>Retry</button>
+                                    </div>
+                                )}
+
+                                {journeysLoading && liveJourneys.length === 0 ? (
+                                    <div className="od-users-loading">
+                                        <div className="od-spinner" />
+                                        <span>Fetching bookings from database…</span>
+                                    </div>
+                                ) : (
+                                    <table className="od-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Txn ID</th>
+                                                <th>User</th>
+                                                <th>Route (From → To)</th>
+                                                <th>Timestamp</th>
+                                                <th>Amount</th>
+                                                <th>Payment</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {displayJourneys.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>
+                                                        {journeySearch ? 'No journeys match your search.' : 'No booking records found in database.'}
+                                                    </td>
+                                                </tr>
+                                            ) : displayJourneys.map(j => (
+                                                <tr key={j.bookingId}>
+                                                    <td style={{ color: '#64748b', fontSize: '0.8rem' }}><strong>{j.bookingId}</strong></td>
+                                                    <td style={{ fontWeight: 600, color: '#0f172a' }}>
+                                                        {j.passengerName || 'Guest User'}
+                                                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>{j.userEmail || j.passengerPhone || 'No contact info'}</div>
+                                                    </td>
+                                                    <td>{j.fromStation} <ArrowRight01Icon size={12} color="#94a3b8" style={{ verticalAlign: 'middle', margin: '0 4px' }} /> {j.toStation}</td>
+                                                    <td style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                                        {new Date(j.createdAt).toLocaleDateString('en-GB')}<br />
+                                                        {new Date(j.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                    </td>
+                                                    <td style={{ fontWeight: 700, color: '#10b981' }}>₹{j.fare}</td>
+                                                    <td style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{j.method || 'Card/UPI'}</td>
+                                                    <td>
+                                                        <span className={`od-badge ${j.status === 'Success' || j.status === 'Completed' ? 'green' : 'amber'}`}>
+                                                            {j.status || 'Completed'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
-                            <div className="od-users-search-wrap">
-                                <Search01Icon size={14} color="#94a3b8" style={{ position: 'absolute', left: '14px' }} />
-                                <input
-                                    className="od-users-search"
-                                    type="text"
-                                    placeholder="Search by transaction ID, user, or station..."
-                                    style={{ paddingLeft: '36px' }}
-                                />
-                            </div>
-                            <table className="od-table">
-                                <thead>
-                                    <tr>
-                                        <th>Txn ID</th>
-                                        <th>User</th>
-                                        <th>Route (From → To)</th>
-                                        <th>Timestamp</th>
-                                        <th>Amount</th>
-                                        <th>Payment</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {MOCK_JOURNEYS.map(j => (
-                                        <tr key={j.id}>
-                                            <td style={{ color: '#64748b', fontSize: '0.8rem' }}><strong>{j.id}</strong></td>
-                                            <td style={{ fontWeight: 600, color: '#0f172a' }}>{j.user}</td>
-                                            <td>{j.from} <ArrowRight01Icon size={12} color="#94a3b8" style={{ verticalAlign: 'middle', margin: '0 4px' }} /> {j.to}</td>
-                                            <td style={{ fontSize: '0.8rem', color: '#64748b' }}>{j.date}</td>
-                                            <td style={{ fontWeight: 700, color: '#10b981' }}>{j.amount}</td>
-                                            <td style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{j.method}</td>
-                                            <td>
-                                                <span className={`od-badge ${j.status === 'Completed' ? 'green' : 'amber'}`}>
-                                                    {j.status}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
 
                 {/* ════════════════════════ NEWS ═══════════════════════════ */}
                 {activeTab === 'news' && (
@@ -864,6 +982,83 @@ function OfficerDashboard({ user, onLogout, onNavigate }) {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ════════════════════════ COMPLAINTS COMPONENT ════════════════════════ */}
+                {activeTab === 'complaints' && (
+                    <div className="od-content">
+                        <div className="od-card">
+                            <div className="od-card-head">
+                                <span className="od-card-title">Vigilance & Grievance Complaints</span>
+                                <span className="od-card-badge">{allComplaints.length} Total</span>
+                            </div>
+
+                            {allComplaints.length === 0 ? (
+                                <p className="od-empty-state" style={{ padding: '2rem', textAlign: 'center' }}>No complaints found.</p>
+                            ) : (
+                                <table className="od-data-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                                    <thead>
+                                        <tr style={{ textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>
+                                            <th style={{ padding: '12px 8px' }}>ID / Type</th>
+                                            <th style={{ padding: '12px 8px' }}>User Info</th>
+                                            <th style={{ padding: '12px 8px' }}>Subject & Description</th>
+                                            <th style={{ padding: '12px 8px' }}>Date</th>
+                                            <th style={{ padding: '12px 8px' }}>Status</th>
+                                            <th style={{ padding: '12px 8px' }}>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {allComplaints.map(c => (
+                                            <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                                <td style={{ padding: '12px 8px' }}>
+                                                    <div style={{ fontWeight: 700 }}>{c.id}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>{c.type}</div>
+                                                </td>
+                                                <td style={{ padding: '12px 8px' }}>
+                                                    <div style={{ fontWeight: 600 }}>{c.userName}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#475569' }}>{c.userEmail}</div>
+                                                </td>
+                                                <td style={{ padding: '12px 8px', maxWidth: '300px' }}>
+                                                    <div style={{ fontWeight: 600, marginBottom: '2px' }}>{c.subject}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={c.description}>
+                                                        {c.description}
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: '12px 8px', fontSize: '0.85rem', color: '#475569' }}>{c.date}</td>
+                                                <td style={{ padding: '12px 8px' }}>
+                                                    <span style={{
+                                                        padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700,
+                                                        backgroundColor: c.status === 'Resolved' ? '#dcfce7' : c.status === 'In Progress' ? '#fef3c7' : '#f1f5f9',
+                                                        color: c.status === 'Resolved' ? '#166534' : c.status === 'In Progress' ? '#d97706' : '#475569'
+                                                    }}>
+                                                        {c.status}
+                                                    </span>
+                                                    {c.type === 'Grievance' && (
+                                                        <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '4px' }}>Handled by Station Master</div>
+                                                    )}
+                                                </td>
+                                                <td style={{ padding: '12px 8px' }}>
+                                                    {c.type === 'Vigilance' ? (
+                                                        <select
+                                                            value={c.status}
+                                                            onChange={(e) => updateVigilanceStatus(c.id, e.target.value)}
+                                                            style={{ padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                                                        >
+                                                            <option value="Pending">Pending</option>
+                                                            <option value="In Progress">In Progress</option>
+                                                            <option value="Resolved">Resolved</option>
+                                                        </select>
+                                                    ) : (
+                                                        <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Read-only</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 )}

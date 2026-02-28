@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
+=======
+git commit -m "Station master dashboard UI updates"
+import React, { useState, useEffect } from 'react';
+>>>>>>> officerdashboard
 import '../styles/StationMasterDashboard.css';
 import {
     Train01Icon, SpeedTrain01Icon, MetroIcon,
@@ -39,6 +44,12 @@ const KMRL_STATIONS = [
     { name: 'Petta', factor: 0.55 },
 ];
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+const mockIncidents = [
+=======
+>>>>>>> officerdashboard
 // Ordered list of all stations (North→South)
 const STATION_NAMES = KMRL_STATIONS.map(s => s.name);
 const getStationFactor = (name) => KMRL_STATIONS.find(s => s.name === name)?.factor ?? 1;
@@ -180,9 +191,17 @@ const NAV = [
     { key: 'incidents', icon: Alert01Icon, label: 'Incidents' },
     { key: 'facilities', icon: Settings01Icon, label: 'Facilities' },
     { key: 'announcements', icon: Megaphone01Icon, label: 'Announcements' },
+<<<<<<< HEAD
 ];
 
 const INITIAL_INCIDENTS = [
+=======
+    { key: 'grievances', icon: LegalDocument01Icon, label: 'Grievances' }
+];
+
+const INITIAL_INCIDENTS = [
+>>>>>>> Stashed changes
+>>>>>>> officerdashboard
     { id: 1, type: 'Overcrowding', platform: '1', time: '10:20 AM', status: 'Resolved' },
     { id: 2, type: 'Lift Malfunction', platform: 'Entry Gate', time: '09:55 AM', status: 'Active' },
 ];
@@ -365,12 +384,41 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
     const [trainSearch, setTrainSearch] = useState('');
     const [aiQuery, setAiQuery] = useState('');
 
+<<<<<<< HEAD
     /* Live clock */
+=======
+<<<<<<< Updated upstream
+>>>>>>> officerdashboard
     useEffect(() => {
         const t = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(t);
     }, []);
 
+<<<<<<< HEAD
+=======
+    const filteredTrains = mockTrains.filter(t =>
+=======
+    const [grievances, setGrievances] = useState([]);
+
+    /* Live clock & Load grievances */
+    useEffect(() => {
+        const t = setInterval(() => setNow(new Date()), 1000);
+
+        // Load grievances
+        const all = JSON.parse(localStorage.getItem('kmrl_complaints') || '[]');
+        setGrievances(all.filter(c => c.type === 'Grievance'));
+
+        return () => clearInterval(t);
+    }, []);
+
+    const updateGrievanceStatus = (id, newStatus) => {
+        const all = JSON.parse(localStorage.getItem('kmrl_complaints') || '[]');
+        const updated = all.map(c => c.id === id ? { ...c, status: newStatus } : c);
+        localStorage.setItem('kmrl_complaints', JSON.stringify(updated));
+        setGrievances(updated.filter(c => c.type === 'Grievance'));
+    };
+
+>>>>>>> officerdashboard
     /* Compute data for selected date — scaled by station busyness */
     const stationFactor = getStationFactor(selectedStation);
     const selData = seedDate(selectedDate, stationFactor);
@@ -391,6 +439,40 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
         { label: 'Active Incidents', value: activeIncidents, Icon: Alert01Icon, color: activeIncidents > 0 ? '#f59e0b' : '#10b981', bg: activeIncidents > 0 ? '#fefce8' : '#f0fdf4', trend: activeIncidents > 0 ? 'Needs Attention' : 'All Clear', trendClass: activeIncidents > 0 ? 'warn' : '' },
         { label: 'Facilities OK', value: `${opFacilities}/${FACILITIES.length}`, Icon: CheckmarkCircle01Icon, color: '#8b5cf6', bg: '#f5f3ff', trend: `${FACILITIES.length - opFacilities} issues`, trendClass: FACILITIES.length - opFacilities > 0 ? 'warn' : '' },
     ];
+<<<<<<< HEAD
+=======
+
+    const handleReportIncident = (e) => {
+        e.preventDefault();
+        if (!incidentForm.type || !incidentForm.platform) return;
+        setIncidents(p => [{
+            id: Date.now(), type: incidentForm.type,
+            platform: incidentForm.platform,
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            status: 'Active'
+        }, ...p]);
+        setIncidentForm({ type: '', platform: '', description: '' });
+    };
+
+    const resolveIncident = (id) =>
+        setIncidents(p => p.map(i => i.id === id ? { ...i, status: 'Resolved' } : i));
+
+    const postAnnouncement = (e) => {
+        e.preventDefault();
+        if (!announcement.trim()) return;
+        setAnnouncements(p => [{
+            id: Date.now(), text: announcement,
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        }, ...p]);
+        setAnnouncement('');
+    };
+
+    const filteredTrains = upcomingTrains.filter(t =>
+>>>>>>> Stashed changes
+        t.id.toLowerCase().includes(trainSearch.toLowerCase()) ||
+        t.route.toLowerCase().includes(trainSearch.toLowerCase())
+    );
+>>>>>>> officerdashboard
 
     const handleReportIncident = (e) => {
         e.preventDefault();
@@ -485,6 +567,7 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
                             {activeTab === 'incidents' && 'Incident Management'}
                             {activeTab === 'facilities' && 'Facility Status'}
                             {activeTab === 'announcements' && 'Announcements'}
+                            {activeTab === 'grievances' && 'Passenger Grievances'}
                         </h1>
                         <p className="sm-page-sub">
                             {selectedStation} Station{' \u00b7 '}
@@ -897,6 +980,66 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ══════════════════ GRIEVANCES ══════════════════ */}
+                {activeTab === 'grievances' && (
+                    <div className="sm-content">
+                        <div className="sm-card">
+                            <div className="sm-card-head">
+                                <span className="sm-card-title">Passenger Grievances</span>
+                                <span className="sm-card-badge">{grievances.length} Total</span>
+                            </div>
+                            {grievances.length === 0 ? (
+                                <p className="sm-empty">No grievances reported yet.</p>
+                            ) : (
+                                <table className="sm-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Passenger</th>
+                                            <th>Subject</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {grievances.map(g => (
+                                            <tr key={g.id}>
+                                                <td><strong>{g.id}</strong></td>
+                                                <td>
+                                                    <div style={{ fontWeight: 600 }}>{g.userName}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{g.userEmail}</div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ fontWeight: 600 }}>{g.subject}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#475569', maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={g.description}>{g.description}</div>
+                                                </td>
+                                                <td>{g.date}</td>
+                                                <td>
+                                                    <span className={`sm-status-badge ${g.status === 'Resolved' ? 'green' : g.status === 'In Progress' ? 'amber' : 'amber'}`}>
+                                                        {g.status}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <select
+                                                        value={g.status}
+                                                        onChange={(e) => updateGrievanceStatus(g.id, e.target.value)}
+                                                        style={{ padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                                                    >
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="In Progress">In Progress</option>
+                                                        <option value="Resolved">Resolved</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 )}

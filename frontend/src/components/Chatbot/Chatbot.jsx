@@ -1,4 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import {
+    Message02Icon, Cancel01Icon, ArrowRight01Icon, Ticket01Icon,
+    Location01Icon, Navigation02Icon, SmartPhone01Icon
+} from 'hugeicons-react';
 import '../../styles/Chatbot.css';
 import metroLinesData from '../../data/metroLines';
 
@@ -573,11 +577,11 @@ function Chatbot() {
         <div className="chatbot-container">
             {/* Chat Button */}
             <button
-                className="chatbot-toggle-btn"
+                className={`chatbot-toggle-btn ${isOpen ? 'open' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
                 title="KMRL Assistant"
             >
-                {isOpen ? '✕' : '💬'}
+                {isOpen ? <Cancel01Icon size={28} /> : <Message02Icon size={28} />}
             </button>
 
             {/* Chat Window */}
@@ -585,60 +589,63 @@ function Chatbot() {
                 <div className="chatbot-window">
                     {/* Header */}
                     <div className="chatbot-header">
-                        <h3>🚇 KMRL Assistant</h3>
-                        <div className="language-toggle">
-                            <button
-                                className={language === 'hindi' ? 'active' : ''}
-                                onClick={() => setLanguage('hindi')}
-                            >
-                                हिंदी
-                            </button>
-                            <button
-                                className={language === 'english' ? 'active' : ''}
-                                onClick={() => setLanguage('english')}
-                            >
-                                English
-                            </button>
+                        <div className="chatbot-header-left">
+                            <div className="chatbot-status"></div>
+                            <h3>KMRL Assistant</h3>
                         </div>
-                        <button
-                            className="close-btn"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            ✕
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className="language-toggle">
+                                <button
+                                    className={language === 'hindi' ? 'active' : ''}
+                                    onClick={() => setLanguage('hindi')}
+                                >
+                                    हिंदी
+                                </button>
+                                <button
+                                    className={language === 'english' ? 'active' : ''}
+                                    onClick={() => setLanguage('english')}
+                                >
+                                    EN
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Messages */}
                     <div className="chatbot-messages">
                         {messages.map(msg => (
                             <div key={msg.id} className={`message ${msg.type}`}>
-                                <div className="message-content">
-                                    {msg.text}
-                                </div>
-                                {(msg.type === 'route' || msg.type === 'eta' || msg.fare) && (
-                                    <div className="message-actions">
-                                        {msg.fromStation && msg.toStation && (
-                                            <>
-                                                <button className="btn-action" onClick={() => sendAndProcess(`ETA from ${msg.fromStation} to ${msg.toStation}`)}>
-                                                    ⏱️ {language === 'hindi' ? 'ETA' : 'ETA'}
-                                                </button>
-                                                <button className="btn-action" onClick={() => sendAndProcess(`Crowd at ${msg.fromStation}`)}>
-                                                    👥 {language === 'hindi' ? 'भीड़' : 'Crowd'}
-                                                </button>
-                                                <button className="btn-action" onClick={() => sendAndProcess(`Station updates for ${msg.fromStation}`)}>
-                                                    📝 {language === 'hindi' ? 'अपडेट्स' : 'Updates'}
-                                                </button>
-                                                <button className="btn-action" onClick={() => sendAndProcess(`Book ticket from ${msg.fromStation} to ${msg.toStation}`)}>
-                                                    📱 {getText('book')}
-                                                </button>
-                                            </>
-                                        )}
+                                {msg.type === 'bot' && (
+                                    <div className="bot-avatar">
+                                        <Message02Icon size={16} />
                                     </div>
                                 )}
+                                <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '100%', alignItems: msg.type === 'user' ? 'flex-end' : 'flex-start' }}>
+                                    <div className="message-content">
+                                        {msg.text}
+                                    </div>
+                                    {(msg.type === 'route' || msg.type === 'eta' || msg.fare) && (
+                                        <div className="message-actions">
+                                            {msg.fromStation && msg.toStation && (
+                                                <>
+                                                    <button className="btn-action" onClick={() => sendAndProcess(`ETA from ${msg.fromStation} to ${msg.toStation}`)}>
+                                                        <Navigation02Icon size={14} /> {language === 'hindi' ? 'ETA' : 'ETA'}
+                                                    </button>
+                                                    <button className="btn-action" onClick={() => sendAndProcess(`Book ticket from ${msg.fromStation} to ${msg.toStation}`)}>
+                                                        <SmartPhone01Icon size={14} /> {getText('book')}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                         {loading && (
                             <div className="message bot">
+                                <div className="bot-avatar">
+                                    <Message02Icon size={16} />
+                                </div>
                                 <div className="message-content">
                                     <span className="typing-indicator">
                                         <span></span><span></span><span></span>
@@ -664,23 +671,20 @@ function Chatbot() {
                             className="btn-send"
                             disabled={!inputValue.trim() || loading}
                         >
-                            ➤
+                            <ArrowRight01Icon size={20} />
                         </button>
                     </div>
 
                     {/* Quick Actions */}
                     <div className="quick-actions">
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'दूरी बताओ Aluva से M.G. Road' : 'Distance from Aluva to M.G. Road')}>
-                            🗺️ {language === 'hindi' ? 'दूरी' : 'Distance'}
+                        <button className="quick-action-btn" onClick={() => sendAndProcess(language === 'hindi' ? 'दूरी बताओ Aluva से M.G. Road' : 'Distance from Aluva to M.G. Road')}>
+                            <Navigation02Icon size={14} /> {language === 'hindi' ? 'दूरी' : 'Distance'}
                         </button>
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'किराया क्या है' : 'What is the fare')}>
-                            💰 {language === 'hindi' ? 'किराया' : 'Fare'}
+                        <button className="quick-action-btn" onClick={() => sendAndProcess(language === 'hindi' ? 'किराया क्या है' : 'What is the fare')}>
+                            <Ticket01Icon size={14} /> {language === 'hindi' ? 'किराया' : 'Fare'}
                         </button>
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव स्टेटस' : 'Live metro status')}>
-                            🟢 {language === 'hindi' ? 'स्टेटस' : 'Status'}
-                        </button>
-                        <button onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव ट्रैकिंग' : 'Live train tracking')}>
-                            📍 {language === 'hindi' ? 'ट्रैक' : 'Track'}
+                        <button className="quick-action-btn red-hover" onClick={() => sendAndProcess(language === 'hindi' ? 'लाइव स्टेटस' : 'Live metro status')}>
+                            <Location01Icon size={14} /> {language === 'hindi' ? 'स्टेटस' : 'Status'}
                         </button>
                     </div>
                 </div>
