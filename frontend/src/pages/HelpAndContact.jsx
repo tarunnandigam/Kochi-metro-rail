@@ -1,5 +1,4 @@
 import React from "react";
-import Footer from "../components/Layout/Footer";
 import "../styles/HelpAndContact.css";
 import KMRLogo from "../assets/KMRlogo.png";
 import { Mail01Icon, Location01Icon, ReloadIcon, VolumeHighIcon } from "hugeicons-react";
@@ -107,7 +106,6 @@ const HelpAndContact = ({ onNavigate }) => {
                 </div>
             </div>
 
-            <Footer />
         </div>
     );
 };

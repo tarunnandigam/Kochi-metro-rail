@@ -81,16 +81,32 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
             }));
 
             // Map Local data
-            const mappedLocal = userTxns.map(t => ({
-                from: t.fromStation || 'Network',
-                to: t.toStation || 'Network',
-                id: t.bookingId || 'TXN',
-                dateTime: t.date || new Date().toLocaleString(),
-                method: t.method || 'Bill Desk / UPI',
-                status: t.status || 'Success',
-                amount: `₹ ${t.fare || 0}`,
-                rawDate: new Date(t.date || new Date())
-            }));
+            const mappedLocal = userTxns.map(t => {
+                let parsedDate = new Date(t.date || new Date());
+                if (isNaN(parsedDate.getTime()) && t.date) {
+                    const parts = t.date.split(/[,\s]+/);
+                    if (parts.length > 0) {
+                        const dParts = parts[0].split(/[/-]/);
+                        if (dParts.length === 3) {
+                            // Convert DD/MM/YYYY into parseable MM/DD/YYYY and append the time parts 
+                            const timeStr = parts.length > 1 ? parts.slice(1).join(' ') : '12:00:00 PM';
+                            parsedDate = new Date(`${dParts[1]}/${dParts[0]}/${dParts[2]} ${timeStr}`);
+                        }
+                    }
+                }
+                if (isNaN(parsedDate.getTime())) parsedDate = new Date();
+
+                return {
+                    from: t.fromStation || 'Network',
+                    to: t.toStation || 'Network',
+                    id: t.bookingId || 'TXN',
+                    dateTime: t.date || parsedDate.toLocaleString(),
+                    method: t.method || 'Bill Desk / UPI',
+                    status: t.status || 'Success',
+                    amount: `₹ ${t.fare || 0}`,
+                    rawDate: parsedDate
+                };
+            });
 
             // Combine filtering duplicates by bookingId
             const combined = [...mappedLocal];
@@ -384,8 +400,16 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
 
                 {activeTab === 'tickets' && (() => {
                     const now = new Date();
-                    const activeTxns = transactions.filter(t => (now - new Date(t.rawDate)) <= 2 * 60 * 60 * 1000);
-                    const completedTxns = transactions.filter(t => (now - new Date(t.rawDate)) > 2 * 60 * 60 * 1000);
+                    const activeTxns = transactions.filter(t => {
+                        const rd = new Date(t.rawDate);
+                        if (isNaN(rd.getTime())) return false; // fallback invalid dates to completed
+                        return (now - rd) <= 2 * 60 * 60 * 1000;
+                    });
+                    const completedTxns = transactions.filter(t => {
+                        const rd = new Date(t.rawDate);
+                        if (isNaN(rd.getTime())) return true;
+                        return (now - rd) > 2 * 60 * 60 * 1000;
+                    });
 
                     const activeCount = activeTxns.length;
                     const completedCount = completedTxns.length;

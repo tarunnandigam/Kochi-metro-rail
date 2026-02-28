@@ -78,6 +78,10 @@ function AppInner() {
     const noHeaderPaths = ['/signin', '/signup', '/station-master', '/officer-dashboard'];
     const isAuthPage = noHeaderPaths.includes(location.pathname);
 
+    // Hide Chatbot on login and signup pages
+    const noChatbotPaths = ['/signin', '/signup'];
+    const hideChatbot = noChatbotPaths.includes(location.pathname);
+
     return (
         <div className="App">
             {!isAuthPage && (
@@ -109,7 +113,7 @@ function AppInner() {
                 </Routes>
             </main>
             {!isAuthPage && <Footer />}
-            <Chatbot />
+            {!hideChatbot && <Chatbot />}
         </div>
     );
 }

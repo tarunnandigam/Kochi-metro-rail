@@ -1,6 +1,5 @@
 import React from 'react';
 import '../styles/Recharge.css';
-import Footer from '../components/Layout/Footer';
 
 // User should place metrocard.png in the assets folder or use public path
 // import metroCardImg from '../../assets/metrocard.png';
@@ -152,7 +151,6 @@ const Recharge = ({ onNavigate }) => {
                 </div>
             </section>
 
-            <Footer />
         </div>
     );
 };

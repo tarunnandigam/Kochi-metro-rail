@@ -199,11 +199,12 @@ router.get('/trains/live', async (req, res) => {
 // Create a booking and return booking id and ticket download
 router.post('/book', async (req, res) => {
     try {
-        const { fromStation, toStation, passengerName, passengerPhone, type, email } = req.body;
+        const { fromStation, toStation, passengerName, passengerPhone, type, email, passengers } = req.body;
         // type: 'single' | 'day-pass' | 'weekly-pass' | 'monthly-pass' | 'smart-card'
         if (!type) return res.status(400).json({ message: 'type is required' });
 
         let fare = 0;
+        let pCount = parseInt(passengers) || 1;
         let fromCode = fromStation || null;
         let toCode = toStation || null;
 
@@ -243,6 +244,8 @@ router.post('/book', async (req, res) => {
         } else {
             return res.status(400).json({ message: 'Unknown ticket type' });
         }
+
+        fare = fare * pCount;
 
         // --- Resolve userId from JWT (if present) before saving ---
         let resolvedUserId = null;

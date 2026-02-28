@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Footer from "../components/Layout/Footer";
 import "../styles/FAQs.css";
 
 const FAQ_DATA = [
@@ -70,7 +69,6 @@ const FAQs = ({ onNavigate }) => {
                 </div>
             </div>
 
-            <Footer />
         </div>
     );
 };

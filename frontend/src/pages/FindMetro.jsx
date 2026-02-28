@@ -244,7 +244,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                 toStation,
                                 estimatedTime: Math.abs(toIdx - fromIdx) * 3,
                                 numberOfStops: Math.abs(toIdx - fromIdx),
-                                fare: Math.max(20, Math.abs(toIdx - fromIdx) * 5),
+                                fare: 10 + (Math.abs(toIdx - fromIdx) * 5),
                                 intermediateStations: stations.slice(fromIdx + 1, toIdx)
                             });
                         }
@@ -320,7 +320,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
             toStation: to,
             estimatedTime: Math.abs(toIdx - fromIdx) * 3,
             numberOfStops: Math.abs(toIdx - fromIdx),
-            fare: Math.abs(toIdx - fromIdx) * 5,
+            fare: 10 + (Math.abs(toIdx - fromIdx) * 5),
             intermediateStations: intermediateStations.map(s => ({ name: s.name }))
         };
     };
@@ -375,6 +375,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
                 passengerName: (user && user.fullName) || '',
                 passengerPhone: '',
                 type: ticketType,
+                passengers: Number(passengers),
                 email: (user && user.email) || undefined
             };
 
