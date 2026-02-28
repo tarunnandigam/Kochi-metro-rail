@@ -11,6 +11,14 @@ import TicketView from './pages/TicketView';
 import Chatbot from './components/Chatbot/Chatbot';
 import Recharge from './pages/Recharge';
 import MyAccount from './pages/MyAccount';
+<<<<<<< Updated upstream
+=======
+import StationMasterDashboard from './pages/StationMasterDashboard';
+import OfficerDashboard from './pages/OfficerDashboard';
+import HelpAndContact from './pages/HelpAndContact';
+import FAQs from './pages/FAQs';
+import Footer from './components/Layout/Footer';
+>>>>>>> Stashed changes
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -66,13 +74,19 @@ function App() {
                     isAuthenticated={isLoggedIn}
                     user={user}
                     onLogout={handleLogout}
+<<<<<<< Updated upstream
                     onNavigate={setCurrentPage}
                     currentPage={currentPage}
+=======
+                    onNavigate={onNavigate}
+                    currentPage={location.pathname.replace('/', '') || 'home'}
+>>>>>>> Stashed changes
                 />
             )}
             <main className={!isAuthPage ? 'app-main' : ''}>
                 {renderPage()}
             </main>
+            {!isAuthPage && <Footer />}
             <Chatbot />
         </div>
     );

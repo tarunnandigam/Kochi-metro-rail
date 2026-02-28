@@ -73,6 +73,8 @@ app.use(express.urlencoded({ extended: true }));
 // Activity logger - logs important user/admin actions to MongoDB
 app.use(activityLogger);
 
+const userRoutes = require('./routes/user');
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/metro', metroRoutes);
@@ -82,6 +84,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/fare', fareRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
 
 // Welcome route
 app.get('/api/welcome', (req, res) => {

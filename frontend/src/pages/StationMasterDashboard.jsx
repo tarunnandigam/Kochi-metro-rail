@@ -1,3 +1,4 @@
+git commit -m "Station master dashboard UI updates"
 import React, { useState, useEffect } from 'react';
 import '../styles/StationMasterDashboard.css';
 
@@ -10,7 +11,155 @@ const mockTrains = [
     { id: 'KM-104', route: 'Vyttila → Aluva', status: 'On Time', nextArrival: '11:22 AM', platform: '2', passengers: 143 },
 ];
 
+<<<<<<< Updated upstream
 const mockIncidents = [
+=======
+// Ordered list of all stations (North→South)
+const STATION_NAMES = KMRL_STATIONS.map(s => s.name);
+const getStationFactor = (name) => KMRL_STATIONS.find(s => s.name === name)?.factor ?? 1;
+
+/* ── Seeded per-date data (station-aware) ─────────────────────────────── */
+const seedDate = (d, stationFactor = 1) => {
+    const v = (d.getDate() * 37 + d.getMonth() * 17 + d.getFullYear()) % 100;
+    const base = 2800 + Math.round(v * 42.5);
+    return {
+        passengers: Math.round(base * stationFactor),
+        trains: 22 + (v % 8),
+        incidents: v % 5 === 0 ? 2 : v % 7 === 0 ? 1 : 0,
+        revenue: Math.round((14000 + Math.round(v * 980)) * stationFactor),
+    };
+};
+
+const HOURLY_BASE = [320, 810, 1240, 680, 490, 570, 430, 380, 510, 740, 1190, 960];
+const HOUR_LABELS = ['7AM', '8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'];
+
+const seedHourly = (d, factor = 1) =>
+    HOURLY_BASE.map(b => Math.max(100, Math.round(b * factor + (d.getDate() % 5) * 30)));
+
+/* ── Train schedule with per-train station stops list ─────────────────── */
+// Each train entry lists every station it halts at (in order).
+// Northbound (Petta→Aluva) and Southbound (Aluva→Petta) services.
+const BASE_TRAINS = [
+    {
+        id: 'KM-101', route: 'Aluva → Petta', platform: '1',
+        stations: ['Aluva', 'Pulinchodu', 'Companypady', 'Ambattukavu', 'Muttom', 'Kalamassery', 'Cusat', 'Pathadipalam', 'Edapally', 'Changampuzha Park', 'Palarivattom', 'JLN Stadium', 'Kaloor', 'Lissie', 'MG Road', 'Maharajas College', 'Ernakulam South', 'Kadavanthra', 'Elamkulam', 'Vyttila', 'Thaikoodam', 'Petta'],
+        times: ['07:12 AM', '09:42 AM', '12:05 PM', '03:30 PM', '06:10 PM'],
+    },
+    {
+        id: 'KM-102', route: 'Petta → Aluva', platform: '2',
+        stations: ['Petta', 'Thaikoodam', 'Vyttila', 'Elamkulam', 'Kadavanthra', 'Ernakulam South', 'Maharajas College', 'MG Road', 'Lissie', 'Kaloor', 'JLN Stadium', 'Palarivattom', 'Changampuzha Park', 'Edapally', 'Pathadipalam', 'Cusat', 'Kalamassery', 'Muttom', 'Ambattukavu', 'Companypady', 'Pulinchodu', 'Aluva'],
+        times: ['07:50 AM', '10:25 AM', '01:00 PM', '04:15 PM', '07:00 PM'],
+    },
+    {
+        id: 'KM-103', route: 'Aluva → Vyttila', platform: '1',
+        stations: ['Aluva', 'Pulinchodu', 'Companypady', 'Ambattukavu', 'Muttom', 'Kalamassery', 'Cusat', 'Pathadipalam', 'Edapally', 'Changampuzha Park', 'Palarivattom', 'JLN Stadium', 'Kaloor', 'Lissie', 'MG Road', 'Maharajas College', 'Ernakulam South', 'Kadavanthra', 'Elamkulam', 'Vyttila'],
+        times: ['08:10 AM', '11:00 AM', '02:20 PM', '05:45 PM'],
+    },
+    {
+        id: 'KM-104', route: 'Vyttila → Aluva', platform: '2',
+        stations: ['Vyttila', 'Elamkulam', 'Kadavanthra', 'Ernakulam South', 'Maharajas College', 'MG Road', 'Lissie', 'Kaloor', 'JLN Stadium', 'Palarivattom', 'Changampuzha Park', 'Edapally', 'Pathadipalam', 'Cusat', 'Kalamassery', 'Muttom', 'Ambattukavu', 'Companypady', 'Pulinchodu', 'Aluva'],
+        times: ['08:55 AM', '11:40 AM', '03:05 PM', '06:30 PM'],
+    },
+    {
+        id: 'KM-105', route: 'Aluva → Kalamassery', platform: '1',
+        stations: ['Aluva', 'Pulinchodu', 'Companypady', 'Ambattukavu', 'Muttom', 'Kalamassery'],
+        times: ['09:20 AM', '12:50 PM', '04:40 PM'],
+    },
+    {
+        id: 'KM-106', route: 'MG Road → Aluva', platform: '2',
+        stations: ['MG Road', 'Lissie', 'Kaloor', 'JLN Stadium', 'Palarivattom', 'Changampuzha Park', 'Edapally', 'Pathadipalam', 'Cusat', 'Kalamassery', 'Muttom', 'Ambattukavu', 'Companypady', 'Pulinchodu', 'Aluva'],
+        times: ['08:00 AM', '10:45 AM', '01:30 PM', '05:00 PM'],
+    },
+    {
+        id: 'KM-107', route: 'Ernakulam South → Aluva', platform: '2',
+        stations: ['Ernakulam South', 'Maharajas College', 'MG Road', 'Lissie', 'Kaloor', 'JLN Stadium', 'Palarivattom', 'Changampuzha Park', 'Edapally', 'Pathadipalam', 'Cusat', 'Kalamassery', 'Muttom', 'Ambattukavu', 'Companypady', 'Pulinchodu', 'Aluva'],
+        times: ['07:30 AM', '11:15 AM', '03:45 PM', '07:20 PM'],
+    },
+];
+
+/* Returns upcoming trains that STOP AT the given station */
+const getUpcomingTrains = (selectedDate, now, stationName) => {
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    const curMins = isToday ? now.getHours() * 60 + now.getMinutes() : 0;
+    const dayOfWeek = selectedDate.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const seed = selectedDate.getDate() % 3;
+
+    // Filter trains that actually pass through selected station
+    const relevantTrains = BASE_TRAINS.filter(t => t.stations.includes(stationName));
+    // On weekends, use subset (fewer services)
+    const trainsPool = isWeekend ? relevantTrains.slice(0, Math.ceil(relevantTrains.length * 0.7)) : relevantTrains;
+
+    const upcoming = [];
+    trainsPool.forEach(train => {
+        // Calculate approximate arrival offset based on station index
+        const stationIdx = train.stations.indexOf(stationName);
+        const offsetMins = stationIdx * 2; // ~2 min per stop
+
+        train.times.forEach(t => {
+            const [hm, ampm] = [t.slice(0, -3), t.slice(-2)];
+            const [hh, mm] = hm.split(':').map(Number);
+            let mins = hh * 60 + mm + offsetMins;
+            if (ampm === 'PM' && hh !== 12) mins += 720;
+            if (mins < curMins) return; // past
+
+            const delayMin = (train.id === 'KM-102' && seed === 1) ? 4 :
+                (train.id === 'KM-105' && seed === 2) ? 2 : 0;
+
+            // Format adjusted arrival time
+            const totalMins = mins + delayMin;
+            const arrH = Math.floor(totalMins / 60) % 24;
+            const arrM = totalMins % 60;
+            const arrAMPM = arrH >= 12 ? 'PM' : 'AM';
+            const arrH12 = arrH % 12 || 12;
+            const arrivalTime = `${String(arrH12).padStart(2, '0')}:${String(arrM).padStart(2, '0')} ${arrAMPM}`;
+
+            upcoming.push({
+                id: train.id,
+                route: train.route,
+                platform: train.platform,
+                time: arrivalTime,
+                status: delayMin > 0 ? `Delayed ${delayMin}m` : 'On Time',
+                passengers: Math.round(150 + (Math.sin(mins) + 1) * 150),
+                stopsAt: stationName,
+            });
+        });
+    });
+
+    upcoming.sort((a, b) => {
+        const toMins = s => {
+            const [hm, ap] = [s.slice(0, -3), s.slice(-2)];
+            const [h, m] = hm.split(':').map(Number);
+            let x = h * 60 + m; if (ap === 'PM' && h !== 12) x += 720; return x;
+        };
+        return toMins(a.time) - toMins(b.time);
+    });
+    return upcoming.slice(0, 6);
+};
+
+const FACILITIES = [
+    { name: 'ATM', Icon: Atm01Icon, status: 'Operational' },
+    { name: 'WiFi', Icon: Wifi01Icon, status: 'Operational' },
+    { name: 'Restrooms', Icon: UserGroupIcon, status: 'Maintenance' },
+    { name: 'Lifts (P1)', Icon: ArrowUp01Icon, status: 'Fault' },
+    { name: 'CCTV', Icon: CctvCameraIcon, status: 'Operational' },
+    { name: 'Ticket Counter', Icon: Ticket01Icon, status: 'Operational' },
+    { name: 'Drinking Water', Icon: DropletIcon, status: 'Operational' },
+    { name: 'First Aid', Icon: HeartCheckIcon, status: 'Operational' },
+    { name: 'Fire Safety', Icon: FireIcon, status: 'Maintenance' },
+];
+
+const NAV = [
+    { key: 'overview', icon: DashboardCircleIcon, label: 'Overview' },
+    { key: 'trains', icon: Train01Icon, label: 'Train Monitor' },
+    { key: 'incidents', icon: Alert01Icon, label: 'Incidents' },
+    { key: 'facilities', icon: Settings01Icon, label: 'Facilities' },
+    { key: 'announcements', icon: Megaphone01Icon, label: 'Announcements' },
+    { key: 'grievances', icon: LegalDocument01Icon, label: 'Grievances' }
+];
+
+const INITIAL_INCIDENTS = [
+>>>>>>> Stashed changes
     { id: 1, type: 'Overcrowding', platform: '1', time: '10:20 AM', status: 'Resolved' },
     { id: 2, type: 'Lift Malfunction', platform: 'Entry Gate', time: '09:55 AM', status: 'Active' },
 ];
@@ -137,12 +286,82 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [aiQuery, setAiQuery] = useState('');
 
+<<<<<<< Updated upstream
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
     const filteredTrains = mockTrains.filter(t =>
+=======
+    const [grievances, setGrievances] = useState([]);
+
+    /* Live clock & Load grievances */
+    useEffect(() => {
+        const t = setInterval(() => setNow(new Date()), 1000);
+
+        // Load grievances
+        const all = JSON.parse(localStorage.getItem('kmrl_complaints') || '[]');
+        setGrievances(all.filter(c => c.type === 'Grievance'));
+
+        return () => clearInterval(t);
+    }, []);
+
+    const updateGrievanceStatus = (id, newStatus) => {
+        const all = JSON.parse(localStorage.getItem('kmrl_complaints') || '[]');
+        const updated = all.map(c => c.id === id ? { ...c, status: newStatus } : c);
+        localStorage.setItem('kmrl_complaints', JSON.stringify(updated));
+        setGrievances(updated.filter(c => c.type === 'Grievance'));
+    };
+
+    /* Compute data for selected date — scaled by station busyness */
+    const stationFactor = getStationFactor(selectedStation);
+    const selData = seedDate(selectedDate, stationFactor);
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    const hourFactor = (chartTab === 'Weekday' ? 1.1 : chartTab === 'Weekend' ? 0.72 : 1) * stationFactor;
+    const hourlyData = seedHourly(selectedDate, hourFactor);
+    const upcomingTrains = getUpcomingTrains(selectedDate, now, selectedStation);
+
+    /* Current hour index for chart highlight */
+    const curHourIdx = isToday ? Math.max(0, now.getHours() - 7) : null; // 7AM = index 0
+
+    const activeIncidents = incidents.filter(i => i.status === 'Active').length;
+    const opFacilities = FACILITIES.filter(f => f.status === 'Operational').length;
+
+    const statCards = [
+        { label: 'Trains Today', value: selData.trains, Icon: SpeedTrain01Icon, color: '#0066b3', bg: '#eff6ff', trend: '+2 vs yesterday', trendClass: '' },
+        { label: 'Passengers Today', value: selData.passengers.toLocaleString(), Icon: UserGroupIcon, color: '#0d9488', bg: '#f0fdfa', trend: '↑ 8.3%', trendClass: '' },
+        { label: 'Active Incidents', value: activeIncidents, Icon: Alert01Icon, color: activeIncidents > 0 ? '#f59e0b' : '#10b981', bg: activeIncidents > 0 ? '#fefce8' : '#f0fdf4', trend: activeIncidents > 0 ? 'Needs Attention' : 'All Clear', trendClass: activeIncidents > 0 ? 'warn' : '' },
+        { label: 'Facilities OK', value: `${opFacilities}/${FACILITIES.length}`, Icon: CheckmarkCircle01Icon, color: '#8b5cf6', bg: '#f5f3ff', trend: `${FACILITIES.length - opFacilities} issues`, trendClass: FACILITIES.length - opFacilities > 0 ? 'warn' : '' },
+    ];
+
+    const handleReportIncident = (e) => {
+        e.preventDefault();
+        if (!incidentForm.type || !incidentForm.platform) return;
+        setIncidents(p => [{
+            id: Date.now(), type: incidentForm.type,
+            platform: incidentForm.platform,
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            status: 'Active'
+        }, ...p]);
+        setIncidentForm({ type: '', platform: '', description: '' });
+    };
+
+    const resolveIncident = (id) =>
+        setIncidents(p => p.map(i => i.id === id ? { ...i, status: 'Resolved' } : i));
+
+    const postAnnouncement = (e) => {
+        e.preventDefault();
+        if (!announcement.trim()) return;
+        setAnnouncements(p => [{
+            id: Date.now(), text: announcement,
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        }, ...p]);
+        setAnnouncement('');
+    };
+
+    const filteredTrains = upcomingTrains.filter(t =>
+>>>>>>> Stashed changes
         t.id.toLowerCase().includes(trainSearch.toLowerCase()) ||
         t.route.toLowerCase().includes(trainSearch.toLowerCase())
     );
@@ -286,6 +505,7 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
                             {activeTab === 'incidents' && 'Incident Management'}
                             {activeTab === 'facilities' && 'Facility Status'}
                             {activeTab === 'announcements' && 'Announcements'}
+                            {activeTab === 'grievances' && 'Passenger Grievances'}
                         </h1>
                         <p className="sm-page-sub">
                             {user?.stationAssigned || STATION} Station · {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -655,6 +875,66 @@ function StationMasterDashboard({ user, onLogout, onNavigate }) {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ══════════════════ GRIEVANCES ══════════════════ */}
+                {activeTab === 'grievances' && (
+                    <div className="sm-content">
+                        <div className="sm-card">
+                            <div className="sm-card-head">
+                                <span className="sm-card-title">Passenger Grievances</span>
+                                <span className="sm-card-badge">{grievances.length} Total</span>
+                            </div>
+                            {grievances.length === 0 ? (
+                                <p className="sm-empty">No grievances reported yet.</p>
+                            ) : (
+                                <table className="sm-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Passenger</th>
+                                            <th>Subject</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {grievances.map(g => (
+                                            <tr key={g.id}>
+                                                <td><strong>{g.id}</strong></td>
+                                                <td>
+                                                    <div style={{ fontWeight: 600 }}>{g.userName}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{g.userEmail}</div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ fontWeight: 600 }}>{g.subject}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#475569', maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={g.description}>{g.description}</div>
+                                                </td>
+                                                <td>{g.date}</td>
+                                                <td>
+                                                    <span className={`sm-status-badge ${g.status === 'Resolved' ? 'green' : g.status === 'In Progress' ? 'amber' : 'amber'}`}>
+                                                        {g.status}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <select
+                                                        value={g.status}
+                                                        onChange={(e) => updateGrievanceStatus(g.id, e.target.value)}
+                                                        style={{ padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                                                    >
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="In Progress">In Progress</option>
+                                                        <option value="Resolved">Resolved</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 )}

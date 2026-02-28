@@ -15,8 +15,31 @@ const NAV_ITEMS = [
 
 const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPage }) => {
     const [search, setSearch] = useState("");
+    const [fetchedName, setFetchedName] = useState("");
 
-    const fullName = user?.fullName || user?.name || "Nandigam Tarun";
+    React.useEffect(() => {
+        const fetchUserData = async () => {
+            const token = localStorage.getItem('kmrl_token');
+            if (isAuthenticated && token) {
+                try {
+                    const resp = await fetch('/api/user/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (data.firstName || data.lastName) {
+                            setFetchedName(`${data.firstName || ''} ${data.lastName || ''}`.trim());
+                        }
+                    }
+                } catch (err) {
+                    console.warn(err);
+                }
+            }
+        };
+        fetchUserData();
+    }, [isAuthenticated]);
+
+    const fullName = fetchedName || user?.fullName || user?.name || "Nandigam Tarun";
     const initial = fullName.charAt(0).toUpperCase();
     const nav = (page) => { if (page && onNavigate) onNavigate(page); };
 
