@@ -16,6 +16,12 @@ const NAV_ITEMS = [
 const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPage }) => {
     const [search, setSearch] = useState("");
     const [fetchedName, setFetchedName] = useState("");
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    React.useEffect(() => {
+        const timerId = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timerId);
+    }, []);
 
     React.useEffect(() => {
         const fetchUserData = async () => {
@@ -65,6 +71,10 @@ const Header = ({ isAuthenticated = false, user, onLogout, onNavigate, currentPa
                     <span onClick={() => nav(isAuthenticated ? "home" : "signin")}>For Passengers</span>
                     <span className="divider">|</span>
                     <span>For Corporates</span>
+                    <span className="divider">|</span>
+                    <span className="live-clock" style={{ fontWeight: 600, color: '#0da1a6' }}>
+                        {currentTime.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
                 </div>
             </div>
 
