@@ -355,8 +355,8 @@ function FindMetro({ onNavigate, user, onLogout }) {
         setSelectedService('all');
     };
 
-    const submitBooking = async () => {
-        if (!selectedTrain) return;
+    const submitBooking = async (trainToBook = selectedTrain) => {
+        if (!trainToBook) return;
         try {
             // Ensure we send station CODES for single journey bookings.
             const getCodeFor = (stationNameOrCode) => {
@@ -370,8 +370,8 @@ function FindMetro({ onNavigate, user, onLogout }) {
             };
 
             const payload = {
-                fromStation: ticketType === 'single' ? getCodeFor(selectedTrain.fromStation) : undefined,
-                toStation: ticketType === 'single' ? getCodeFor(selectedTrain.toStation) : undefined,
+                fromStation: ticketType === 'single' ? getCodeFor(trainToBook.fromStation) : undefined,
+                toStation: ticketType === 'single' ? getCodeFor(trainToBook.toStation) : undefined,
                 passengerName: (user && user.fullName) || '',
                 passengerPhone: '',
                 type: ticketType,
@@ -391,8 +391,8 @@ function FindMetro({ onNavigate, user, onLogout }) {
                         bookingId: data.bookingId,
                         fare: data.fare,
                         ticketUrl: data.ticketUrl,
-                        fromStation: ticketType === 'single' ? (selectedTrain.fromStation || payload.fromStation) : '',
-                        toStation: ticketType === 'single' ? (selectedTrain.toStation || payload.toStation) : '',
+                        fromStation: ticketType === 'single' ? (trainToBook.fromStation || payload.fromStation) : '',
+                        toStation: ticketType === 'single' ? (trainToBook.toStation || payload.toStation) : '',
                         passengerName: payload.passengerName,
                         email: payload.email,
                         type: payload.type,
@@ -424,8 +424,8 @@ function FindMetro({ onNavigate, user, onLogout }) {
                 bookingId: mockData.bookingId,
                 fare: mockData.fare,
                 ticketUrl: mockData.ticketUrl,
-                fromStation: ticketType === 'single' ? (selectedTrain.fromStation || payload.fromStation) : '',
-                toStation: ticketType === 'single' ? (selectedTrain.toStation || payload.toStation) : '',
+                fromStation: ticketType === 'single' ? (trainToBook.fromStation || payload.fromStation) : '',
+                toStation: ticketType === 'single' ? (trainToBook.toStation || payload.toStation) : '',
                 passengerName: payload.passengerName,
                 email: payload.email,
                 type: payload.type,
@@ -644,8 +644,9 @@ function FindMetro({ onNavigate, user, onLogout }) {
 
                                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
                                     <button className="fm-proceed-btn" style={{ borderRadius: '10px', padding: '0.8rem 2rem', fontSize: '1.1rem', background: '#0ea5e9', fontWeight: 800, fontFamily: 'inherit' }} onClick={() => {
-                                        setSelectedTrain({ ...route, fare: routeFare * Number(passengers) });
-                                        submitBooking();
+                                        const finalTrain = { ...route, fare: routeFare * Number(passengers) };
+                                        setSelectedTrain(finalTrain);
+                                        submitBooking(finalTrain);
                                     }}>
                                         Make payment
                                     </button>
