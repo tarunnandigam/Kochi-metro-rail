@@ -41,10 +41,13 @@ function SearchMetro({ onLogout, user, onNavigate }) {
     const [selectedService, setSelectedService] = useState('all');
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTrain, setSelectedTrain] = useState(null);
-    const [passengerName, setPassengerName] = useState('');
+    const [passengerName, setPassengerName] = useState('John Doe');
     const [passengerPhone, setPassengerPhone] = useState('');
     const [passengerEmail, setPassengerEmail] = useState('');
     const [bookingResponse, setBookingResponse] = useState(null);
+    const [ticketCount, setTicketCount] = useState(1);
+    const [paymentMethod, setPaymentMethod] = useState('card');
+    const [isPaying, setIsPaying] = useState(false);
 
     useEffect(() => {
         // Fetch stations from API
@@ -191,6 +194,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
     };
 
     const handleBookTicket = (train) => {
+        setTicketCount(parseInt(searchData.passengers) || 1);
         // attach journey details from current search
         const journey = {
             ...train,
@@ -198,10 +202,10 @@ function SearchMetro({ onLogout, user, onNavigate }) {
             toStation: searchData.toStation,
             fromCode: searchData.fromStation,
             toCode: searchData.toStation,
-            lineName: 'Line 1',
+            lineName: train.lineName || 'Line 1',
             estimatedTime: fareInfo ? fareInfo.distance : 0,
-            numberOfStops: fareInfo ? fareInfo.distance / 2 : 0,
-            fare: fareInfo ? fareInfo.totalFare : 0
+            numberOfStops: fareInfo ? Math.round(fareInfo.distance / 2) : 0,
+            fare: train.fare || (fareInfo ? fareInfo.baseFare : 0)
         };
         setSelectedTrain(journey);
         setShowBookingModal(true);
@@ -214,6 +218,7 @@ function SearchMetro({ onLogout, user, onNavigate }) {
 
     const submitBooking = async () => {
         if (!selectedTrain) return;
+        setIsPaying(true);
         const payload = {
             type: ticketType,
             fromStation: selectedTrain.fromStation,
@@ -255,6 +260,8 @@ function SearchMetro({ onLogout, user, onNavigate }) {
         } catch (err) {
             console.error('Booking error', err);
             setBookingResponse({ success: false, error: 'Network error or backend issue' });
+        } finally {
+            setIsPaying(false);
         }
     };
 
@@ -648,113 +655,154 @@ function SearchMetro({ onLogout, user, onNavigate }) {
                 </div>
             )}
 
-            {/* Booking Modal */}
+            {/* Booking Modal (Redesigned as Ticket Summary Screen) */}
             {showBookingModal && selectedTrain && (
-                <div className="modal-overlay" onClick={closeBookingModal}>
-                    <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>📱 Book Your Ticket</h2>
-                            <button className="btn-close" onClick={closeBookingModal}>✕</button>
+                <div className="modal-overlay payment-modal-overlay" onClick={closeBookingModal}>
+                    <div className="ts-modal-container" onClick={(e) => e.stopPropagation()}>
+                        <div className="ts-header">
+                            <h2 className="ts-title">Ticket Summary</h2>
+                            <button className="ts-close-btn" onClick={closeBookingModal}>✕</button>
                         </div>
+                        <div className="ts-content">
+                            {/* Left Column - Journey Details */}
+                            <div className="ts-left-col">
+                                <div className="ts-journey-card">
+                                    <div className="ts-trip-status">
+                                        <span className="ts-active-text">ACTIVE TRIP</span>
+                                        <span className="ts-dot">•</span>
+                                        <span className="ts-line-name">{selectedTrain.lineName}</span>
+                                    </div>
+                                    <div className="ts-route-big">
+                                        <span className="ts-station">{selectedTrain.fromStation}</span>
+                                        <span className="ts-arrow">→</span>
+                                        <span className="ts-station">{selectedTrain.toStation}</span>
+                                    </div>
+                                    <div className="ts-time-info">
+                                        <div className="ts-time-block">
+                                            <div className="ts-time-label">DEPARTURE</div>
+                                            <div className="ts-time-val">{selectedTrain.trainSchedules?.[0]?.time || '10:45 AM'}, Today</div>
+                                        </div>
+                                        <div className="ts-time-block">
+                                            <div className="ts-time-label">ESTIMATED ARRIVAL</div>
+                                            <div className="ts-time-val">{selectedTrain.trainSchedules?.[1]?.time || '11:12 AM'}, Today</div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div className="modal-content">
-                            <div className="booking-summary">
-                                <h3>🚆 Journey Details</h3>
-                                <p><strong>📍 From:</strong> {selectedTrain.fromStation} ({selectedTrain.fromCode})</p>
-                                <p><strong>📍 To:</strong> {selectedTrain.toStation} ({selectedTrain.toCode})</p>
-                                <p><strong>🚌 Line:</strong> {selectedTrain.lineName}</p>
-                                <p><strong>⏱️ Duration:</strong> {selectedTrain.estimatedTime} mins</p>
-                                <p><strong>🛑 Stops:</strong> {selectedTrain.numberOfStops} stops</p>
-                                <p><strong>💰 Fare:</strong> ₹{selectedTrain.fare}</p>
+                                <div className="ts-middle-cards">
+                                    <div className="ts-traveler-card">
+                                        <div className="ts-traveler-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        </div>
+                                        <div className="ts-traveler-info">
+                                            <label>TRAVELER NAME</label>
+                                            <input type="text" value={passengerName} onChange={(e) => setPassengerName(e.target.value)} placeholder="Enter Name" className="ts-name-input" />
+                                            <div className="ts-passenger-id">Primary Passenger ID: MR-99281</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="ts-tickets-card">
+                                        <div className="ts-tickets-label">NUMBER OF TICKETS</div>
+                                        <div className="ts-counter-row">
+                                            <div className="ts-counter">
+                                                <button onClick={() => setTicketCount(Math.max(1, ticketCount - 1))} className="ts-counter-btn">−</button>
+                                                <span className="ts-count-val">{ticketCount}</span>
+                                                <button onClick={() => setTicketCount(ticketCount + 1)} className="ts-counter-btn">+</button>
+                                            </div>
+                                            <div className="ts-unit-price">
+                                                <div className="ts-price-label">Unit Price</div>
+                                                <div className="ts-price-val">₹{selectedTrain.fare.toFixed(2)}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="booking-form">
-                                <div className="form-group">
-                                    <label>Ticket Type *</label>
-                                    <select value={ticketType} onChange={(e) => setTicketType(e.target.value)}>
-                                        <option value="single">🎫 Single Journey Ticket</option>
-                                        <option value="day-pass">📅 Day Pass (Unlimited)</option>
-                                        <option value="weekly-pass">📆 Weekly Pass</option>
-                                        <option value="monthly-pass">📊 Monthly Pass</option>
-                                        <option value="smart-card">💳 Smart Card</option>
-                                    </select>
-                                </div>
+                            {/* Right Column - Payment */}
+                            <div className="ts-right-col">
+                                <div className="ts-payment-card">
+                                    <h3 className="ts-payment-title">Payment Method</h3>
 
-                                <div className="form-group">
-                                    <label>Station Services *</label>
-                                    <select value={selectedService} onChange={(e) => setSelectedService(e.target.value)}>
-                                        <option value="all">✓ All Services</option>
-                                        <option value="atm">🏧 ATM Available</option>
-                                        <option value="food">🍔 Food Stalls</option>
-                                        <option value="wifi">📶 WiFi Available</option>
-                                        <option value="lostandfound">📦 Lost & Found</option>
-                                        <option value="helpdesk">🆘 Help Desk</option>
-                                    </select>
-                                </div>
+                                    <div className="ts-payment-options">
+                                        <div className={`ts-pm-option ${paymentMethod === 'card' ? 'active' : ''}`} onClick={() => setPaymentMethod('card')}>
+                                            <div className="ts-radio">
+                                                <div className="ts-radio-inner"></div>
+                                            </div>
+                                            <div className="ts-pm-icon">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            </div>
+                                            <div className="ts-pm-name">Credit/Debit Card</div>
+                                        </div>
 
-                                <div className="form-group">
-                                    <label>Passenger Name</label>
-                                    <input type="text" value={passengerName} onChange={(e) => setPassengerName(e.target.value)} placeholder="Full name" />
-                                </div>
+                                        <div className={`ts-pm-option ${paymentMethod === 'wallet' ? 'active' : ''}`} onClick={() => setPaymentMethod('wallet')}>
+                                            <div className="ts-radio">
+                                                <div className="ts-radio-inner"></div>
+                                            </div>
+                                            <div className="ts-pm-icon">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+                                            </div>
+                                            <div className="ts-pm-name">Digital Wallet</div>
+                                        </div>
 
-                                <div className="form-group">
-                                    <label>Phone (optional)</label>
-                                    <input type="text" value={passengerPhone} onChange={(e) => setPassengerPhone(e.target.value)} placeholder="Phone number" />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Email (optional — for ticket delivery)</label>
-                                    <input type="email" value={passengerEmail} onChange={(e) => setPassengerEmail(e.target.value)} placeholder="you@example.com" />
-                                </div>
-
-                                <div className="price-breakdown">
-                                    <h4>Price Breakdown</h4>
-                                    <div className="price-row">
-                                        <span>Base Fare:</span>
-                                        <span>₹{selectedTrain.fare}</span>
+                                        <div className={`ts-pm-option ${paymentMethod === 'upi' ? 'active' : ''}`} onClick={() => setPaymentMethod('upi')}>
+                                            <div className="ts-radio">
+                                                <div className="ts-radio-inner"></div>
+                                            </div>
+                                            <div className="ts-pm-icon">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                            </div>
+                                            <div className="ts-pm-name">UPI / QR Pay</div>
+                                        </div>
                                     </div>
-                                    {ticketType === 'day-pass' && (
-                                        <div className="price-row">
-                                            <span>Day Pass Surcharge:</span>
-                                            <span>₹50</span>
+
+                                    <div className="ts-summary-totals">
+                                        <div className="ts-total-row">
+                                            <span>Subtotal</span>
+                                            <span>₹{(selectedTrain.fare * ticketCount).toFixed(2)}</span>
+                                        </div>
+                                        <div className="ts-total-row">
+                                            <span>Booking Fee</span>
+                                            <span>₹0.00</span>
+                                        </div>
+                                        <div className="ts-total-row ts-grand-total">
+                                            <span>Grand Total</span>
+                                            <span className="ts-grand-val">₹{(selectedTrain.fare * ticketCount).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+
+                                    <button className="ts-pay-btn" onClick={submitBooking} disabled={bookingResponse?.success || isPaying}>
+                                        {isPaying ? 'Processing...' : 'Pay Now'} <span className="arrow">→</span>
+                                    </button>
+
+                                    {bookingResponse && (
+                                        <div className="ts-booking-status" style={{ textAlign: 'center', marginTop: '1rem' }}>
+                                            {bookingResponse.success ? (
+                                                <>
+                                                    <p style={{ color: '#16a34a', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>Payment successful!</p>
+                                                    <button onClick={() => { localStorage.setItem('kmrl_latest_booking', JSON.stringify({ ...bookingResponse.data, fromStation: selectedTrain.fromStation, toStation: selectedTrain.toStation })); onNavigate('ticket'); }} className="ts-view-ticket-btn" style={{ background: '#22c55e', color: 'white', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '5px', cursor: 'pointer', fontWeight: 600 }}>View Ticket Details</button>
+                                                </>
+                                            ) : (
+                                                <p style={{ color: '#dc2626', margin: 0 }}>Payment failed: {bookingResponse.error}</p>
+                                            )}
                                         </div>
                                     )}
-                                    {ticketType === 'smart-card' && (
-                                        <div className="price-row">
-                                            <span>Smart Card:</span>
-                                            <span>₹100</span>
-                                        </div>
-                                    )}
-                                    <div className="price-row total">
-                                        <span>Total:</span>
-                                        <span className="total-price">
-                                            ₹{ticketType === 'day-pass' ? selectedTrain.fare + 50 : ticketType === 'smart-card' ? 100 : selectedTrain.fare}
-                                        </span>
+
+                                    <div className="ts-secure-text">
+                                        SECURE 256-BIT SSL ENCRYPTED PAYMENT
                                     </div>
                                 </div>
 
-                                <div className="modal-buttons">
-                                    <button className="btn-cancel" onClick={closeBookingModal}>Cancel</button>
-                                    <button className="btn-submit" onClick={submitBooking}>✓ Confirm</button>
+                                <div className="ts-help-card">
+                                    <div className="ts-help-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                    </div>
+                                    <div className="ts-help-text">
+                                        <strong>Need help?</strong>
+                                        <p>Our customer support is available 24/7 for ticketing issues.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        {bookingResponse && (
-                            <div style={{ padding: '1rem', borderTop: '1px solid #eee' }}>
-                                {bookingResponse.success ? (
-                                    <div>
-                                        <p style={{ color: 'green' }}>Booking successful! ID: {bookingResponse.data.bookingId}</p>
-                                        <button onClick={() => downloadTicket(bookingResponse.data.ticketUrl)}>Download Ticket</button>
-                                        <div style={{ marginTop: '0.5rem' }}>
-                                            <input placeholder="Email address" value={passengerEmail} onChange={(e) => setPassengerEmail(e.target.value)} />
-                                            <button onClick={() => emailTicket(bookingResponse.data.bookingId, passengerEmail)}>Email Ticket</button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div style={{ color: 'red' }}>Booking failed: {bookingResponse.error}</div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
             )}

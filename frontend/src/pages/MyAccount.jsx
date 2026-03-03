@@ -69,36 +69,57 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
             const userTxns = storedTxns.filter(t => user && (t.email === user.email || t.passengerName === user.fullName));
 
             // Map API data
-            const mappedApi = apiData.map(t => ({
-                from: t.fromStation || 'Network',
-                to: t.toStation || 'Network',
-                id: t.bookingId || 'TXN',
-                dateTime: new Date(t.createdAt).toLocaleString(),
-                method: t.method || 'Bill Desk / UPI',
-                status: t.status || 'Success',
-                amount: `₹ ${t.fare || 0}`,
-                rawDate: new Date(t.createdAt)
-            }));
+            const mappedApi = apiData.map(t => {
+                let d = new Date(t.createdAt);
+                if (isNaN(d.getTime())) d = new Date(0);
+                return {
+                    from: t.fromStation || t.from || 'Network',
+                    to: t.toStation || t.to || 'Network',
+                    id: t.bookingId || 'TXN',
+                    dateTime: d.toLocaleString(),
+                    method: t.method || 'Bill Desk / UPI',
+                    status: t.status || 'Success',
+                    amount: `₹ ${t.fare || 0}`,
+                    rawDate: d
+                };
+            });
 
             // Map Local data
             const mappedLocal = userTxns.map(t => {
-                let parsedDate = new Date(t.date || new Date());
-                if (isNaN(parsedDate.getTime()) && t.date) {
-                    const parts = t.date.split(/[,\s]+/);
-                    if (parts.length > 0) {
-                        const dParts = parts[0].split(/[/-]/);
-                        if (dParts.length === 3) {
-                            // Convert DD/MM/YYYY into parseable MM/DD/YYYY and append the time parts 
-                            const timeStr = parts.length > 1 ? parts.slice(1).join(' ') : '12:00:00 PM';
-                            parsedDate = new Date(`${dParts[1]}/${dParts[0]}/${dParts[2]} ${timeStr}`);
+                let parsedDate = t.createdAt ? new Date(t.createdAt) : null;
+
+                if (!parsedDate || isNaN(parsedDate.getTime())) {
+                    if (t.date) {
+                        let tempDate = new Date(t.date);
+                        if (!isNaN(tempDate.getTime())) {
+                            parsedDate = tempDate;
+                        } else {
+                            try {
+                                if (t.date.includes('/')) {
+                                    const parts = t.date.split(/[,\s]+/);
+                                    const dParts = parts[0].split(/[/-]/);
+                                    if (dParts.length === 3) {
+                                        const timeStr = parts.length > 1 ? parts.slice(1).join(' ') : '12:00:00 PM';
+                                        tempDate = new Date(`${dParts[1]}/${dParts[0]}/${dParts[2]} ${timeStr}`);
+                                        if (!isNaN(tempDate.getTime())) {
+                                            parsedDate = tempDate;
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                // Fallback below
+                            }
                         }
                     }
                 }
-                if (isNaN(parsedDate.getTime())) parsedDate = new Date();
+
+                if (!parsedDate || isNaN(parsedDate.getTime())) {
+                    parsedDate = new Date(0);
+                }
 
                 return {
-                    from: t.fromStation || 'Network',
-                    to: t.toStation || 'Network',
+                    from: t.fromStation || t.from || 'Network',
+                    to: t.toStation || t.to || 'Network',
                     id: t.bookingId || 'TXN',
                     dateTime: t.date || parsedDate.toLocaleString(),
                     method: t.method || 'Bill Desk / UPI',
@@ -109,12 +130,23 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
             });
 
             // Combine filtering duplicates by bookingId
-            const combined = [...mappedLocal];
-            mappedApi.forEach(apiTxn => {
-                if (!combined.find(c => c.id === apiTxn.id)) {
-                    combined.push(apiTxn);
+            const uniqueMap = new Map();
+            mappedLocal.forEach(t => {
+                if (t.id && t.id !== 'TXN' && !uniqueMap.has(t.id)) {
+                    uniqueMap.set(t.id, t);
+                } else if (!t.id || t.id === 'TXN') {
+                    // if it's a generic TXN from local, fallback to a unique key based on rawDate to prevent grouping all 'TXN's
+                    uniqueMap.set('TXN-' + Math.random(), t);
                 }
             });
+            mappedApi.forEach(t => {
+                if (t.id && t.id !== 'TXN' && !uniqueMap.has(t.id)) {
+                    uniqueMap.set(t.id, t);
+                } else if (!t.id || t.id === 'TXN') {
+                    uniqueMap.set('TXN-' + Math.random(), t);
+                }
+            });
+            const combined = Array.from(uniqueMap.values());
 
             combined.sort((a, b) => b.rawDate - a.rawDate);
             setTransactions(combined);
@@ -403,12 +435,12 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
                     const activeTxns = transactions.filter(t => {
                         const rd = new Date(t.rawDate);
                         if (isNaN(rd.getTime())) return false; // fallback invalid dates to completed
-                        return (now - rd) <= 2 * 60 * 60 * 1000;
+                        return (now.getTime() - rd.getTime()) <= 2 * 60 * 60 * 1000;
                     });
                     const completedTxns = transactions.filter(t => {
                         const rd = new Date(t.rawDate);
                         if (isNaN(rd.getTime())) return true;
-                        return (now - rd) > 2 * 60 * 60 * 1000;
+                        return (now.getTime() - rd.getTime()) > 2 * 60 * 60 * 1000;
                     });
 
                     const activeCount = activeTxns.length;
@@ -486,7 +518,7 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div>
                                                     <div className="cp-item-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        {txn.from} <ArrowRight01Icon size={16} color="#94a3b8" /> {txn.to}
+                                                        {txn.from} <span style={{ color: '#94a3b8', fontWeight: 'bold' }}>→</span> {txn.to}
                                                     </div>
                                                     <div className="cp-item-desc" style={{ marginTop: '0.4rem', display: 'flex', gap: '1rem' }}>
                                                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Ticket01Icon size={14} /> Standard Journey</span>
@@ -541,7 +573,7 @@ const MyAccount = ({ user, onLogout, onNavigate }) => {
                                     <div className="txn-info-left">
                                         <div className="icon-circle"><Train01Icon size={20} color="#0284c7" /></div>
                                         <div className="txn-route-info">
-                                            <div className="route-title">{txn.from} <ArrowRight01Icon size={14} style={{ color: '#94a3b8', margin: '0 4px' }} /> {txn.to}</div>
+                                            <div className="route-title">{txn.from} <span style={{ color: '#94a3b8', margin: '0 4px', fontWeight: 'bold' }}>→</span> {txn.to}</div>
                                             <div className="txn-subtext">{txn.dateTime} &bull; {txn.method} &bull; ID: {txn.id}</div>
                                         </div>
                                     </div>

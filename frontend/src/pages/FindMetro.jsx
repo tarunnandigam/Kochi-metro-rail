@@ -20,7 +20,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
     const [availableTrains, setAvailableTrains] = useState([]);
     const [liveTrains, setLiveTrains] = useState([]);
     const [errors, setErrors] = useState({});
-    const [ticketType, setTicketType] = useState('single');
+    const [ticketType, setTicketType] = useState('card');
     const [selectedService, setSelectedService] = useState('all');
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTrain, setSelectedTrain] = useState(null);
@@ -31,6 +31,7 @@ function FindMetro({ onNavigate, user, onLogout }) {
     const resultsRef = useRef(null);
     const [showJourneySummary, setShowJourneySummary] = useState(false);
     const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+    const [isPaying, setIsPaying] = useState(false);
 
     // Load metro lines and stations on component mount
     useEffect(() => {
@@ -370,11 +371,11 @@ function FindMetro({ onNavigate, user, onLogout }) {
             };
 
             const payload = {
-                fromStation: ticketType === 'single' ? getCodeFor(trainToBook.fromStation) : undefined,
-                toStation: ticketType === 'single' ? getCodeFor(trainToBook.toStation) : undefined,
+                fromStation: getCodeFor(trainToBook.fromStation),
+                toStation: getCodeFor(trainToBook.toStation),
                 passengerName: (user && user.fullName) || '',
                 passengerPhone: '',
-                type: ticketType,
+                type: 'single',
                 passengers: Number(passengers),
                 email: (user && user.email) || undefined
             };
@@ -392,12 +393,13 @@ function FindMetro({ onNavigate, user, onLogout }) {
                         bookingId: data.bookingId,
                         fare: data.fare,
                         ticketUrl: data.ticketUrl,
-                        fromStation: ticketType === 'single' ? (trainToBook.fromStation || payload.fromStation) : '',
-                        toStation: ticketType === 'single' ? (trainToBook.toStation || payload.toStation) : '',
+                        fromStation: trainToBook.fromStation || payload.fromStation,
+                        toStation: trainToBook.toStation || payload.toStation,
                         passengerName: payload.passengerName,
                         email: payload.email,
                         type: payload.type,
                         date: new Date().toLocaleString(),
+                        createdAt: Date.now(),
                         status: 'Success',
                         method: 'Card/UPI'
                     };
@@ -425,12 +427,13 @@ function FindMetro({ onNavigate, user, onLogout }) {
                 bookingId: mockData.bookingId,
                 fare: mockData.fare,
                 ticketUrl: mockData.ticketUrl,
-                fromStation: ticketType === 'single' ? (trainToBook.fromStation || payload.fromStation) : '',
-                toStation: ticketType === 'single' ? (trainToBook.toStation || payload.toStation) : '',
+                fromStation: trainToBook.fromStation || payload.fromStation,
+                toStation: trainToBook.toStation || payload.toStation,
                 passengerName: payload.passengerName,
                 email: payload.email,
                 type: payload.type,
                 date: new Date().toLocaleString(),
+                createdAt: Date.now(),
                 status: 'Success',
                 method: 'Card/UPI'
             };
@@ -465,196 +468,172 @@ function FindMetro({ onNavigate, user, onLogout }) {
     if ((showJourneySummary || showPaymentOptions) && searchResults.length > 0) {
         const route = searchResults[0];
         const routeFare = route.fare || 10;
-        const totalFare = (routeFare * Number(passengers)).toFixed(0);
-        const distance = ((route.numberOfStops || 1) * 1.24).toFixed(2);
+        const activeTrain = selectedTrain || {
+            ...route,
+            fare: routeFare,
+            estimatedTime: route.estimatedTime || route.time || 15,
+            numberOfStops: route.numberOfStops || route.stops || 3
+        };
 
         return (
-            <div className="fm-journey-summary-page">
-                <div className="fm-summary-container">
-                    <button className="fm-back-btn" onClick={() => {
-                        if (showPaymentOptions) {
-                            setShowPaymentOptions(false);
-                            setShowJourneySummary(true);
-                        } else {
-                            setShowJourneySummary(false);
-                        }
-                    }}>
-                        ← {showPaymentOptions ? 'Back to Summary' : 'Back to Search'}
-                    </button>
+            <div className="fm-journey-summary-page" style={{ padding: '2rem 1rem', display: 'flex', justifyContent: 'center', background: '#f4f6f8', minHeight: '80vh' }}>
+                <div className="ts-modal-container" style={{ maxWidth: '1000px', width: '100%', background: 'transparent' }}>
+                    <div className="ts-header" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center' }}>
+                        <button className="ts-close-btn" onClick={() => { setShowJourneySummary(false); setShowPaymentOptions(false); }} style={{ fontSize: '1rem', background: '#e2e8f0', padding: '0.5rem 1rem', borderRadius: '8px', color: '#334155', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            Back to Search
+                        </button>
+                    </div>
 
-                    {showJourneySummary && (
-                        <div className="fm-summary-card">
-                            <div className="fm-summary-header">
-                                <h3>JOURNEY SUMMARY</h3>
-                            </div>
-
-                            <div className="fm-stations-row">
-                                <div className="fm-station-col">
-                                    <span className="fm-st-label">FROM STATION</span>
-                                    <span className="fm-st-code" style={{ color: '#4c1d95' }}>{route.fromStation.substring(0, 4).toUpperCase()}</span>
-                                    <span className="fm-st-name">{route.fromStation}</span>
+                    <div className="ts-content">
+                        {/* LEFT COLUMN - Journey Details */}
+                        <div className="ts-left-col">
+                            <div className="ts-journey-card">
+                                <div className="ts-trip-status">
+                                    <span className="ts-active-text">● ACTIVE TRIP</span>
+                                    <span className="ts-dot">•</span>
+                                    <span className="ts-line-name">{activeTrain.lineName}</span>
                                 </div>
-                                <div className="fm-st-arrow">➔</div>
-                                <div className="fm-station-col" style={{ alignItems: 'flex-end', textAlign: 'right' }}>
-                                    <span className="fm-st-label">TO STATION</span>
-                                    <span className="fm-st-code" style={{ color: '#4c1d95' }}>{route.toStation.substring(0, 4).toUpperCase()}</span>
-                                    <span className="fm-st-name">{route.toStation}</span>
+
+                                <div className="ts-route-big">
+                                    <div className="ts-station">{activeTrain.fromStation}</div>
+                                    <div className="ts-arrow">➔</div>
+                                    <div className="ts-station">{activeTrain.toStation}</div>
                                 </div>
-                            </div>
 
-                            <div className="fm-date-row">
-                                <span className="fm-st-label">DATE OF DEPARTURE</span>
-                                <span className="fm-date-val">
-                                    {new Date(tripDate || new Date()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })},{' '}
-                                    {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                            </div>
-
-                            <div className="fm-dashed-divider"></div>
-
-                            <div className="fm-warning-box">
-                                This ticket is valid for the day of purchase.<br />
-                                QR tickets are non-refundable.<br />
-                                Metro Journey should be completed within 2 Hrs after entry.
-                            </div>
-
-                            <div className="fm-stats-box">
-                                <div className="fm-stat">
-                                    <div className="fm-stat-icon text-green">📍</div>
-                                    <div className="fm-stat-info">
-                                        <span className="fm-stat-lbl">Distance</span>
-                                        <span className="fm-stat-val">{distance} km</span>
+                                <div className="ts-time-info">
+                                    <div className="ts-time-block">
+                                        <span className="ts-time-label">Departure</span>
+                                        <span className="ts-time-val">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
-                                </div>
-                                <div className="fm-stat">
-                                    <div className="fm-stat-icon text-teal">🚆</div>
-                                    <div className="fm-stat-info">
-                                        <span className="fm-stat-lbl">Stations</span>
-                                        <span className="fm-stat-val">{route.numberOfStops || 1}</span>
-                                    </div>
-                                </div>
-                                <div className="fm-stat">
-                                    <div className="fm-stat-icon text-blue">↑</div>
-                                    <div className="fm-stat-info">
-                                        <span className="fm-stat-lbl">Journey</span>
-                                        <span className="fm-stat-val">One way</span>
+                                    <div className="ts-time-block">
+                                        <span className="ts-time-label">Expected Arrival</span>
+                                        <span className="ts-time-val">{new Date(Date.now() + (activeTrain.estimatedTime || 15) * 60000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="fm-pax-row">
-                                <div className="fm-pax-left">
-                                    <span className="fm-pax-lbl">Passengers</span>
-                                    <span className="fm-pax-sub">You can add up to 6 peoples</span>
+                            <div className="ts-middle-cards">
+                                <div className="ts-traveler-card">
+                                    <div className="ts-traveler-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    </div>
+                                    <div className="ts-traveler-info">
+                                        <label>Traveler Detail</label>
+                                        <input
+                                            type="text"
+                                            className="ts-name-input"
+                                            value={user?.fullName || 'John Doe'}
+                                            readOnly
+                                            placeholder="Enter your name"
+                                        />
+                                        <div className="ts-passenger-id">ID: {user?.id || 'Pass-X91A1'}</div>
+                                    </div>
                                 </div>
-                                <div className="fm-pax-controls">
-                                    <button type="button" onClick={() => setPassengers(p => Math.max(1, Number(p) - 1))}>−</button>
-                                    <span>{passengers}</span>
-                                    <button type="button" onClick={() => setPassengers(p => Math.min(6, Number(p) + 1))}>+</button>
+
+                                <div className="ts-tickets-card">
+                                    <div className="ts-tickets-label">Number of Tickets</div>
+                                    <div className="ts-counter-row">
+                                        <div className="ts-counter">
+                                            <button className="ts-counter-btn" onClick={() => setPassengers(p => Math.max(1, Number(p) - 1))}>−</button>
+                                            <span className="ts-count-val">{passengers}</span>
+                                            <button className="ts-counter-btn" onClick={() => setPassengers(p => Math.min(6, Number(p) + 1))}>+</button>
+                                        </div>
+                                        <div className="ts-unit-price">
+                                            <div className="ts-price-label">Base Fare</div>
+                                            <div className="ts-price-val">₹{routeFare}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="fm-dashed-divider"></div>
+                        {/* RIGHT COLUMN - Payments */}
+                        <div className="ts-right-col">
+                            <div className="ts-payment-card">
+                                <h3 className="ts-payment-title">Payment Method</h3>
 
-                            <div className="fm-price-row">
-                                <div className="fm-price-left">
-                                    <span className="fm-price-val">₹ {totalFare}</span>
-                                    <span className="fm-price-sub">Inclusive of all taxes</span>
+                                <div className="ts-payment-options">
+                                    <div className={`ts-pm-option ${ticketType === 'card' ? 'active' : ''}`} onClick={() => setTicketType('card')}>
+                                        <div className="ts-radio">
+                                            <div className="ts-radio-inner"></div>
+                                        </div>
+                                        <div className="ts-pm-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        </div>
+                                        <span className="ts-pm-name">Credit/Debit Card</span>
+                                    </div>
+
+                                    <div className={`ts-pm-option ${ticketType === 'wallet' ? 'active' : ''}`} onClick={() => setTicketType('wallet')}>
+                                        <div className="ts-radio">
+                                            <div className="ts-radio-inner"></div>
+                                        </div>
+                                        <div className="ts-pm-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                        </div>
+                                        <span className="ts-pm-name">Digital Wallet</span>
+                                    </div>
+
+                                    <div className={`ts-pm-option ${ticketType === 'upi' ? 'active' : ''}`} onClick={() => setTicketType('upi')}>
+                                        <div className="ts-radio">
+                                            <div className="ts-radio-inner"></div>
+                                        </div>
+                                        <div className="ts-pm-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+                                        </div>
+                                        <span className="ts-pm-name">UPI / QR Pay</span>
+                                    </div>
                                 </div>
-                                <button className="fm-proceed-btn" onClick={() => {
+
+                                <div className="ts-summary-totals">
+                                    <div className="ts-total-row">
+                                        <span>Subtotal</span>
+                                        <span>₹{routeFare * Number(passengers)}</span>
+                                    </div>
+                                    <div className="ts-total-row">
+                                        <span>Booking Fee</span>
+                                        <span>₹0</span>
+                                    </div>
+                                    <div className="ts-total-row ts-grand-total">
+                                        <span>Grand Total</span>
+                                        <span className="ts-grand-val">₹{routeFare * Number(passengers)}</span>
+                                    </div>
+                                </div>
+
+                                <button className="ts-pay-btn" disabled={isPaying || loading} style={{ position: 'relative' }} onClick={async () => {
                                     if (!user) {
                                         alert("Please sign in to proceed with booking.");
                                         onNavigate("signin");
                                         return;
                                     }
-                                    setShowJourneySummary(false);
-                                    setShowPaymentOptions(true);
+                                    setIsPaying(true);
+
+                                    // Random delay between 4000ms and 6000ms
+                                    const delay = Math.floor(Math.random() * 2000) + 4000;
+                                    await new Promise(res => setTimeout(res, delay));
+
+                                    try {
+                                        await submitBooking(activeTrain);
+                                    } finally {
+                                        setIsPaying(false);
+                                    }
                                 }}>
-                                    PROCEED TO PAY
+                                    {isPaying ? 'Processing Payment...' : `Pay ₹${routeFare * Number(passengers)}`}
                                 </button>
+                                <div className="ts-secure-text">🔒 256-bit SSL Secured Payment</div>
+                            </div>
+
+                            <div className="ts-help-card">
+                                <div className="ts-help-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                </div>
+                                <div className="ts-help-text">
+                                    <strong>Need Help?</strong>
+                                    <p>Contact 24/7 customer support for payment issues or delays.</p>
+                                </div>
                             </div>
                         </div>
-                    )}
-
-                    {showJourneySummary && !showPaymentOptions && (
-                        <div className="fm-payment-method-card" onClick={() => {
-                            setShowJourneySummary(false);
-                            setShowPaymentOptions(true);
-                        }}>
-                            <span className="fm-pm-lbl">SELECT PAYMENT METHOD</span>
-                            <span className="fm-pm-icon">˅</span>
-                        </div>
-                    )}
-
-                    {showPaymentOptions && (
-                        <>
-                            <div className="fm-summary-card" style={{ padding: '1.5rem 2rem' }}>
-                                <div className="fm-summary-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
-                                    <h3 style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 800, fontFamily: "'Montserrat', sans-serif" }}>JOURNEY SUMMARY</h3>
-                                </div>
-
-                                <div className="fm-stations-row" style={{ marginBottom: '1rem' }}>
-                                    <div className="fm-station-col">
-                                        <span className="fm-st-label" style={{ fontSize: '0.75rem' }}>FROM STATION</span>
-                                        <span className="fm-st-code" style={{ fontSize: '1.8rem', color: '#4c1d95' }}>{route.fromStation.substring(0, 4).toUpperCase()}</span>
-                                        <span className="fm-st-name" style={{ fontSize: '0.85rem' }}>{route.fromStation}</span>
-                                    </div>
-                                    <div className="fm-st-arrow" style={{ fontSize: '1.2rem', marginTop: '1rem' }}>➔</div>
-                                    <div className="fm-station-col" style={{ alignItems: 'flex-end', textAlign: 'right' }}>
-                                        <span className="fm-st-label" style={{ fontSize: '0.75rem' }}>TO STATION</span>
-                                        <span className="fm-st-code" style={{ fontSize: '1.8rem', color: '#4c1d95' }}>{route.toStation.substring(0, 4).toUpperCase()}</span>
-                                        <span className="fm-st-name" style={{ fontSize: '0.85rem' }}>{route.toStation}</span>
-                                    </div>
-                                </div>
-
-                                <div className="fm-dashed-divider" style={{ margin: '1.2rem 0' }}></div>
-
-                                <div className="fm-price-row" style={{ alignItems: 'flex-start' }}>
-                                    <div className="fm-price-left">
-                                        <span className="fm-st-label" style={{ fontSize: '0.75rem', marginBottom: '0.2rem' }}>DATE OF DEPARTURE</span>
-                                        <span className="fm-date-val" style={{ fontSize: '1rem', color: '#312e81' }}>
-                                            {new Date(tripDate || new Date()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })},{' '}
-                                            {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <span className="fm-price-val" style={{ fontSize: '1.6rem' }}>₹ {totalFare}</span>
-                                        <div className="fm-price-sub" style={{ fontSize: '0.75rem' }}>Inclusive of all taxes</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="fm-summary-card payment-options-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <span className="fm-pm-lbl" style={{ fontWeight: 800, color: '#334155', fontSize: '1rem', textTransform: 'uppercase' }}>SELECT PAYMENT METHOD</span>
-                                    <span className="fm-pm-icon" style={{ transform: 'rotate(180deg)', fontWeight: 800, color: '#334155' }}>˅</span>
-                                </div>
-
-                                <div className="fm-payment-option" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{ width: '40px', height: '40px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                                            <span style={{ fontWeight: 800, color: '#334155', fontSize: '0.95rem' }}>BillDesk</span>
-                                            <span style={{ fontSize: '0.85rem', color: '#0d9488', fontWeight: 600 }}>Pay with UPI, Card, Net banking Etc.</span>
-                                        </div>
-                                    </div>
-                                    <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#0d9488', boxShadow: 'inset 0 0 0 4px #fff', border: '2px solid #0d9488' }}></div>
-                                </div>
-
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-                                    <button className="fm-proceed-btn" style={{ borderRadius: '10px', padding: '0.8rem 2rem', fontSize: '1.1rem', background: '#0ea5e9', fontWeight: 800, fontFamily: 'inherit' }} onClick={() => {
-                                        const finalTrain = { ...route, fare: routeFare * Number(passengers) };
-                                        setSelectedTrain(finalTrain);
-                                        submitBooking(finalTrain);
-                                    }}>
-                                        Make payment
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-                    )}
+                    </div>
                 </div>
             </div>
         );
@@ -816,8 +795,14 @@ function FindMetro({ onNavigate, user, onLogout }) {
                                     }}>
                                         <span style={{ fontSize: '1.2rem' }}>↻</span> RESET
                                     </button>
-                                    <button type="submit" className="tp-submit-btn" disabled={loading}>
-                                        {loading ? 'Searching...' : 'PLAN JOURNEY'}
+                                    <button type="submit" className="tp-submit-btn" disabled={loading} onClick={(e) => {
+                                        if (!user) {
+                                            e.preventDefault();
+                                            alert("Please sign in to plan a journey.");
+                                            onNavigate("signin");
+                                        }
+                                    }}>
+                                        {loading ? 'Searching...' : (!user ? 'SIGN IN TO PLAN' : 'PLAN JOURNEY')}
                                     </button>
                                 </div>
                             </form>
@@ -896,97 +881,33 @@ function FindMetro({ onNavigate, user, onLogout }) {
                 </div>
             </div>
 
-
-
-
-            {/* Booking Modal */}
-            {showBookingModal && selectedTrain && (
-                <div className="modal-overlay" onClick={closeBookingModal}>
-                    <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>📱 Book Your Ticket</h2>
-                            <button className="btn-close" onClick={closeBookingModal}>✕</button>
-                        </div>
-
-                        <div className="modal-content">
-                            <div className="booking-summary">
-                                <h3>Journey Details</h3>
-                                <p><strong>Line:</strong> {selectedTrain.lineName}</p>
-                                <p><strong>From:</strong> {selectedTrain.fromStation}</p>
-                                <p><strong>To:</strong> {selectedTrain.toStation}</p>
-                                <p><strong>⏱️ Duration:</strong> {selectedTrain.estimatedTime} minutes</p>
-                                <p><strong>🛑 Stops:</strong> {selectedTrain.numberOfStops}</p>
-                                <p><strong>💰 Fare:</strong> ₹{selectedTrain.fare}</p>
-                            </div>
-
-                            <div className="booking-form">
-                                <div className="form-group">
-                                    <label>Ticket Type *</label>
-                                    <select value={ticketType} onChange={(e) => setTicketType(e.target.value)}>
-                                        <option value="single">🎫 Single Journey Ticket</option>
-                                        <option value="day-pass">📅 Day Pass (Unlimited)</option>
-                                        <option value="weekly-pass">📆 Weekly Pass</option>
-                                        <option value="monthly-pass">📊 Monthly Pass</option>
-                                        <option value="smart-card">💳 Smart Card</option>
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Station Services *</label>
-                                    <select value={selectedService} onChange={(e) => setSelectedService(e.target.value)}>
-                                        <option value="all">✓ All Services</option>
-                                        <option value="atm">🏧 ATM Available</option>
-                                        <option value="food">🍔 Food Stalls</option>
-                                        <option value="wifi">📶 WiFi Available</option>
-                                        <option value="lostandfound">📦 Lost & Found</option>
-                                        <option value="helpdesk">🆘 Help Desk</option>
-                                    </select>
-                                </div>
-
-                                <div className="price-breakdown">
-                                    <h4>Price Breakdown</h4>
-                                    <div className="price-row">
-                                        <span>Base Fare:</span>
-                                        <span>₹{selectedTrain.fare}</span>
-                                    </div>
-                                    {ticketType === 'day-pass' && (
-                                        <div className="price-row">
-                                            <span>Day Pass Surcharge:</span>
-                                            <span>₹50</span>
-                                        </div>
-                                    )}
-                                    {ticketType === 'weekly-pass' && (
-                                        <div className="price-row">
-                                            <span>Weekly Pass Price:</span>
-                                            <span>₹300</span>
-                                        </div>
-                                    )}
-                                    {ticketType === 'monthly-pass' && (
-                                        <div className="price-row">
-                                            <span>Monthly Pass Price:</span>
-                                            <span>₹600</span>
-                                        </div>
-                                    )}
-                                    {ticketType === 'smart-card' && (
-                                        <div className="price-row">
-                                            <span>Smart Card (one-time):</span>
-                                            <span>₹100</span>
-                                        </div>
-                                    )}
-
-                                    <div className="price-row total">
-                                        <span>Total:</span>
-                                        <span className="total-price">₹{computeDisplayedTotal()}</span>
-                                    </div>
-                                </div>
-
-                                <div className="modal-buttons">
-                                    <button className="btn-cancel" onClick={closeBookingModal}>Cancel</button>
-                                    <button className="btn-submit" onClick={submitBooking}>✓ Confirm</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {/* Payment Processing Overlay */}
+            {isPaying && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(8px)',
+                    zIndex: 9999, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', color: 'white'
+                }}>
+                    <style>
+                        {`
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+                        `}
+                    </style>
+                    <div style={{
+                        width: '64px', height: '64px', borderRadius: '50%',
+                        border: '4px solid rgba(255,255,255,0.1)',
+                        borderTopColor: '#0ea5e9',
+                        animation: 'spin 1s linear infinite',
+                        marginBottom: '1.5rem'
+                    }} />
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
+                        Processing Payment
+                    </h2>
+                    <p style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
+                        Please wait while we confirm your transaction securely. Do not close or refresh this page.
+                    </p>
                 </div>
             )}
         </div>

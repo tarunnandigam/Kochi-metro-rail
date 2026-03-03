@@ -343,8 +343,8 @@ function Dashboard({ user, onLogout, onNavigate }) {
                         const data = await resp.json();
                         apiData = data.map(t => ({
                             id: t.bookingId || 'TXN',
-                            from: t.fromStation || 'Network',
-                            to: t.toStation || 'Network',
+                            from: t.fromStation || t.from || 'Network',
+                            to: t.toStation || t.to || 'Network',
                             date: new Date(t.createdAt).toLocaleDateString(),
                             fare: t.fare || 0,
                             status: t.status || 'Completed'
@@ -360,20 +360,30 @@ function Dashboard({ user, onLogout, onNavigate }) {
             const filteredTxns = storedTxns.filter(t => user && (t.email === user.email || t.passengerName === user.fullName));
             const localData = filteredTxns.map(t => ({
                 id: t.bookingId || 'TXN',
-                from: t.fromStation || 'Network',
-                to: t.toStation || 'Network',
+                from: t.fromStation || t.from || 'Network',
+                to: t.toStation || t.to || 'Network',
                 date: new Date(t.date || new Date()).toLocaleDateString(),
                 fare: t.fare || 0,
                 status: t.status || 'Completed'
             }));
 
             // Combine filtering duplicates by bookingId
-            const combined = [...localData];
-            apiData.forEach(apiTxn => {
-                if (!combined.find(c => c.id === apiTxn.id)) {
-                    combined.push(apiTxn);
+            const uniqueMap = new Map();
+            localData.forEach(t => {
+                if (t.id && t.id !== 'TXN' && !uniqueMap.has(t.id)) {
+                    uniqueMap.set(t.id, t);
+                } else if (!t.id || t.id === 'TXN') {
+                    uniqueMap.set('TXN-' + Math.random(), t);
                 }
             });
+            apiData.forEach(t => {
+                if (t.id && t.id !== 'TXN' && !uniqueMap.has(t.id)) {
+                    uniqueMap.set(t.id, t);
+                } else if (!t.id || t.id === 'TXN') {
+                    uniqueMap.set('TXN-' + Math.random(), t);
+                }
+            });
+            const combined = Array.from(uniqueMap.values());
 
             // Make sure newer tickets are first
             combined.sort((a, b) => new Date(b.date) - new Date(a.date));

@@ -5,7 +5,6 @@ import Header from './components/Layout/Header';
 import HomePage from './pages/HomePage';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
-import SearchMetro from './pages/SearchMetro';
 import Dashboard from './pages/Dashboard';
 import FindMetro from './pages/FindMetro';
 import TicketView from './pages/TicketView';
@@ -64,7 +63,6 @@ function AppInner() {
             dashboard: '/dashboard',
             findmetro: '/findmetro',
             ticket: '/ticket',
-            search: '/search',
             recharge: '/recharge',
             myaccount: '/myaccount',
             help: '/help',
@@ -101,7 +99,6 @@ function AppInner() {
                     <Route path="/dashboard" element={<Dashboard user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
                     <Route path="/findmetro" element={<FindMetro user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
                     <Route path="/ticket" element={<TicketView onNavigate={onNavigate} />} />
-                    <Route path="/search" element={<SearchMetro onLogout={handleLogout} user={user} onNavigate={onNavigate} />} />
                     <Route path="/recharge" element={<Recharge onNavigate={onNavigate} />} />
                     <Route path="/myaccount" element={<MyAccount user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
                     <Route path="/station-master" element={<StationMasterDashboard user={user} onLogout={handleLogout} onNavigate={onNavigate} />} />
