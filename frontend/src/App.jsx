@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Analytics } from "@vercel/analytics/next"
 import './App.css';
 import Header from './components/Layout/Header';
 import HomePage from './pages/HomePage';
