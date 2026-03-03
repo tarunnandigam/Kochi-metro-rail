@@ -102,24 +102,9 @@ app.get('/api/welcome', (req, res) => {
 });
 
 // Note: frontend static serving removed to keep backend and frontend running on separate ports
-
 const PORT = parseInt(process.env.PORT, 10) || 5000;
 
-const startServer = (port) => {
-    const server = app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-        console.log(`KMRL Metro System API is ready`);
-    });
-
-    server.on('error', (err) => {
-        if (err && err.code === 'EADDRINUSE') {
-            console.warn(`Port ${port} in use, trying port ${port + 1}...`);
-            setTimeout(() => startServer(port + 1), 500);
-        } else {
-            console.error('Server error:', err);
-            process.exit(1);
-        }
-    });
-};
-
-startServer(PORT);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`KMRL Metro System API is ready`);
+});
