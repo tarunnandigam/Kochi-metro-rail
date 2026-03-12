@@ -214,7 +214,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
         } else {
             const filtered = allStations.filter(station =>
                 station.name.toLowerCase().includes(value.toLowerCase()) ||
-                station.code.toLowerCase().includes(value.toLowerCase())
+                (station.code || '').toLowerCase().includes(value.toLowerCase())
             );
             setFromSuggestions(filtered);
         }
@@ -230,7 +230,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
         } else {
             const filtered = allStations.filter(station =>
                 station.name.toLowerCase().includes(value.toLowerCase()) ||
-                station.code.toLowerCase().includes(value.toLowerCase())
+                (station.code || '').toLowerCase().includes(value.toLowerCase())
             );
             setToSuggestions(filtered);
         }
@@ -661,7 +661,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                         <h2>💰 Station to Station Fare Calculator</h2>
                         <div className="fare-calculator-card">
                             <div className="fare-form">
-                                <div className="form-group" ref={fromDropdownRef}>
+                                <div className="form-group" ref={fromDropdownRef} style={{ zIndex: showFromDropdown ? 10 : 1, position: 'relative' }}>
                                     <label>From Station</label>
                                     <div className="input-wrapper">
                                         <input
@@ -696,7 +696,7 @@ function Dashboard({ user, onLogout, onNavigate }) {
                                     </div>
                                 </div>
 
-                                <div className="form-group" ref={toDropdownRef}>
+                                <div className="form-group" ref={toDropdownRef} style={{ zIndex: showToDropdown ? 10 : 1, position: 'relative' }}>
                                     <label>To Station</label>
                                     <div className="input-wrapper">
                                         <input

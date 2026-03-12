@@ -37,7 +37,6 @@ A comprehensive, full-stack **Metro Management System** designed for Kochi Metro
 - **React (v18)** powered by **Vite**
 - **React Router** for declarative navigation
 - **React Leaflet** for map components
-- **@stripe/react-stripe-js** for client-side payment handling
 - **Axios** for API requests
 - **Hugeicons** for modern, lightweight iconography
 
@@ -45,10 +44,8 @@ A comprehensive, full-stack **Metro Management System** designed for Kochi Metro
 - **Node.js** & **Express** Server
 - **MongoDB** with **Mongoose** ORM
 - **JSON Web Tokens (JWT)** & **bcryptjs** for secure authentication
-- **Stripe API** for payment processing
 - **PDFKit** for automated ticket generation
 - **QRCode** for ticket scanning endpoints
-- **Nodemailer** for email notifications
 
 ---
 
@@ -57,7 +54,6 @@ A comprehensive, full-stack **Metro Management System** designed for Kochi Metro
 ### Prerequisites
 - Node.js (v16 or higher)
 - MongoDB instance (Local or Atlas)
-- Stripe Account (for payment testing)
 
 ### Installation
 
@@ -77,7 +73,6 @@ A comprehensive, full-stack **Metro Management System** designed for Kochi Metro
    PORT=5000
    MONGODB_URI=mongodb://127.0.0.1:27017/kmrl_metro
    JWT_SECRET=your_jwt_secret_key
-   STRIPE_SECRET_KEY=your_stripe_secret_key
    SMTP_HOST=your_smtp_host
    SMTP_PORT=587
    SMTP_USER=your_smtp_user

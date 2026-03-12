@@ -162,6 +162,8 @@ function HomePage({ onNavigate }) {
             if (response.ok) {
                 const data = await response.json();
                 setAllStations(data);
+            } else {
+                setAllStations(fareStationsData || []);
             }
         } catch (error) {
             console.error('Error fetching stations:', error);
@@ -1192,7 +1194,7 @@ function HomePage({ onNavigate }) {
                             {/* Inputs Group */}
                             <div className="fare-inputs-group">
                                 {/* From Input */}
-                                <div className="fare-input-row" ref={fareFromRef}>
+                                <div className="fare-input-row" ref={fareFromRef} style={{ zIndex: showFareFromDropdown ? 10 : 1 }}>
                                     <label>From</label>
                                     <input
                                         type="text"
@@ -1234,7 +1236,7 @@ function HomePage({ onNavigate }) {
                                 </button>
 
                                 {/* To Input */}
-                                <div className="fare-input-row" ref={fareToRef}>
+                                <div className="fare-input-row" ref={fareToRef} style={{ zIndex: showFareToDropdown ? 10 : 1 }}>
                                     <label>To</label>
                                     <input
                                         type="text"
