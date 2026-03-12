@@ -1,11 +1,18 @@
 [
-  { "id": 1, "name": "Aluva", "code": "ALV", "location": "Aluva", "area": "Ernakulam" },
-  { "id": 2, "name": "Pulinchodu", "code": "PUL", "location": "Pulinchodu", "area": "Ernakulam" },
-  { "id": 3, "name": "Companypady", "code": "COM", "location": "Kochi", "area": "Ernakulam" },
-  { "id": 4, "name": "SN Junction", "code": "SNJ", "location": "Kochi", "area": "Ernakulam" },
-  { "id": 5, "name": "Ambattukavu", "code": "AMB", "location": "Kochi", "area": "Ernakulam" },
-  { "id": 6, "name": "Kakkanad", "code": "KAK", "location": "Kakkanad", "area": "Ernakulam" },
-  { "id": 7, "name": "Palarivattom", "code": "PAL", "location": "Kochi", "area": "Ernakulam" },
-  { "id": 8, "name": "Edapally", "code": "EDA", "location": "Edapally", "area": "Ernakulam" },
-  { "id": 9, "name": "M.G. Road", "code": "MGR", "location": "M G Road", "area": "Ernakulam" }
+  { "id": 1, "name": "Aluva", "code": "ALV", "location": "Aluva", "area": "Ernakulam", "order": 1 },
+  { "id": 2, "name": "Pulinchodu", "code": "PUL", "location": "Pulinchodu", "area": "Ernakulam", "order": 2 },
+  { "id": 3, "name": "Companypady", "code": "COM", "location": "Kochi", "area": "Ernakulam", "order": 3 },
+  { "id": 4, "name": "SN Junction", "code": "SNJ", "location": "Kochi", "area": "Ernakulam", "order": 4 },
+  { "id": 5, "name": "Ambattukavu", "code": "AMB", "location": "Kochi", "area": "Ernakulam", "order": 5 },
+  { "id": 6, "name": "Kakkanad", "code": "KAK", "location": "Kakkanad", "area": "Ernakulam", "order": 6 },
+  { "id": 7, "name": "Palarivattom", "code": "PAL", "location": "Kochi", "area": "Ernakulam", "order": 7 },
+  { "id": 8, "name": "Edapally", "code": "EDA", "location": "Edapally", "area": "Ernakulam", "order": 8 },
+  { "id": 9, "name": "Muttom", "code": "MUT", "location": "Muttom", "area": "Ernakulam", "order": 9 },
+  { "id": 10, "name": "Kaloor", "code": "KAL", "location": "Kaloor", "area": "Ernakulam", "order": 10 },
+  { "id": 11, "name": "Lissie", "code": "LIS", "location": "Lissie", "area": "Ernakulam", "order": 11 },
+  { "id": 12, "name": "M.G. Road", "code": "MGR", "location": "M G Road", "area": "Ernakulam", "order": 12 },
+  { "id": 13, "name": "Ernakulam South", "code": "ERS", "location": "Ernakulam South", "area": "Ernakulam", "order": 13 },
+  { "id": 14, "name": "Vyttila", "code": "VYT", "location": "Vyttila", "area": "Ernakulam", "order": 14 },
+  { "id": 15, "name": "Thykoodam", "code": "THY", "location": "Thykoodam", "area": "Ernakulam", "order": 15 },
+  { "id": 16, "name": "Seaport", "code": "SEA", "location": "Seaport", "area": "Ernakulam", "order": 16 }
 ]

@@ -9,7 +9,7 @@ function HomePage({ onNavigate }) {
     const [metroLines, setMetroLines] = useState([]);
     const [fromStation, setFromStation] = useState('');
     const [toStation, setToStation] = useState('');
-    const [allStations, setAllStations] = useState([]);
+    const [allStations, setAllStations] = useState(fareStationsData || []);
     const [fromSuggestions, setFromSuggestions] = useState([]);
     const [toSuggestions, setToSuggestions] = useState([]);
     const [showFromDropdown, setShowFromDropdown] = useState(false);
