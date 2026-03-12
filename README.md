@@ -109,8 +109,8 @@ The application automatically provisions default users on the first run for test
 | Role | Username | Password |
 | :--- | :--- | :--- |
 | **Customer** | `testuser` | `Test@1234` |
-| **Station Master** | `stationmaster` | `MASTER123` |
-| **KMRL Officer** | `kmrlofficer` | `OFFICER456` |
+
+Create the accont and Use this Amazing Interface.......
 
 Navigate to `http://localhost:5173` in your browser to start exploring the system.
 
